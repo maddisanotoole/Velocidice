@@ -1,4 +1,4 @@
-import { type DieStatusType, type Die, DieStatus } from "../types";
+import { type Die, DieStatus } from "../types";
 
 interface DieProps {
   onClick: () => void;
