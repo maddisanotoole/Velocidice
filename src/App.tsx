@@ -1,34 +1,70 @@
 import { useState } from "react";
-import { rollDie } from "./game/dice";
+import { initializeDice, rollDie } from "./game/dice";
+import Button from "./components/button";
+import { DieStatus, type Die } from "./types";
+import { DieFace } from "./components/dice";
 
 function App() {
-  const [dice, setDice] = useState([1, 1, 1, 1, 1, 1]);
+  const [dice, setDice] = useState<Die[]>(initializeDice());
+
+  function holdDice() {
+    setDice((prev) =>
+      prev.map((die) =>
+        die.status === DieStatus.SELECTED
+          ? { ...die, status: DieStatus.HELD }
+          : die,
+      ),
+    );
+  }
+  function selectDie(id: number) {
+    setDice((prev) =>
+      prev.map((die) =>
+        die.id === id
+          ? {
+              ...die,
+              status:
+                die.status === DieStatus.HELD
+                  ? die.status
+                  : die.status === DieStatus.SELECTED
+                    ? DieStatus.ACTIVE
+                    : DieStatus.SELECTED,
+            }
+          : die,
+      ),
+    );
+  }
 
   function rollDice() {
-    const newDice = Array.from({ length: 6 }, () => rollDie());
+    const newDice: Die[] = dice.map((d) => {
+      if (d.status == DieStatus.ACTIVE) {
+        d.value = rollDie();
+      }
+      return d;
+    });
 
     setDice(newDice);
   }
+
+  function resetGame() {
+    setDice(initializeDice());
+  }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
-      <body>
-        <div className="flex gap-4">
-          {dice.map((value, index) => (
-            <div
-              key={index}
-              className="w-16 h-16 bg-white text-black rounded-xl flex items-center justify-center text-2xl font-bold"
-            >
-              {value}
-            </div>
-          ))}
-        </div>
-        <button
-          onClick={rollDice}
-          className="bg-green-500 px-6 py-3 rounded-xl font-bold"
-        >
-          Roll Dice
-        </button>
-      </body>
+      <div className="flex gap-4">
+        {dice.map((die) => (
+          <DieFace onClick={() => selectDie(die.id)} die={die}></DieFace>
+        ))}
+      </div>
+
+      <Button onClick={holdDice} color="blue">
+        Hold
+      </Button>
+      <Button onClick={rollDice} color="green">
+        Roll Dice
+      </Button>
+      <Button onClick={resetGame} color="yellow">
+        Reset
+      </Button>
     </div>
   );
 }
