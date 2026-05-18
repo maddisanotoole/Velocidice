@@ -11,7 +11,7 @@ npm run dev
 
 ## Dev Steps
 
-Phase 1
+Phase 1 - COMPLETE
 
 - Dice rendering
 - Roll button
@@ -20,8 +20,8 @@ Phase 1
 Phase 2
 
 - Hold dice
-- Turn state
 - Score calculation
+- Turn state
 
 Phase 3
 

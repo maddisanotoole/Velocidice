@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { initializeDice, rollDie } from "./game/dice";
-import Button from "./components/button";
+import Button from "./components/GameButton";
 import { DieStatus, type Die } from "./types";
-import { DieFace } from "./components/dice";
+import { DieFace } from "./components/DiceFace";
+import { ScoreBoard } from "./components/ScoreBoard";
+import { scoreDice } from "./game/scoring";
 
 function App() {
   const [dice, setDice] = useState<Die[]>(initializeDice());
+  const [totalScore, setTotalScore] = useState(0);
+  const [roundScore, setRoundScore] = useState(0);
 
+  const selectedDice = dice.filter((die) => die.status === DieStatus.SELECTED);
+  const selectedScore = scoreDice(selectedDice.map((die) => die.value));
   function holdDice() {
     setDice((prev) =>
       prev.map((die) =>
@@ -50,18 +56,24 @@ function App() {
   }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
+      <ScoreBoard
+        totalScore={totalScore}
+        roundScore={roundScore}
+        selectedScore={selectedScore}
+      />{" "}
       <div className="flex gap-4">
         {dice.map((die) => (
           <DieFace onClick={() => selectDie(die.id)} die={die}></DieFace>
         ))}
       </div>
-
-      <Button onClick={holdDice} color="blue">
-        Hold
-      </Button>
-      <Button onClick={rollDice} color="green">
-        Roll Dice
-      </Button>
+      <div className="flex gap-4">
+        <Button onClick={holdDice} color="blue">
+          Hold
+        </Button>
+        <Button onClick={rollDice} color="green">
+          Roll Dice
+        </Button>
+      </div>
       <Button onClick={resetGame} color="yellow">
         Reset
       </Button>
