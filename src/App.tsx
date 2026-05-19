@@ -13,6 +13,7 @@ function App() {
 
   const selectedDice = dice.filter((die) => die.status === DieStatus.SELECTED);
   const selectedScore = scoreDice(selectedDice.map((die) => die.value));
+
   function holdDice() {
     setDice((prev) =>
       prev.map((die) =>
@@ -21,6 +22,7 @@ function App() {
           : die,
       ),
     );
+    setRoundScore((prev) => prev + selectedScore);
   }
   function selectDie(id: number) {
     setDice((prev) =>
@@ -49,6 +51,7 @@ function App() {
     });
 
     setDice(newDice);
+    setTotalScore(roundScore);
   }
 
   function resetGame() {
@@ -60,7 +63,7 @@ function App() {
         totalScore={totalScore}
         roundScore={roundScore}
         selectedScore={selectedScore}
-      />{" "}
+      />
       <div className="flex gap-4">
         {dice.map((die) => (
           <DieFace onClick={() => selectDie(die.id)} die={die}></DieFace>

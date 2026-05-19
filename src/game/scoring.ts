@@ -8,6 +8,19 @@ export function scoreDice(values: number[]): number {
     counts[value]++;
   }
 
+  if (values.length === 6) {
+    const isStraight = counts.slice(1).every((count) => count === 1);
+
+    if (isStraight) {
+      return 1500;
+    }
+    const pairCount = counts.slice(1).filter((count) => count === 2).length;
+
+    const isThreePairs = pairCount === 3;
+    if (isThreePairs) {
+      return 750;
+    }
+  }
   for (const index in counts) {
     const count = counts[index];
     const newScore = calculateScore(count, Number(index));
