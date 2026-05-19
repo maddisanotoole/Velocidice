@@ -6,6 +6,7 @@ import { DieFace } from "./components/DiceFace";
 import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
 import { PlayerBoard } from "./components/PlayerBoard";
+import { RulesModal } from "./components/RulesModal";
 
 const WINNING_SCORE = 5000;
 
@@ -45,6 +46,7 @@ function App() {
   });
 
   const [roundScore, setRoundScore] = useState(0);
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
 
   const dice = turn.dice;
   const selectedDice = dice.filter((die) => die.status === DieStatus.SELECTED);
@@ -219,8 +221,12 @@ function App() {
         </Button>
       </div>
       <Button onClick={resetGame} color="red">
-        End Game
+        {winner ? "New Game " : "End Game"}
       </Button>
+      <Button onClick={() => setIsRulesOpen(true)} color="blue">
+        Rules
+      </Button>
+      {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
     </div>
   );
 }
