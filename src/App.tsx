@@ -7,7 +7,7 @@ import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
 import { PlayerBoard } from "./components/PlayerBoard";
 
-const WINNING_SCORE = 10_000;
+const WINNING_SCORE = 5000;
 
 type TurnStatus = "rolling" | "farkled";
 

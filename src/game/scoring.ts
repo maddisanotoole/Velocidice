@@ -93,7 +93,7 @@ const calculateScore = (count: number, index: number): number => {
     return 0;
   }
   const tripleScore = threeOfAKind[index];
-  const extraDice = count - 3;
+  const multiplier = count - 2;
 
-  return tripleScore * Math.pow(2, extraDice);
+  return tripleScore * multiplier;
 };
