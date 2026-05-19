@@ -219,7 +219,7 @@ function App() {
         </Button>
       </div>
       <Button onClick={resetGame} color="red">
-        Reset
+        End Game
       </Button>
     </div>
   );

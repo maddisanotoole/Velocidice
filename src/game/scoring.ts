@@ -47,19 +47,19 @@ export function scoreDice(values: number[]): ScoreResult {
     }
   }
 
-  if (values.length === 5) {
-    const isLowStraight = [1, 2, 3, 4, 5].every(
-      (value) => counts[value] === 1,
-    );
-    const isHighStraight = [2, 3, 4, 5, 6].every(
-      (value) => counts[value] === 1,
-    );
+  if (values.length >= 5) {
+    const isLowStraight = [1, 2, 3, 4, 5].every((value) => counts[value] >= 1);
+    const isHighStraight = [2, 3, 4, 5, 6].every((value) => counts[value] >= 1);
 
     if (isLowStraight || isHighStraight) {
-      return {
-        score: 1000,
-        allDiceScore: true,
-      };
+      score += 1000;
+
+      const straightValues = isLowStraight ? [1, 2, 3, 4, 5] : [2, 3, 4, 5, 6];
+
+      // remove the value of the straight, so we can score the remaining die
+      for (const value of straightValues) {
+        counts[value]--;
+      }
     }
   }
 
