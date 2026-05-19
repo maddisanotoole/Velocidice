@@ -1,8 +1,17 @@
-export function scoreDice(values: number[]): number {
+type ScoreResult = {
+  score: number;
+  allDiceScore: boolean;
+};
+
+export function scoreDice(values: number[]): ScoreResult {
   if (values.length === 0) {
-    return 0;
+    return {
+      score: 0,
+      allDiceScore: false,
+    };
   }
   let score = 0;
+  let allDiceScore = true;
   const counts = [0, 0, 0, 0, 0, 0, 0];
   for (const value of values) {
     counts[value]++;
@@ -12,22 +21,35 @@ export function scoreDice(values: number[]): number {
     const isStraight = counts.slice(1).every((count) => count === 1);
 
     if (isStraight) {
-      return 1500;
+      return {
+        score: 1500,
+        allDiceScore: true,
+      };
     }
     const pairCount = counts.slice(1).filter((count) => count === 2).length;
 
     const isThreePairs = pairCount === 3;
     if (isThreePairs) {
-      return 750;
+      return {
+        score: 750,
+        allDiceScore: true,
+      };
     }
   }
   for (const index in counts) {
     const count = counts[index];
     const newScore = calculateScore(count, Number(index));
     score += newScore;
+
+    if (count > 0 && newScore === 0) {
+      allDiceScore = false;
+    }
   }
 
-  return score;
+  return {
+    score,
+    allDiceScore: score > 0 && allDiceScore,
+  };
 }
 
 const calculateScore = (count: number, index: number): number => {

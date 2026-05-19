@@ -14,10 +14,20 @@ function App() {
 
   const selectedDice = dice.filter((die) => die.status === DieStatus.SELECTED);
   const activeDice = dice.filter((die) => die.status === DieStatus.ACTIVE);
-  const selectedScore = scoreDice(selectedDice.map((die) => die.value));
-  const possibleScore = scoreDice(activeDice.map((die) => die.value));
+  const selectedScoreResult = scoreDice(selectedDice.map((die) => die.value));
+  const possibleScoreResult = scoreDice(activeDice.map((die) => die.value));
+  const selectedScore = selectedScoreResult.score;
+  const selectedDiceAreValid = selectedScoreResult.allDiceScore;
+  const possibleScore = possibleScoreResult.score;
   const isFarkle =
     activeDice.length > 0 && selectedDice.length === 0 && possibleScore === 0;
+  const actionDisabledReason = isFarkle
+    ? "You farkled. Start a new turn."
+    : selectedDice.length === 0
+      ? "Select scoring dice first."
+      : !selectedDiceAreValid
+        ? "Every selected die must contribute to the score."
+        : undefined;
 
   function holdDice() {
     setFarkleMessage("");
@@ -35,7 +45,9 @@ function App() {
     const nextActiveDice = nextDice.filter(
       (die) => die.status === DieStatus.ACTIVE,
     );
-    const nextPossibleScore = scoreDice(nextActiveDice.map((die) => die.value));
+    const nextPossibleScore = scoreDice(
+      nextActiveDice.map((die) => die.value),
+    ).score;
 
     if (nextActiveDice.length > 0 && nextPossibleScore === 0) {
       setFarkleMessage("Farkle!");
@@ -101,14 +113,16 @@ function App() {
       <div className="flex gap-4">
         <Button
           onClick={holdDice}
-          disabled={selectedScore === 0 || isFarkle}
+          disabled={!selectedDiceAreValid || isFarkle}
+          title={actionDisabledReason}
           color="blue"
         >
           Hold & Reroll
         </Button>
         <Button
           onClick={endTurn}
-          disabled={selectedScore === 0 || isFarkle}
+          disabled={!selectedDiceAreValid || isFarkle}
+          title={actionDisabledReason}
           color="yellow"
         >
           End Turn

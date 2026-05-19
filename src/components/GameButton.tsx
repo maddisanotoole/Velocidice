@@ -2,6 +2,7 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
+  title?: string;
   color?: "green" | "blue" | "red" | "yellow";
 }
 
@@ -19,6 +20,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   disabled = false,
+  title,
   color = "green",
 }) => {
   return (
@@ -29,6 +31,7 @@ const Button: React.FC<ButtonProps> = ({
         colorClasses[color]
       } ${disabledClasses}`}
       disabled={disabled}
+      title={title}
     >
       {children}
     </button>
