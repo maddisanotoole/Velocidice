@@ -1,6 +1,7 @@
 interface ButtonProps {
   children: React.ReactNode;
   onClick: () => void;
+  disabled?: boolean;
   color?: "green" | "blue" | "red" | "yellow";
 }
 
@@ -11,9 +12,13 @@ const colorClasses = {
   yellow: "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700",
 } as const;
 
+const disabledClasses =
+  "disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-zinc-300 disabled:opacity-60 disabled:hover:bg-zinc-600 disabled:active:bg-zinc-600";
+
 const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
+  disabled = false,
   color = "green",
 }) => {
   return (
@@ -22,7 +27,8 @@ const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       className={`px-6 py-3 rounded-xl font-bold transition-colors duration-200 ${
         colorClasses[color]
-      }`}
+      } ${disabledClasses}`}
+      disabled={disabled}
     >
       {children}
     </button>

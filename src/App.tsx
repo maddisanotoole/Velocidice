@@ -67,10 +67,10 @@ function App() {
         ))}
       </div>
       <div className="flex gap-4">
-        <Button onClick={holdDice} color="blue">
+        <Button onClick={holdDice} disabled={selectedScore === 0} color="blue">
           Hold
         </Button>
-        <Button onClick={rollDice} color="green">
+        <Button onClick={rollDice} disabled={selectedScore === 0} color="green">
           Roll Dice
         </Button>
       </div>
