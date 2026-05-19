@@ -10,18 +10,41 @@ function App() {
   const [dice, setDice] = useState<Die[]>(initializeDice());
   const [totalScore, setTotalScore] = useState(0);
   const [roundScore, setRoundScore] = useState(0);
+  const [farkleMessage, setFarkleMessage] = useState("");
 
   const selectedDice = dice.filter((die) => die.status === DieStatus.SELECTED);
+  const activeDice = dice.filter((die) => die.status === DieStatus.ACTIVE);
   const selectedScore = scoreDice(selectedDice.map((die) => die.value));
+  const possibleScore = scoreDice(activeDice.map((die) => die.value));
+  const isFarkle =
+    activeDice.length > 0 && selectedDice.length === 0 && possibleScore === 0;
 
   function holdDice() {
-    setDice((prev) =>
-      prev.map((die) =>
-        die.status === DieStatus.SELECTED
-          ? { ...die, status: DieStatus.HELD }
-          : die,
-      ),
+    setFarkleMessage("");
+    const nextDice = dice.map((die) => {
+      if (die.status === DieStatus.SELECTED) {
+        return { ...die, status: DieStatus.HELD };
+      }
+
+      if (die.status === DieStatus.ACTIVE) {
+        return { ...die, value: rollDie() };
+      }
+
+      return die;
+    });
+    const nextActiveDice = nextDice.filter(
+      (die) => die.status === DieStatus.ACTIVE,
     );
+    const nextPossibleScore = scoreDice(nextActiveDice.map((die) => die.value));
+
+    if (nextActiveDice.length > 0 && nextPossibleScore === 0) {
+      setFarkleMessage("Farkle!");
+      setRoundScore(0);
+      setDice(initializeDice());
+      return;
+    }
+
+    setDice(nextDice);
     setRoundScore((prev) => prev + selectedScore);
   }
   function selectDie(id: number) {
@@ -42,20 +65,17 @@ function App() {
     );
   }
 
-  function rollDice() {
-    const newDice: Die[] = dice.map((d) => {
-      if (d.status == DieStatus.ACTIVE) {
-        d.value = rollDie();
-      }
-      return d;
-    });
-
-    setDice(newDice);
+  function endTurn() {
     setTotalScore(roundScore);
+    setRoundScore(0);
+    setFarkleMessage("");
+    // setDice(initializeDice());
   }
 
   function resetGame() {
     setDice(initializeDice());
+    setRoundScore(0);
+    setFarkleMessage("");
   }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
@@ -66,18 +86,35 @@ function App() {
       />
       <div className="flex gap-4">
         {dice.map((die) => (
-          <DieFace onClick={() => selectDie(die.id)} die={die}></DieFace>
+          <DieFace
+            key={`die_${die.id}`}
+            onClick={() => selectDie(die.id)}
+            die={die}
+          ></DieFace>
         ))}
       </div>
+      {farkleMessage && (
+        <p className="text-4xl font-black uppercase tracking-wide text-red-400">
+          {farkleMessage}
+        </p>
+      )}
       <div className="flex gap-4">
-        <Button onClick={holdDice} disabled={selectedScore === 0} color="blue">
-          Hold
+        <Button
+          onClick={holdDice}
+          disabled={selectedScore === 0 || isFarkle}
+          color="blue"
+        >
+          Hold & Reroll
         </Button>
-        <Button onClick={rollDice} disabled={selectedScore === 0} color="green">
-          Roll Dice
+        <Button
+          onClick={endTurn}
+          disabled={selectedScore === 0 || isFarkle}
+          color="yellow"
+        >
+          End Turn
         </Button>
       </div>
-      <Button onClick={resetGame} color="yellow">
+      <Button onClick={resetGame} color="red">
         Reset
       </Button>
     </div>
