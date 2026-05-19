@@ -11,3 +11,22 @@ export type Die = {
   status: DieStatusType;
   group?: number;
 };
+
+export type PlayerId = "human" | "computer";
+
+export type PlayerScores = {
+  human: number;
+  computer: number;
+};
+
+export type ScoreBoardProps = {
+  currentPlayer: PlayerId;
+  playerScores: PlayerScores;
+  roundScore: number;
+  selectedScore: number;
+};
+
+export type ScoreItemProps = {
+  label: string;
+  value: number;
+};

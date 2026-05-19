@@ -26,6 +26,16 @@ export function scoreDice(values: number[]): ScoreResult {
         allDiceScore: true,
       };
     }
+
+    const tripletCount = counts.slice(1).filter((count) => count === 3).length;
+
+    if (tripletCount === 2) {
+      return {
+        score: 2500,
+        allDiceScore: true,
+      };
+    }
+
     const pairCount = counts.slice(1).filter((count) => count === 2).length;
 
     const isThreePairs = pairCount === 3;
@@ -36,6 +46,23 @@ export function scoreDice(values: number[]): ScoreResult {
       };
     }
   }
+
+  if (values.length === 5) {
+    const isLowStraight = [1, 2, 3, 4, 5].every(
+      (value) => counts[value] === 1,
+    );
+    const isHighStraight = [2, 3, 4, 5, 6].every(
+      (value) => counts[value] === 1,
+    );
+
+    if (isLowStraight || isHighStraight) {
+      return {
+        score: 1000,
+        allDiceScore: true,
+      };
+    }
+  }
+
   for (const index in counts) {
     const count = counts[index];
     const newScore = calculateScore(count, Number(index));
