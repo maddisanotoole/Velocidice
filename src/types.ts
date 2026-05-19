@@ -12,10 +12,10 @@ export type Die = {
   group?: number;
 };
 
-export type PlayerId = "human" | "computer";
+export type PlayerId = "player" | "computer";
 
 export type PlayerScores = {
-  human: number;
+  player: number;
   computer: number;
 };
 
@@ -26,7 +26,16 @@ export type ScoreBoardProps = {
   selectedScore: number;
 };
 
-export type ScoreItemProps = {
-  label: string;
-  value: number;
-};
+export const TextSize = {
+  SMALL: "SMALL",
+  NORMAL: "NORMAL",
+} as const;
+
+export type TextSizeType = (typeof TextSize)[keyof typeof TextSize];
+
+export const BoardSize = {
+  SMALL: "SMALL",
+  NORMAL: "NORMAL",
+} as const;
+
+export type BoardSizeType = (typeof BoardSize)[keyof typeof BoardSize];

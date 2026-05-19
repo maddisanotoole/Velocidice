@@ -1,27 +1,43 @@
-import type { PlayerId, PlayerScores } from "../types";
+import {
+  BoardSize,
+  TextSize,
+  type PlayerId,
+  type PlayerScores,
+} from "../types";
 import { Board } from "./Board";
+import { Row } from "./Row";
 import { ScoreItem } from "./ScoreItem";
 
 type PlayerBoardProps = {
+  targetScore: number;
   currentPlayer: PlayerId;
   playerScores: PlayerScores;
 };
-export function PlayerBoard({ currentPlayer, playerScores }: PlayerBoardProps) {
+export function PlayerBoard({
+  targetScore,
+  currentPlayer,
+  playerScores,
+}: PlayerBoardProps) {
   return (
-    <Board>
-      <div className="flex gap-8">
-        <ScoreItem label="Human" value={playerScores.human} />
-
-        <ScoreItem label="Computer" value={playerScores.computer} />
-
-        <span className="text-sm uppercase text-zinc-400 tracking-wide">
-          Turn
-        </span>
-
-        <span className="text-3xl font-black capitalize text-white">
-          {currentPlayer}
-        </span>
-      </div>
+    <Board size={BoardSize.SMALL}>
+      <ScoreItem label="Turn" value={currentPlayer} textSize={TextSize.SMALL} />
+      <Row>
+        <ScoreItem
+          label="Target"
+          value={targetScore}
+          textSize={TextSize.SMALL}
+        />
+        <ScoreItem
+          label="Human"
+          value={playerScores.player}
+          textSize={TextSize.SMALL}
+        />
+        <ScoreItem
+          label="Computer"
+          value={playerScores.computer}
+          textSize={TextSize.SMALL}
+        />
+      </Row>
     </Board>
   );
 }

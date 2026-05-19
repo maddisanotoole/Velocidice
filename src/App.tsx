@@ -7,6 +7,7 @@ import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
 import { PlayerBoard } from "./components/PlayerBoard";
 import { RulesModal } from "./components/RulesModal";
+import { Row } from "./components/Row";
 
 const WINNING_SCORE = 5000;
 
@@ -37,11 +38,11 @@ function rollNewDice(): TurnState {
 
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
-  const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("human");
+  const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
 
   const [playerScore, setPlayerScore] = useState<PlayerScores>({
-    human: 0,
+    player: 0,
     computer: 0,
   });
 
@@ -65,7 +66,7 @@ function App() {
           : undefined;
 
   function switchTurn() {
-    setCurrentPlayer((prev) => (prev === "human" ? "computer" : "human"));
+    setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
     setRoundScore(0);
     setTurn(rollNewDice());
   }
@@ -165,17 +166,21 @@ function App() {
 
   function resetGame() {
     setPlayerScore({
-      human: 0,
+      player: 0,
       computer: 0,
     });
-    setCurrentPlayer("human");
+    setCurrentPlayer("player");
     setWinner(null);
     setTurn(rollNewDice());
     setRoundScore(0);
   }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
-      <PlayerBoard currentPlayer={currentPlayer} playerScores={playerScore} />
+      <PlayerBoard
+        targetScore={WINNING_SCORE}
+        currentPlayer={currentPlayer}
+        playerScores={playerScore}
+      />
       <ScoreBoard
         currentPlayer={currentPlayer}
         playerScores={playerScore}
@@ -183,7 +188,7 @@ function App() {
         selectedScore={selectedScore}
       />
 
-      <div className="flex gap-4">
+      <div className="grid grid-cols-3 gap-3 sm:flex sm:gap-4">
         {dice.map((die) => (
           <DieFace
             key={`die_${die.id}`}
@@ -202,7 +207,7 @@ function App() {
           {winner} wins!
         </p>
       )}
-      <div className="flex gap-4">
+      <Row>
         <Button
           onClick={holdDice}
           disabled={Boolean(winner) || hasFarkled || !selectedDiceAreValid}
@@ -219,14 +224,16 @@ function App() {
         >
           End Turn
         </Button>
-      </div>
-      <Button onClick={resetGame} color="red">
-        {winner ? "New Game " : "End Game"}
-      </Button>
-      <Button onClick={() => setIsRulesOpen(true)} color="blue">
-        Rules
-      </Button>
-      {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
+      </Row>
+      <Row>
+        <Button onClick={() => setIsRulesOpen(true)} color="blue">
+          Rules
+        </Button>
+        {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}{" "}
+        <Button onClick={resetGame} color="red">
+          {winner ? "New Game " : "End Game"}
+        </Button>
+      </Row>
     </div>
   );
 }

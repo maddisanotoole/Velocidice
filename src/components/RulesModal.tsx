@@ -33,18 +33,18 @@ export function RulesModal({ onClose }: RulesModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 px-3 py-4 sm:items-center sm:px-4"
       onClick={onClose}
     >
       <section
         aria-modal="true"
-        className="w-full max-w-xl rounded-xl bg-zinc-800 p-6 text-white shadow-2xl"
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-y-auto rounded-xl bg-zinc-800 p-4 text-white shadow-2xl sm:p-6"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
-        <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-3xl font-black">Rules</h2>
+            <h2 className="text-2xl font-black sm:text-3xl">Rules</h2>
             <p className="mt-1 text-sm text-zinc-400">
               Select only dice that contribute to the score.
             </p>
@@ -58,11 +58,11 @@ export function RulesModal({ onClose }: RulesModalProps) {
         <div className="divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
           {scoringRules.map(([label, value]) => (
             <div
-              className="grid grid-cols-[1fr_auto] gap-4 px-4 py-3"
+              className="grid gap-1 px-4 py-3 sm:grid-cols-[1fr_auto] sm:gap-4"
               key={label}
             >
               <span className="font-bold text-zinc-100">{label}</span>
-              <span className="text-right text-zinc-300">{value}</span>
+              <span className="text-zinc-300 sm:text-right">{value}</span>
             </div>
           ))}
         </div>
