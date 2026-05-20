@@ -229,8 +229,8 @@ function App() {
         <Button onClick={() => setIsRulesOpen(true)} color="blue">
           Rules
         </Button>
-        {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}{" "}
-        <Button onClick={resetGame} color="red">
+        {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
+        <Button onClick={resetGame} color={winner ? "green" : "red"}>
           {winner ? "New Game " : "End Game"}
         </Button>
       </Row>

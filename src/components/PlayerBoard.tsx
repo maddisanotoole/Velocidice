@@ -28,7 +28,7 @@ export function PlayerBoard({
           textSize={TextSize.SMALL}
         />
         <ScoreItem
-          label="Human"
+          label="Player"
           value={playerScores.player}
           textSize={TextSize.SMALL}
         />
