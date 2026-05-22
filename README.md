@@ -60,14 +60,13 @@ npm run preview
 
 Phase 3:
 
-- Polish
+- Mobile responsiveness (Done)
+- Computer turn ai
 - Animations
-- Mobile responsiveness
 
 Phase 4:
 
 - Sound effects
 - Statistics
 - Local save data
-- Loaded dice unlocks
-- Opponent difficulty settings
+- Difficulty settings
