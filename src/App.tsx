@@ -55,6 +55,11 @@ function App() {
   const selectedScore = selectedScoreResult.score;
   const selectedDiceAreValid = selectedScoreResult.allDiceScore;
   const hasFarkled = turn.status === "farkled";
+  const turnLabel = currentPlayer === "player" ? "Your Turn" : "Computer Turn";
+  const turnBannerClasses =
+    currentPlayer === "player"
+      ? "border-blue-300 bg-blue-500 text-white"
+      : "border-purple-300 bg-purple-500 text-white";
   const actionDisabledReason = winner
     ? `${winner} won the game. Reset to play again.`
     : hasFarkled
@@ -187,6 +192,12 @@ function App() {
         roundScore={roundScore}
         selectedScore={selectedScore}
       />
+
+      <p
+        className={`rounded-xl border-2 px-5 py-2 text-lg font-black uppercase tracking-wide shadow-lg ${turnBannerClasses}`}
+      >
+        {turnLabel}
+      </p>
 
       <div className="grid grid-cols-3 gap-3 sm:flex sm:gap-4">
         {dice.map((die) => (

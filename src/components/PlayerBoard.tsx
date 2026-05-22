@@ -20,7 +20,6 @@ export function PlayerBoard({
 }: PlayerBoardProps) {
   return (
     <Board size={BoardSize.SMALL}>
-      <ScoreItem label="Turn" value={currentPlayer} textSize={TextSize.SMALL} />
       <Row>
         <ScoreItem
           label="Target"
@@ -31,11 +30,13 @@ export function PlayerBoard({
           label="Player"
           value={playerScores.player}
           textSize={TextSize.SMALL}
+          active={currentPlayer === "player"}
         />
         <ScoreItem
           label="Computer"
           value={playerScores.computer}
           textSize={TextSize.SMALL}
+          active={currentPlayer === "computer"}
         />
       </Row>
     </Board>
