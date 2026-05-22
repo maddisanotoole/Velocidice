@@ -39,3 +39,9 @@ export const BoardSize = {
 } as const;
 
 export type BoardSizeType = (typeof BoardSize)[keyof typeof BoardSize];
+
+export type ComputerAction =
+  | "select-scoring-dice"
+  | "hold-and-reroll"
+  | "bank"
+  | "end-farkled-turn";
