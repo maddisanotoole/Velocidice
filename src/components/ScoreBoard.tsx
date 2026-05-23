@@ -8,14 +8,24 @@ export function ScoreBoard({
   playerScores,
   roundScore,
   selectedScore,
+  totalScoreDelta = 0,
+  roundScoreDelta = 0,
 }: ScoreBoardProps) {
   return (
     <Board>
       <Row>
-        <ScoreItem label="Total" value={playerScores[currentPlayer]} />
+        <ScoreItem
+          delta={totalScoreDelta}
+          label="Total"
+          value={playerScores[currentPlayer]}
+        />
 
-        <ScoreItem label="Round" value={roundScore} />
-        <ScoreItem label="Selected" value={selectedScore} />
+        <ScoreItem delta={roundScoreDelta} label="Round" value={roundScore} />
+        <ScoreItem
+          delta={selectedScore}
+          label="Selected"
+          value={selectedScore}
+        />
       </Row>
     </Board>
   );

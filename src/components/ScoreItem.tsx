@@ -3,6 +3,7 @@ import { TextSize, type TextSizeType } from "../types";
 type ScoreItemProps = {
   label: string;
   value: number | string;
+  delta?: number;
   textSize?: TextSizeType;
   active?: boolean;
 };
@@ -21,6 +22,7 @@ const textSizeClasses = {
 export function ScoreItem({
   label,
   value,
+  delta = 0,
   textSize = TextSize.NORMAL,
   active = false,
 }: ScoreItemProps) {
@@ -46,6 +48,18 @@ export function ScoreItem({
         }`}
       >
         {value}
+      </span>
+
+      <span
+        className={`min-h-5 text-sm font-black ${
+          delta > 0
+            ? active
+              ? "text-green-950"
+              : "text-green-400"
+            : "text-transparent"
+        }`}
+      >
+        +{delta}
       </span>
     </div>
   );

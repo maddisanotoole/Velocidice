@@ -22,6 +22,8 @@ import { chooseComputerDice, COMPUTER_BANK_THRESHOLD } from "./game/computer";
 
 const COMPUTER_TURN_DELAY_MS = 1400;
 const ACTION_MESSAGE_DELAY_MS = 1200;
+const SCORE_DELTA_DELAY_MS = 1200;
+const TURN_SWITCH_DELAY_MS = 1200;
 
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
@@ -36,6 +38,9 @@ function App() {
   const [roundScore, setRoundScore] = useState(0);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
+  const [roundScoreDelta, setRoundScoreDelta] = useState(0);
+  const [totalScoreDelta, setTotalScoreDelta] = useState(0);
+  const [isTurnChanging, setIsTurnChanging] = useState(false);
 
   const dice = turn.dice;
   const selectedDice = getSelectedDice(dice);
@@ -60,7 +65,7 @@ function App() {
           : undefined;
 
   useEffect(() => {
-    if (!isComputerTurn || winner) return;
+    if (!isComputerTurn || winner || isTurnChanging) return;
 
     const timeout = setTimeout(() => {
       if (hasFarkled) {
@@ -100,6 +105,19 @@ function App() {
   });
 
   useEffect(() => {
+    if (!isTurnChanging) return;
+
+    const timeout = setTimeout(() => {
+      setTotalScoreDelta(0);
+      setRoundScoreDelta(0);
+      switchTurn();
+      setIsTurnChanging(false);
+    }, TURN_SWITCH_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [isTurnChanging]);
+
+  useEffect(() => {
     if (!actionMessage) return;
 
     const timeout = setTimeout(() => {
@@ -109,6 +127,17 @@ function App() {
     return () => clearTimeout(timeout);
   }, [actionMessage]);
 
+  useEffect(() => {
+    if (roundScoreDelta === 0 && totalScoreDelta === 0) return;
+
+    const timeout = setTimeout(() => {
+      setRoundScoreDelta(0);
+      setTotalScoreDelta(0);
+    }, SCORE_DELTA_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [roundScoreDelta, totalScoreDelta]);
+
   function switchTurn() {
     setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
     setRoundScore(0);
@@ -116,7 +145,7 @@ function App() {
   }
 
   function holdDice() {
-    if (winner || hasFarkled || !selectedDiceAreValid) {
+    if (winner || isTurnChanging || hasFarkled || !selectedDiceAreValid) {
       return;
     }
 
@@ -128,6 +157,7 @@ function App() {
       const nextRoll = rollNewDice();
 
       setActionMessage("Held");
+      setRoundScoreDelta(selectedScore);
       setRoundScore((prev) => prev + selectedScore);
       setTurn(nextRoll);
       return;
@@ -139,13 +169,18 @@ function App() {
       dice: nextDice,
       status: nextStatus,
     });
-    setActionMessage("Held");
+
+    if (nextStatus === "rolling") {
+      setActionMessage("Held");
+      setRoundScoreDelta(selectedScore);
+    }
+
     setRoundScore((prev) =>
       nextStatus === "farkled" ? 0 : prev + selectedScore,
     );
   }
   function selectDie(id: number) {
-    if (winner || hasFarkled || isComputerTurn) {
+    if (winner || isTurnChanging || hasFarkled || isComputerTurn) {
       return;
     }
 
@@ -156,7 +191,7 @@ function App() {
   }
 
   function endTurn() {
-    if (winner || (!hasFarkled && !selectedDiceAreValid)) {
+    if (winner || isTurnChanging || (!hasFarkled && !selectedDiceAreValid)) {
       return;
     }
 
@@ -164,6 +199,7 @@ function App() {
 
     if (!hasFarkled) {
       setActionMessage("Banked");
+      setTotalScoreDelta(bankedScore);
       setPlayerScore((prev) => {
         const nextScore = prev[currentPlayer] + bankedScore;
 
@@ -181,7 +217,7 @@ function App() {
       return;
     }
 
-    switchTurn();
+    setIsTurnChanging(true);
   }
 
   function resetGame() {
@@ -194,6 +230,9 @@ function App() {
     setTurn(rollNewDice());
     setRoundScore(0);
     setActionMessage("");
+    setRoundScoreDelta(0);
+    setTotalScoreDelta(0);
+    setIsTurnChanging(false);
   }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
@@ -223,7 +262,9 @@ function App() {
         currentPlayer={currentPlayer}
         playerScores={playerScore}
         roundScore={roundScore}
+        roundScoreDelta={roundScoreDelta}
         selectedScore={selectedScore}
+        totalScoreDelta={totalScoreDelta}
       />
 
       <p
@@ -261,6 +302,7 @@ function App() {
           onClick={holdDice}
           disabled={
             Boolean(winner) ||
+            isTurnChanging ||
             isComputerTurn ||
             hasFarkled ||
             !selectedDiceAreValid
@@ -274,6 +316,7 @@ function App() {
           onClick={endTurn}
           disabled={
             Boolean(winner) ||
+            isTurnChanging ||
             isComputerTurn ||
             (!hasFarkled && !selectedDiceAreValid)
           }

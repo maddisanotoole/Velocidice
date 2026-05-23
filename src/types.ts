@@ -24,6 +24,8 @@ export type ScoreBoardProps = {
   playerScores: PlayerScores;
   roundScore: number;
   selectedScore: number;
+  totalScoreDelta?: number;
+  roundScoreDelta?: number;
 };
 
 export const TextSize = {
