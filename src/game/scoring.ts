@@ -3,6 +3,47 @@ type ScoreResult = {
   allDiceScore: boolean;
 };
 
+export type DiceCounts = number[];
+
+export const LOW_STRAIGHT = [1, 2, 3, 4, 5] as const;
+export const HIGH_STRAIGHT = [2, 3, 4, 5, 6] as const;
+
+export function countDiceValues(values: number[]): DiceCounts {
+  const counts = [0, 0, 0, 0, 0, 0, 0];
+
+  for (const value of values) {
+    counts[value]++;
+  }
+
+  return counts;
+}
+
+export function isSixDieStraight(counts: DiceCounts): boolean {
+  return counts.slice(1).every((count) => count === 1);
+}
+
+export function findFiveDieStraightValues(
+  counts: DiceCounts,
+): number[] | null {
+  if (LOW_STRAIGHT.every((value) => counts[value] >= 1)) {
+    return [...LOW_STRAIGHT];
+  }
+
+  if (HIGH_STRAIGHT.every((value) => counts[value] >= 1)) {
+    return [...HIGH_STRAIGHT];
+  }
+
+  return null;
+}
+
+export function countPairs(counts: DiceCounts): number {
+  return counts.slice(1).filter((count) => count === 2).length;
+}
+
+export function countTriplets(counts: DiceCounts): number {
+  return counts.slice(1).filter((count) => count === 3).length;
+}
+
 export function scoreDice(values: number[]): ScoreResult {
   if (values.length === 0) {
     return {
@@ -12,34 +53,24 @@ export function scoreDice(values: number[]): ScoreResult {
   }
   let score = 0;
   let allDiceScore = true;
-  const counts = [0, 0, 0, 0, 0, 0, 0];
-  for (const value of values) {
-    counts[value]++;
-  }
+  const counts = countDiceValues(values);
 
   if (values.length === 6) {
-    const isStraight = counts.slice(1).every((count) => count === 1);
-
-    if (isStraight) {
+    if (isSixDieStraight(counts)) {
       return {
         score: 1500,
         allDiceScore: true,
       };
     }
 
-    const tripletCount = counts.slice(1).filter((count) => count === 3).length;
-
-    if (tripletCount === 2) {
+    if (countTriplets(counts) === 2) {
       return {
         score: 2500,
         allDiceScore: true,
       };
     }
 
-    const pairCount = counts.slice(1).filter((count) => count === 2).length;
-
-    const isThreePairs = pairCount === 3;
-    if (isThreePairs) {
+    if (countPairs(counts) === 3) {
       return {
         score: 750,
         allDiceScore: true,
@@ -48,13 +79,10 @@ export function scoreDice(values: number[]): ScoreResult {
   }
 
   if (values.length >= 5) {
-    const isLowStraight = [1, 2, 3, 4, 5].every((value) => counts[value] >= 1);
-    const isHighStraight = [2, 3, 4, 5, 6].every((value) => counts[value] >= 1);
+    const straightValues = findFiveDieStraightValues(counts);
 
-    if (isLowStraight || isHighStraight) {
+    if (straightValues) {
       score += 1000;
-
-      const straightValues = isLowStraight ? [1, 2, 3, 4, 5] : [2, 3, 4, 5, 6];
 
       // remove the value of the straight, so we can score the remaining die
       for (const value of straightValues) {

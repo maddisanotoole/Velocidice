@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./components/GameButton";
-import { type PlayerId, type PlayerScores } from "./types";
+import { DieStatus, type Die, type PlayerId, type PlayerScores } from "./types";
 import { DieFace } from "./components/DiceFace";
 import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
@@ -18,6 +18,7 @@ import {
   toggleDieSelection,
   type TurnState,
 } from "./game/turn";
+import { chooseComputerDice } from "./game/computer";
 
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
@@ -52,6 +53,37 @@ function App() {
         : !selectedDiceAreValid
           ? "Every selected die must contribute to the score."
           : undefined;
+
+  useEffect(() => {
+    if (currentPlayer !== "computer") return;
+
+    const timeout = setTimeout(() => {
+      if (hasFarkled) {
+        endTurn();
+        return;
+      }
+
+      const activeDice: Die[] = [];
+      dice.forEach((die) => {
+        if (die.status === DieStatus.ACTIVE) {
+          activeDice.push(die);
+        }
+      });
+      const selection = chooseComputerDice(activeDice);
+      selection.map((die) => {
+        selectDie(die.id);
+      });
+      if (
+        activeDice.length === selection.length ||
+        activeDice.length - selection.length > 2
+      ) {
+        holdDice();
+      } else {
+        endTurn();
+      }
+    }, 800);
+    return () => clearTimeout(timeout);
+  });
 
   function switchTurn() {
     setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
