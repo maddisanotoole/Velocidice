@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "./components/GameButton";
-import { DieStatus, type Die, type PlayerId, type PlayerScores } from "./types";
+import { DieStatus, type PlayerId, type PlayerScores } from "./types";
 import { DieFace } from "./components/DiceFace";
 import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
@@ -18,7 +18,10 @@ import {
   toggleDieSelection,
   type TurnState,
 } from "./game/turn";
-import { chooseComputerDice } from "./game/computer";
+import { chooseComputerDice, COMPUTER_BANK_THRESHOLD } from "./game/computer";
+
+const COMPUTER_TURN_DELAY_MS = 1400;
+const ACTION_MESSAGE_DELAY_MS = 1200;
 
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
@@ -32,6 +35,7 @@ function App() {
 
   const [roundScore, setRoundScore] = useState(0);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+  const [actionMessage, setActionMessage] = useState("");
 
   const dice = turn.dice;
   const selectedDice = getSelectedDice(dice);
@@ -39,6 +43,7 @@ function App() {
   const selectedScore = selectedScoreResult.score;
   const selectedDiceAreValid = selectedScoreResult.allDiceScore;
   const hasFarkled = turn.status === "farkled";
+  const isComputerTurn = currentPlayer === "computer";
   const turnLabel = currentPlayer === "player" ? "Your Turn" : "Computer Turn";
   const turnBannerClasses =
     currentPlayer === "player"
@@ -55,7 +60,7 @@ function App() {
           : undefined;
 
   useEffect(() => {
-    if (currentPlayer !== "computer") return;
+    if (!isComputerTurn || winner) return;
 
     const timeout = setTimeout(() => {
       if (hasFarkled) {
@@ -63,27 +68,46 @@ function App() {
         return;
       }
 
-      const activeDice: Die[] = [];
-      dice.forEach((die) => {
-        if (die.status === DieStatus.ACTIVE) {
-          activeDice.push(die);
+      if (selectedDice.length === 0) {
+        const selection = chooseComputerDice(dice);
+        const selectedIds = new Set(selection.map((die) => die.id));
+
+        if (selectedIds.size === 0) {
+          endTurn();
+          return;
         }
-      });
-      const selection = chooseComputerDice(activeDice);
-      selection.map((die) => {
-        selectDie(die.id);
-      });
-      if (
-        activeDice.length === selection.length ||
-        activeDice.length - selection.length > 2
-      ) {
-        holdDice();
-      } else {
-        endTurn();
+
+        setTurn((prev) => ({
+          ...prev,
+          dice: prev.dice.map((die) =>
+            selectedIds.has(die.id)
+              ? { ...die, status: DieStatus.SELECTED }
+              : die,
+          ),
+        }));
+        return;
       }
-    }, 800);
+
+      if (roundScore + selectedScore >= COMPUTER_BANK_THRESHOLD) {
+        endTurn();
+        return;
+      }
+
+      holdDice();
+    }, COMPUTER_TURN_DELAY_MS);
+
     return () => clearTimeout(timeout);
   });
+
+  useEffect(() => {
+    if (!actionMessage) return;
+
+    const timeout = setTimeout(() => {
+      setActionMessage("");
+    }, ACTION_MESSAGE_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [actionMessage]);
 
   function switchTurn() {
     setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
@@ -103,6 +127,7 @@ function App() {
     if (nextActiveDice.length === 0) {
       const nextRoll = rollNewDice();
 
+      setActionMessage("Held");
       setRoundScore((prev) => prev + selectedScore);
       setTurn(nextRoll);
       return;
@@ -114,12 +139,13 @@ function App() {
       dice: nextDice,
       status: nextStatus,
     });
+    setActionMessage("Held");
     setRoundScore((prev) =>
       nextStatus === "farkled" ? 0 : prev + selectedScore,
     );
   }
   function selectDie(id: number) {
-    if (winner || hasFarkled) {
+    if (winner || hasFarkled || isComputerTurn) {
       return;
     }
 
@@ -137,6 +163,7 @@ function App() {
     const bankedScore = hasFarkled ? 0 : roundScore + selectedScore;
 
     if (!hasFarkled) {
+      setActionMessage("Banked");
       setPlayerScore((prev) => {
         const nextScore = prev[currentPlayer] + bankedScore;
 
@@ -166,6 +193,7 @@ function App() {
     setWinner(null);
     setTurn(rollNewDice());
     setRoundScore(0);
+    setActionMessage("");
   }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
@@ -223,10 +251,20 @@ function App() {
           {winner} wins!
         </p>
       )}
+      {actionMessage && (
+        <p className="pointer-events-none fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-xl bg-zinc-950/90 px-5 py-3 text-2xl font-black uppercase tracking-wide text-white shadow-2xl">
+          {actionMessage}
+        </p>
+      )}
       <Row>
         <Button
           onClick={holdDice}
-          disabled={Boolean(winner) || hasFarkled || !selectedDiceAreValid}
+          disabled={
+            Boolean(winner) ||
+            isComputerTurn ||
+            hasFarkled ||
+            !selectedDiceAreValid
+          }
           title={actionDisabledReason}
           color="blue"
         >
@@ -234,11 +272,15 @@ function App() {
         </Button>
         <Button
           onClick={endTurn}
-          disabled={Boolean(winner) || (!hasFarkled && !selectedDiceAreValid)}
+          disabled={
+            Boolean(winner) ||
+            isComputerTurn ||
+            (!hasFarkled && !selectedDiceAreValid)
+          }
           title={actionDisabledReason}
           color="yellow"
         >
-          End Turn
+          Bank & End Turn
         </Button>
       </Row>
       <Row>
