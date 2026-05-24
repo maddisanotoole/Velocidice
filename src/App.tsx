@@ -418,6 +418,7 @@ function App() {
             key={`die_${die.id}`}
             currentPlayer={currentPlayer}
             isBanked={isTurnChanging && die.status === DieStatus.SELECTED}
+            rollAnimationKey={`${currentPlayer}_${rerollCount}`}
             onClick={() => selectDie(die.id)}
             die={die}
           ></DieFace>

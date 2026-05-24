@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { type Die, DieStatus, type PlayerId } from "../types";
 
 interface DieProps {
@@ -5,6 +6,7 @@ interface DieProps {
   die: Die;
   currentPlayer: PlayerId;
   isBanked?: boolean;
+  rollAnimationKey: string;
 }
 
 const pipPositions = {
@@ -38,14 +40,45 @@ export const DieFace: React.FC<DieProps> = ({
   die,
   currentPlayer,
   isBanked = false,
+  rollAnimationKey,
 }) => {
   const isHeld = die.status === DieStatus.HELD || isBanked;
   const isComputerTurn = currentPlayer === "computer";
+  const shouldAnimateRoll = die.status === DieStatus.ACTIVE && !isBanked;
 
   return (
-    <div
-      key={`die_${die.id}`}
+    <motion.div
+      key={`die_${die.id}_${rollAnimationKey}`}
       onClick={onClick}
+      initial={
+        shouldAnimateRoll
+          ? {
+              rotate: -160,
+              scale: 0.85,
+              y: -8,
+            }
+          : false
+      }
+      animate={
+        shouldAnimateRoll
+          ? {
+              rotate: [0, 120, 260, 360],
+              scale: [1, 0.92, 1.08, 1],
+              y: [0, -10, 4, 0],
+            }
+          : false
+      }
+      transition={
+        shouldAnimateRoll
+          ? {
+              delay: die.id * 0.04,
+              duration: 0.45,
+              ease: "easeOut",
+            }
+          : {
+              duration: 0,
+            }
+      }
       className={`
   relative h-16 w-16 rounded-xl cursor-pointer transition-all shadow-lg
   ${
@@ -67,6 +100,6 @@ export const DieFace: React.FC<DieProps> = ({
           key={position}
         />
       ))}
-    </div>
+    </motion.div>
   );
 };
