@@ -11,6 +11,8 @@ import {
 const COMPUTER_BANK_THRESHOLDS = [750, 500, 300] as const;
 const PLAYER_CLOSE_TO_WINNING_POINTS = 400;
 const MINIMUM_SMALL_ROLL_BANK_SCORE = 300;
+const PLENTY_OF_DICE_REMAINING = 4;
+const SMALL_SELECTION_SCORE = 150;
 
 export type ComputerBankDecisionDetails = Record<
   string,
@@ -29,6 +31,7 @@ type ComputerBankDecisionInput = {
   playerPointsToWin: number;
   remainingDice: number;
   rerollCount: number;
+  selectedScore: number;
 };
 
 export function getComputerBankThreshold(rerollCount: number): number {
@@ -44,6 +47,7 @@ export function getComputerBankDecision({
   playerPointsToWin,
   remainingDice,
   rerollCount,
+  selectedScore,
 }: ComputerBankDecisionInput): ComputerBankDecision {
   const computerBankThreshold = getComputerBankThreshold(rerollCount);
   const effectiveBankThreshold = Math.min(
@@ -52,6 +56,11 @@ export function getComputerBankDecision({
   );
   const playerIsCloseToWinning =
     playerPointsToWin <= PLAYER_CLOSE_TO_WINNING_POINTS;
+  const hasPlentyOfDiceRemaining = remainingDice >= PLENTY_OF_DICE_REMAINING;
+  const hasSmallSelectionWithPlentyOfDice =
+    selectedScore <= SMALL_SELECTION_SCORE &&
+    bankableScore < computerPointsToWin &&
+    hasPlentyOfDiceRemaining;
 
   const sharedDetails = {
     bankableScore,
@@ -62,6 +71,9 @@ export function getComputerBankDecision({
     playerPointsToWin,
     remainingDice,
     rerollCount,
+    selectedScore,
+    hasPlentyOfDiceRemaining,
+    hasSmallSelectionWithPlentyOfDice,
   };
 
   if (bankableScore >= computerPointsToWin) {
@@ -81,6 +93,17 @@ export function getComputerBankDecision({
       shouldBank: true,
       message: "[Computer] Decision: bank because fewer than 3 dice remain",
       details: sharedDetails,
+    };
+  }
+
+  if (hasSmallSelectionWithPlentyOfDice) {
+    return {
+      shouldBank: false,
+      message: "[Computer] Decision: take risk, hold and reroll",
+      details: {
+        ...sharedDetails,
+        reason: "Small score with plenty of dice remaining",
+      },
     };
   }
 

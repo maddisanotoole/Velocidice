@@ -116,6 +116,7 @@ describe("getComputerBankDecision", () => {
       playerPointsToWin: 2000,
       remainingDice: 5,
       rerollCount: 0,
+      selectedScore: 400,
     });
 
     expect(decision.shouldBank).toBe(true);
@@ -129,6 +130,7 @@ describe("getComputerBankDecision", () => {
       playerPointsToWin: 2000,
       remainingDice: 2,
       rerollCount: 0,
+      selectedScore: 350,
     });
 
     expect(decision.shouldBank).toBe(true);
@@ -142,6 +144,7 @@ describe("getComputerBankDecision", () => {
       playerPointsToWin: 2000,
       remainingDice: 2,
       rerollCount: 0,
+      selectedScore: 150,
     });
 
     expect(decision.shouldBank).toBe(false);
@@ -154,6 +157,7 @@ describe("getComputerBankDecision", () => {
       playerPointsToWin: 2000,
       remainingDice: 3,
       rerollCount: 0,
+      selectedScore: 450,
     });
 
     expect(decision.shouldBank).toBe(false);
@@ -167,10 +171,40 @@ describe("getComputerBankDecision", () => {
       playerPointsToWin: 300,
       remainingDice: 3,
       rerollCount: 0,
+      selectedScore: 800,
     });
 
     expect(decision.shouldBank).toBe(false);
     expect(decision.details.reason).toBe("Player is close to winning");
+  });
+
+  it("keeps rolling after a small selection when plenty of dice remain", () => {
+    const decision = getComputerBankDecision({
+      bankableScore: 850,
+      computerPointsToWin: 4700,
+      playerPointsToWin: 2600,
+      remainingDice: 5,
+      rerollCount: 1,
+      selectedScore: 100,
+    });
+
+    expect(decision.shouldBank).toBe(false);
+    expect(decision.details.reason).toBe(
+      "Small score with plenty of dice remaining",
+    );
+  });
+
+  it("still banks a large selected score even when plenty of dice remain", () => {
+    const decision = getComputerBankDecision({
+      bankableScore: 1000,
+      computerPointsToWin: 4700,
+      playerPointsToWin: 2600,
+      remainingDice: 4,
+      rerollCount: 1,
+      selectedScore: 500,
+    });
+
+    expect(decision.shouldBank).toBe(true);
   });
 });
 

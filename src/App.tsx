@@ -141,6 +141,7 @@ function App() {
         playerPointsToWin,
         remainingDice,
         rerollCount,
+        selectedScore,
       });
 
       console.info("[Computer] Evaluating selected dice", {
