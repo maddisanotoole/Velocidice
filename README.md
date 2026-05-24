@@ -58,12 +58,6 @@ npm run preview
 
 ## Roadmap
 
-Phase 3:
-
-- Mobile responsiveness (Done)
-- Computer turn ai
-- Animations
-
 Phase 4:
 
 - Sound effects
