@@ -65,7 +65,7 @@ function App() {
           : undefined;
 
   useEffect(() => {
-    if (!isComputerTurn || winner || isTurnChanging) return;
+    if (!isComputerTurn || hasFarkled || winner || isTurnChanging) return;
 
     const timeout = setTimeout(() => {
       if (hasFarkled) {
@@ -103,6 +103,18 @@ function App() {
 
     return () => clearTimeout(timeout);
   });
+
+  useEffect(() => {
+    if (!hasFarkled || winner || isTurnChanging) return;
+
+    const timeout = setTimeout(() => {
+      setTotalScoreDelta(0);
+      setRoundScoreDelta(0);
+      switchTurn();
+    }, TURN_SWITCH_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [hasFarkled, winner, isTurnChanging]);
 
   useEffect(() => {
     if (!isTurnChanging) return;
@@ -318,7 +330,8 @@ function App() {
             Boolean(winner) ||
             isTurnChanging ||
             isComputerTurn ||
-            (!hasFarkled && !selectedDiceAreValid)
+            hasFarkled ||
+            !selectedDiceAreValid
           }
           title={actionDisabledReason}
           color="yellow"
