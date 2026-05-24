@@ -289,6 +289,7 @@ function App() {
         {dice.map((die) => (
           <DieFace
             key={`die_${die.id}`}
+            currentPlayer={currentPlayer}
             onClick={() => selectDie(die.id)}
             die={die}
           ></DieFace>
