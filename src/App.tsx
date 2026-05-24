@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "./components/GameButton";
 import { DieStatus, type PlayerId, type PlayerScores } from "./types";
 import { DieFace } from "./components/DiceFace";
@@ -16,17 +16,28 @@ import {
   holdSelectedAndRollActive,
   rollNewDice,
   toggleDieSelection,
+  pointsToWin,
   type TurnState,
 } from "./game/turn";
-import { chooseComputerDice, COMPUTER_BANK_THRESHOLD } from "./game/computer";
+import {
+  chooseAdditionalBankingDice,
+  chooseComputerDice,
+  getComputerBankDecision,
+  type ComputerBankDecisionDetails,
+} from "./game/computer";
 
 const COMPUTER_TURN_DELAY_MS = 1400;
 const ACTION_MESSAGE_DELAY_MS = 1200;
 const SCORE_DELTA_DELAY_MS = 1200;
 const TURN_SWITCH_DELAY_MS = 1200;
 
+function diceValuesText(dice: { value: number }[]): string {
+  return dice.map((die) => die.value).join("-");
+}
+
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
+  const previousPlayerRef = useRef<PlayerId | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
 
@@ -41,6 +52,7 @@ function App() {
   const [roundScoreDelta, setRoundScoreDelta] = useState(0);
   const [totalScoreDelta, setTotalScoreDelta] = useState(0);
   const [isTurnChanging, setIsTurnChanging] = useState(false);
+  const [rerollCount, setRerollCount] = useState(0);
 
   const dice = turn.dice;
   const selectedDice = getSelectedDice(dice);
@@ -65,6 +77,20 @@ function App() {
           : undefined;
 
   useEffect(() => {
+    const previousPlayer = previousPlayerRef.current;
+    previousPlayerRef.current = currentPlayer;
+
+    if (!isComputerTurn || previousPlayer === "computer" || winner) return;
+
+    console.info("[Computer] Turn started", {
+      computerScore: playerScore.computer,
+      playerScore: playerScore.player,
+      targetScore: WINNING_SCORE,
+      roll: diceValuesText(dice),
+    });
+  }, [currentPlayer, dice, isComputerTurn, playerScore, winner]);
+
+  useEffect(() => {
     if (!isComputerTurn || hasFarkled || winner || isTurnChanging) return;
 
     const timeout = setTimeout(() => {
@@ -77,10 +103,22 @@ function App() {
         const selection = chooseComputerDice(dice);
         const selectedIds = new Set(selection.map((die) => die.id));
 
+        console.info("[Computer] Evaluating roll", {
+          rollNumber: rerollCount + 1,
+          activeDice: diceValuesText(getActiveDice(dice)),
+          selectedDice: diceValuesText(selection),
+          selectedScore: scoreDice(selection.map((die) => die.value)).score,
+        });
+
         if (selectedIds.size === 0) {
+          console.info("[Computer] Decision: no scoring dice, end turn");
           endTurn();
           return;
         }
+
+        console.info("[Computer] Decision: select scoring dice", {
+          selectedDice: diceValuesText(selection),
+        });
 
         setTurn((prev) => ({
           ...prev,
@@ -93,11 +131,70 @@ function App() {
         return;
       }
 
-      if (roundScore + selectedScore >= COMPUTER_BANK_THRESHOLD) {
-        endTurn();
+      const remainingDice = getActiveDice(dice).length;
+      const computerPointsToWin = pointsToWin(playerScore.computer);
+      const playerPointsToWin = pointsToWin(playerScore.player);
+      const bankableScore = roundScore + selectedScore;
+      const bankDecision = getComputerBankDecision({
+        bankableScore,
+        computerPointsToWin,
+        playerPointsToWin,
+        remainingDice,
+        rerollCount,
+      });
+
+      console.info("[Computer] Evaluating selected dice", {
+        rollNumber: rerollCount + 1,
+        selectedDice: diceValuesText(selectedDice),
+        selectedScore,
+        roundScore,
+        ...bankDecision.details,
+      });
+
+      if (remainingDice === 0) {
+        console.info("[Computer] Decision: hot dice, hold and reroll all dice");
+        holdDice();
         return;
       }
 
+      function bankOrSelectExtraDice(
+        message: string,
+        details?: ComputerBankDecisionDetails,
+      ) {
+        const additionalBankingDice = chooseAdditionalBankingDice(dice);
+
+        if (additionalBankingDice.length > 0) {
+          const selectedIds = new Set(
+            additionalBankingDice.map((die) => die.id),
+          );
+
+          console.info("[Computer] Decision: add scoring singles before banking", {
+            selectedDice: diceValuesText(additionalBankingDice),
+            reason: message,
+            ...details,
+          });
+
+          setTurn((prev) => ({
+            ...prev,
+            dice: prev.dice.map((die) =>
+              selectedIds.has(die.id)
+                ? { ...die, status: DieStatus.SELECTED }
+                : die,
+            ),
+          }));
+          return;
+        }
+
+        console.info(message, details);
+        endTurn();
+      }
+
+      if (bankDecision.shouldBank) {
+        bankOrSelectExtraDice(bankDecision.message, bankDecision.details);
+        return;
+      }
+
+      console.info(bankDecision.message, bankDecision.details);
       holdDice();
     }, COMPUTER_TURN_DELAY_MS);
 
@@ -153,6 +250,7 @@ function App() {
   function switchTurn() {
     setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
     setRoundScore(0);
+    setRerollCount(0);
     setTurn(rollNewDice());
   }
 
@@ -168,14 +266,31 @@ function App() {
     if (nextActiveDice.length === 0) {
       const nextRoll = rollNewDice();
 
+      if (isComputerTurn) {
+        console.info("[Computer] Held dice and rolled hot dice", {
+          heldScore: selectedScore,
+          nextRoll: diceValuesText(nextRoll.dice),
+          nextStatus: nextRoll.status,
+        });
+      }
+
       setActionMessage("Held");
       setRoundScoreDelta(selectedScore);
+      setRerollCount((prev) => prev + 1);
       setRoundScore((prev) => prev + selectedScore);
       setTurn(nextRoll);
       return;
     }
 
     const nextStatus = didFarkle(nextDice) ? "farkled" : "rolling";
+
+    if (isComputerTurn) {
+      console.info("[Computer] Held dice and rerolled", {
+        heldScore: selectedScore,
+        nextActiveDice: diceValuesText(getActiveDice(nextDice)),
+        nextStatus,
+      });
+    }
 
     setTurn({
       dice: nextDice,
@@ -185,6 +300,7 @@ function App() {
     if (nextStatus === "rolling") {
       setActionMessage("Held");
       setRoundScoreDelta(selectedScore);
+      setRerollCount((prev) => prev + 1);
     }
 
     setRoundScore((prev) =>
@@ -210,6 +326,15 @@ function App() {
     const bankedScore = hasFarkled ? 0 : roundScore + selectedScore;
 
     if (!hasFarkled) {
+      if (isComputerTurn) {
+        console.info("[Computer] Banked turn", {
+          roundScore,
+          selectedScore,
+          bankedScore,
+          newTotal: playerScore.computer + bankedScore,
+        });
+      }
+
       setActionMessage("Banked");
       setTotalScoreDelta(bankedScore);
       setPlayerScore((prev) => {
@@ -245,6 +370,7 @@ function App() {
     setRoundScoreDelta(0);
     setTotalScoreDelta(0);
     setIsTurnChanging(false);
+    setRerollCount(0);
   }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
@@ -290,6 +416,7 @@ function App() {
           <DieFace
             key={`die_${die.id}`}
             currentPlayer={currentPlayer}
+            isBanked={isTurnChanging && die.status === DieStatus.SELECTED}
             onClick={() => selectDie(die.id)}
             die={die}
           ></DieFace>

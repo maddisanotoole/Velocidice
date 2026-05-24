@@ -4,6 +4,7 @@ interface DieProps {
   onClick: () => void;
   die: Die;
   currentPlayer: PlayerId;
+  isBanked?: boolean;
 }
 
 const pipPositions = {
@@ -32,8 +33,13 @@ const pipClasses = {
   "bottom-right": "bottom-3 right-3",
 } as const;
 
-export const DieFace: React.FC<DieProps> = ({ onClick, die, currentPlayer }) => {
-  const isHeld = die.status === DieStatus.HELD;
+export const DieFace: React.FC<DieProps> = ({
+  onClick,
+  die,
+  currentPlayer,
+  isBanked = false,
+}) => {
+  const isHeld = die.status === DieStatus.HELD || isBanked;
   const isComputerTurn = currentPlayer === "computer";
 
   return (

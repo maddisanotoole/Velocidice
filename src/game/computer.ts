@@ -8,7 +8,101 @@ import {
   scoreDice,
 } from "./scoring";
 
-export const COMPUTER_BANK_THRESHOLD = 750;
+const COMPUTER_BANK_THRESHOLDS = [750, 500, 300] as const;
+const PLAYER_CLOSE_TO_WINNING_POINTS = 400;
+const MINIMUM_SMALL_ROLL_BANK_SCORE = 300;
+
+export type ComputerBankDecisionDetails = Record<
+  string,
+  number | boolean | string
+>;
+
+export type ComputerBankDecision = {
+  shouldBank: boolean;
+  message: string;
+  details: ComputerBankDecisionDetails;
+};
+
+type ComputerBankDecisionInput = {
+  bankableScore: number;
+  computerPointsToWin: number;
+  playerPointsToWin: number;
+  remainingDice: number;
+  rerollCount: number;
+};
+
+export function getComputerBankThreshold(rerollCount: number): number {
+  return (
+    COMPUTER_BANK_THRESHOLDS[rerollCount] ??
+    COMPUTER_BANK_THRESHOLDS[COMPUTER_BANK_THRESHOLDS.length - 1]
+  );
+}
+
+export function getComputerBankDecision({
+  bankableScore,
+  computerPointsToWin,
+  playerPointsToWin,
+  remainingDice,
+  rerollCount,
+}: ComputerBankDecisionInput): ComputerBankDecision {
+  const computerBankThreshold = getComputerBankThreshold(rerollCount);
+  const effectiveBankThreshold = Math.min(
+    computerBankThreshold,
+    computerPointsToWin,
+  );
+  const playerIsCloseToWinning =
+    playerPointsToWin <= PLAYER_CLOSE_TO_WINNING_POINTS;
+
+  const sharedDetails = {
+    bankableScore,
+    computerBankThreshold,
+    computerPointsToWin,
+    effectiveBankThreshold,
+    playerIsCloseToWinning,
+    playerPointsToWin,
+    remainingDice,
+    rerollCount,
+  };
+
+  if (bankableScore >= computerPointsToWin) {
+    return {
+      shouldBank: true,
+      message: "[Computer] Decision: bank because computer can win now",
+      details: sharedDetails,
+    };
+  }
+
+  if (
+    remainingDice <= 2 &&
+    bankableScore >= MINIMUM_SMALL_ROLL_BANK_SCORE &&
+    !playerIsCloseToWinning
+  ) {
+    return {
+      shouldBank: true,
+      message: "[Computer] Decision: bank because fewer than 3 dice remain",
+      details: sharedDetails,
+    };
+  }
+
+  if (!playerIsCloseToWinning && bankableScore >= effectiveBankThreshold) {
+    return {
+      shouldBank: true,
+      message: "[Computer] Decision: bank because threshold was reached",
+      details: sharedDetails,
+    };
+  }
+
+  return {
+    shouldBank: false,
+    message: "[Computer] Decision: take risk, hold and reroll",
+    details: {
+      ...sharedDetails,
+      reason: playerIsCloseToWinning
+        ? "Player is close to winning"
+        : "Bank threshold not reached",
+    },
+  };
+}
 
 function getActiveDice(dice: Die[]): Die[] {
   return dice.filter((die) => die.status === DieStatus.ACTIVE);
@@ -32,6 +126,27 @@ function getDiceWithValues(dice: Die[], values: number[]): Die[] {
   }
 
   return selectedDice;
+}
+
+function chooseSingleScoringDice(activeDice: Die[]): Die[] {
+  const ones = getDiceByValue(activeDice, 1);
+  const fives = getDiceByValue(activeDice, 5);
+
+  if (activeDice.length > 3 && ones.length > 0) {
+    return ones;
+  }
+
+  if (activeDice.length > 3 && fives.length > 0) {
+    return [fives[0]];
+  }
+
+  return activeDice.filter((die) => die.value === 1 || die.value === 5);
+}
+
+export function chooseAdditionalBankingDice(dice: Die[]): Die[] {
+  return getActiveDice(dice).filter(
+    (die) => die.value === 1 || die.value === 5,
+  );
 }
 
 export function chooseComputerDice(dice: Die[]): Die[] {
@@ -75,7 +190,7 @@ export function chooseComputerDice(dice: Die[]): Die[] {
     }
   }
 
-  return activeDice.filter((die) => die.value === 1 || die.value === 5);
+  return chooseSingleScoringDice(activeDice);
 }
 
 export const getBestScoringSelection = chooseComputerDice;

@@ -24,6 +24,10 @@ export function getActiveDice(dice: Die[]): Die[] {
   return dice.filter((die) => die.status === DieStatus.ACTIVE);
 }
 
+export function pointsToWin(playerScore: number): number {
+  return WINNING_SCORE - playerScore;
+}
+
 export function getSelectedDice(dice: Die[]): Die[] {
   return dice.filter((die) => die.status === DieStatus.SELECTED);
 }
