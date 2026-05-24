@@ -18,6 +18,21 @@ const scoringRules = [
   ["Six of a kind", "Three-of-a-kind score x 4"],
 ];
 
+const turnSteps = [
+  "Roll the dice.",
+  "Select dice that score points.",
+  "Hold and reroll to build your round score, or bank to save your points.",
+  "If you roll no scoring dice, you Farkle and lose your unbanked round score.",
+];
+
+const validSelectionExamples = [
+  ["1", "Valid: scores 100"],
+  ["5", "Valid: scores 50"],
+  ["1-5", "Valid: both dice score"],
+  ["1-2", "Invalid: the 2 does not score"],
+  ["2-2-2", "Valid: three 2s score 200"],
+];
+
 export function RulesModal({ onClose }: RulesModalProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -55,6 +70,78 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </Button>
         </div>
 
+        <div className="space-y-5 text-sm text-zinc-300">
+          <section>
+            <h3 className="mb-2 text-lg font-black text-white">Goal</h3>
+            <p>
+              Build points by selecting scoring dice, then bank before a Farkle
+              wipes out your round score. First player to the target score wins.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="mb-2 text-lg font-black text-white">How To Play</h3>
+            <ol className="list-decimal space-y-1 pl-5">
+              {turnSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </section>
+
+          <section>
+            <h3 className="mb-2 text-lg font-black text-white">
+              Score Areas
+            </h3>
+            <ul className="list-disc space-y-1 pl-5">
+              <li>Total is banked and safe.</li>
+              <li>Round is unbanked and at risk.</li>
+              <li>Selected is the value of the dice currently selected.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="mb-2 text-lg font-black text-white">
+              Selecting Dice
+            </h3>
+            <p>
+              Every selected die must contribute to the score. If one selected
+              die does not score, you need to deselect it before holding or
+              banking.
+            </p>
+            <div className="mt-3 divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
+              {validSelectionExamples.map(([dice, result]) => (
+                <div
+                  className="grid gap-1 px-4 py-2 sm:grid-cols-[1fr_auto] sm:gap-4"
+                  key={dice}
+                >
+                  <span className="font-bold text-zinc-100">{dice}</span>
+                  <span className="text-zinc-300 sm:text-right">{result}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <h3 className="mb-2 text-lg font-black text-white">Farkle</h3>
+            <p>
+              A Farkle happens when the active dice have no possible scoring
+              dice. Your round score becomes 0, and the only available action is
+              to end the turn.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="mb-2 text-lg font-black text-white">Hot Dice</h3>
+            <p>
+              If all dice are held because they all scored, all six dice are
+              rolled again and your round score stays active.
+            </p>
+          </section>
+        </div>
+
+        <h3 className="mb-3 mt-6 text-lg font-black text-white">
+          Scoring Rules
+        </h3>
         <div className="divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
           {scoringRules.map(([label, value]) => (
             <div
@@ -65,14 +152,6 @@ export function RulesModal({ onClose }: RulesModalProps) {
               <span className="text-zinc-300 sm:text-right">{value}</span>
             </div>
           ))}
-        </div>
-
-        <div className="mt-6 space-y-2 text-sm text-zinc-300">
-          <p>After a Farkle, all unbanked round points are lost.</p>
-          <p>
-            If all dice are held, roll all six dice again and keep the round
-            score.
-          </p>
         </div>
       </section>
     </div>
