@@ -25,6 +25,7 @@ import {
   getComputerBankDecision,
   type ComputerBankDecisionDetails,
 } from "./game/computer";
+import { playSound } from "./game/sound";
 
 const COMPUTER_TURN_DELAY_MS = 1400;
 const ACTION_MESSAGE_DELAY_MS = 1200;
@@ -120,6 +121,7 @@ function App() {
           selectedDice: diceValuesText(selection),
         });
 
+        playSound("select");
         setTurn((prev) => ({
           ...prev,
           dice: prev.dice.map((die) =>
@@ -175,6 +177,7 @@ function App() {
             ...details,
           });
 
+          playSound("select");
           setTurn((prev) => ({
             ...prev,
             dice: prev.dice.map((die) =>
@@ -205,6 +208,7 @@ function App() {
   useEffect(() => {
     if (!hasFarkled || winner || isTurnChanging) return;
 
+    playSound("farkle");
     const timeout = setTimeout(() => {
       setTotalScoreDelta(0);
       setRoundScoreDelta(0);
@@ -252,6 +256,7 @@ function App() {
     setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
     setRoundScore(0);
     setRerollCount(0);
+    playSound("roll");
     setTurn(rollNewDice());
   }
 
@@ -276,6 +281,7 @@ function App() {
       }
 
       setActionMessage("Held");
+      playSound("roll");
       setRoundScoreDelta(selectedScore);
       setRerollCount((prev) => prev + 1);
       setRoundScore((prev) => prev + selectedScore);
@@ -298,6 +304,7 @@ function App() {
       status: nextStatus,
     });
 
+    playSound("roll");
     if (nextStatus === "rolling") {
       setActionMessage("Held");
       setRoundScoreDelta(selectedScore);
@@ -313,6 +320,7 @@ function App() {
       return;
     }
 
+    playSound("select");
     setTurn((prev) => ({
       ...prev,
       dice: toggleDieSelection(prev.dice, id),
@@ -325,8 +333,11 @@ function App() {
     }
 
     const bankedScore = hasFarkled ? 0 : roundScore + selectedScore;
+    const willWin = playerScore[currentPlayer] + bankedScore >= WINNING_SCORE;
 
     if (!hasFarkled) {
+      playSound(willWin ? "win" : "bank");
+
       if (isComputerTurn) {
         console.info("[Computer] Banked turn", {
           roundScore,
@@ -348,7 +359,7 @@ function App() {
       });
     }
 
-    if (playerScore[currentPlayer] + bankedScore >= WINNING_SCORE) {
+    if (willWin) {
       setWinner(currentPlayer);
       setRoundScore(0);
       setTurn(createRollingTurn());
@@ -365,6 +376,7 @@ function App() {
     });
     setCurrentPlayer("player");
     setWinner(null);
+    playSound("roll");
     setTurn(rollNewDice());
     setRoundScore(0);
     setActionMessage("");
