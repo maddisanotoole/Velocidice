@@ -21,10 +21,10 @@ export function StartMenu({
   targetScore,
 }: StartMenuProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950 px-4 text-white">
-      <section className="w-full max-w-md rounded-xl bg-zinc-800 p-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-950 px-3 py-4 text-white sm:items-center sm:px-4">
+      <section className="w-full max-w-md rounded-xl bg-zinc-800 p-4 shadow-2xl sm:p-6">
         <div className="text-center">
-          <h1 className="text-4xl font-black uppercase tracking-wide">
+          <h1 className="text-3xl font-black uppercase tracking-wide sm:text-4xl">
             VelociDice
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm text-zinc-400">
@@ -32,13 +32,13 @@ export function StartMenu({
             score.
           </p>
         </div>
-        <div className="mt-6 flex justify-center">
+        <div className="mt-5 flex justify-center sm:mt-6">
           <Button onClick={onStart} color="green">
             Start Game
           </Button>
         </div>
-        <section className="mt-6 rounded-lg border border-zinc-700 px-4 py-3">
-          <div className="mb-3 flex items-center justify-between gap-4">
+        <section className="mt-5 rounded-lg border border-zinc-700 px-3 py-3 sm:mt-6 sm:px-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h2 className="font-bold">Target Score</h2>
               <p className="text-sm text-zinc-400">
@@ -53,7 +53,7 @@ export function StartMenu({
           />
         </section>
 
-        <div className="mt-6 flex items-center justify-center gap-4">
+        <div className="mt-5 flex items-center justify-center gap-3 sm:mt-6 sm:gap-4">
           <RulesButton onClick={onOpenRules} />
           <MuteButton isMuted={isMuted} onMuteChange={onMuteChange} />
         </div>

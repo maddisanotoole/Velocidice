@@ -11,11 +11,11 @@ type ScoreItemProps = {
 const textSizeClasses = {
   [TextSize.SMALL]: {
     label: "text-xs",
-    value: "text-xl",
+    value: "text-lg sm:text-xl",
   },
   [TextSize.NORMAL]: {
     label: "text-sm",
-    value: "text-3xl",
+    value: "text-2xl sm:text-3xl",
   },
 } as const;
 
@@ -30,7 +30,7 @@ export function ScoreItem({
 
   return (
     <div
-      className={`grid grid-rows-[1.25rem_auto_1.25rem] place-items-center rounded-lg px-3 py-2 transition-colors ${
+      className={`grid grid-rows-[1.25rem_auto_1.25rem] place-items-center rounded-lg px-2 py-1 transition-colors sm:px-3 sm:py-2 ${
         active ? "bg-yellow-400" : ""
       }`}
     >

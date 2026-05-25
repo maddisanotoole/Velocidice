@@ -326,7 +326,7 @@ function App() {
   }, [roundScoreDelta, totalScoreDelta]);
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
+    <div className="flex min-h-dvh flex-col items-center justify-start gap-4 bg-zinc-900 px-3 py-16 text-white sm:justify-center sm:gap-8 sm:px-4 sm:py-8">
       {!hasStartedGame && (
         <StartMenu
           isMuted={isMuted}
@@ -361,7 +361,7 @@ function App() {
       />
 
       <p
-        className={`rounded-xl border-2 px-5 py-2 text-lg font-black uppercase tracking-wide shadow-lg ${turnBannerClasses}`}
+        className={`rounded-xl border-2 px-4 py-1.5 text-base font-black uppercase tracking-wide shadow-lg sm:px-5 sm:py-2 sm:text-lg ${turnBannerClasses}`}
       >
         {turnLabel}
       </p>

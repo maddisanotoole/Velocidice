@@ -19,7 +19,7 @@ export function FeedbackToast({
 
   return (
     <p
-      className={`pointer-events-none fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-xl bg-zinc-950/90 px-5 py-3 text-2xl font-black uppercase tracking-wide shadow-2xl ${variantClasses[variant]}`}
+      className={`pointer-events-none fixed left-1/2 top-16 z-50 max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-xl bg-zinc-950/90 px-4 py-2 text-center text-xl font-black uppercase tracking-wide shadow-2xl sm:top-24 sm:px-5 sm:py-3 sm:text-2xl ${variantClasses[variant]}`}
     >
       {message}
     </p>

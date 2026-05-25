@@ -10,12 +10,16 @@ export function MuteButton({ isMuted, onMuteChange }: MuteButtonProps) {
   return (
     <button
       aria-label={isMuted ? "Turn sound on" : "Mute sound"}
-      className="rounded-full bg-zinc-950 p-3 transition-colors hover:bg-zinc-700 active:bg-zinc-600"
+      className="rounded-full bg-zinc-950 p-2.5 transition-colors hover:bg-zinc-700 active:bg-zinc-600 sm:p-3"
       onClick={() => onMuteChange(!isMuted)}
       title={isMuted ? "Turn sound on" : "Mute sound"}
       type="button"
     >
-      <img alt="" className="h-6 w-6" src={isMuted ? soundOffIcon : soundOnIcon} />
+      <img
+        alt=""
+        className="h-5 w-5 sm:h-6 sm:w-6"
+        src={isMuted ? soundOffIcon : soundOnIcon}
+      />
     </button>
   );
 }

@@ -39,7 +39,7 @@ const Button: React.FC<ButtonProps> = ({
       onPointerDown={onPointerDown}
       onPointerLeave={onPointerLeave}
       onPointerUp={onPointerUp}
-      className={`px-6 py-3 rounded-xl font-bold transition-colors duration-200 ${
+      className={`rounded-xl px-4 py-2 text-sm font-bold transition-colors duration-200 sm:px-6 sm:py-3 sm:text-base ${
         colorClasses[color]
       } ${disabledClasses}`}
       disabled={disabled}

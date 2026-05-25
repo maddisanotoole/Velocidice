@@ -26,13 +26,13 @@ const pipPositions = {
 } as const;
 
 const pipClasses = {
-  "top-left": "left-3 top-3",
-  "top-right": "right-3 top-3",
-  "middle-left": "left-3 top-1/2 -translate-y-1/2",
-  "middle-right": "right-3 top-1/2 -translate-y-1/2",
+  "top-left": "left-2.5 top-2.5 sm:left-3 sm:top-3",
+  "top-right": "right-2.5 top-2.5 sm:right-3 sm:top-3",
+  "middle-left": "left-2.5 top-1/2 -translate-y-1/2 sm:left-3",
+  "middle-right": "right-2.5 top-1/2 -translate-y-1/2 sm:right-3",
   center: "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
-  "bottom-left": "bottom-3 left-3",
-  "bottom-right": "bottom-3 right-3",
+  "bottom-left": "bottom-2.5 left-2.5 sm:bottom-3 sm:left-3",
+  "bottom-right": "bottom-2.5 right-2.5 sm:bottom-3 sm:right-3",
 } as const;
 
 export const DieFace: React.FC<DieProps> = ({
@@ -80,7 +80,7 @@ export const DieFace: React.FC<DieProps> = ({
             }
       }
       className={`
-  relative h-16 w-16 rounded-xl cursor-pointer transition-all shadow-lg
+  relative h-14 w-14 rounded-xl cursor-pointer transition-all shadow-lg sm:h-16 sm:w-16
   ${
     isHeld
       ? "bg-green-500"
@@ -94,7 +94,7 @@ export const DieFace: React.FC<DieProps> = ({
     >
       {pipPositions[die.value as keyof typeof pipPositions].map((position) => (
         <span
-          className={`absolute h-3 w-3 rounded-full ${
+          className={`absolute h-2.5 w-2.5 rounded-full sm:h-3 sm:w-3 ${
             isHeld ? "bg-white" : "bg-zinc-950"
           } ${pipClasses[position]}`}
           key={position}

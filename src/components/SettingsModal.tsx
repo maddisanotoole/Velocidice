@@ -35,11 +35,11 @@ export function SettingsModal({
     >
       <section
         aria-modal="true"
-        className="w-full max-w-md rounded-xl bg-zinc-800 p-4 text-white shadow-2xl sm:p-6"
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-xl bg-zinc-800 p-4 text-white shadow-2xl sm:p-6"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
-        <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="mb-5 flex items-start justify-between gap-3 sm:mb-6 sm:gap-4">
           <div>
             <h2 className="text-2xl font-black sm:text-3xl">Settings</h2>
             <p className="mt-1 text-sm text-zinc-400">
@@ -52,8 +52,8 @@ export function SettingsModal({
           </Button>
         </div>
 
-        <div className="space-y-6">
-          <section className="flex items-center justify-between gap-4 rounded-lg border border-zinc-700 px-4 py-3">
+        <div className="space-y-4 sm:space-y-6">
+          <section className="flex items-center justify-between gap-3 rounded-lg border border-zinc-700 px-3 py-3 sm:gap-4 sm:px-4">
             <span>
               <span className="block font-bold">Mute Sound</span>
               <span className="block text-sm text-zinc-400">
@@ -63,7 +63,7 @@ export function SettingsModal({
             <MuteButton isMuted={isMuted} onMuteChange={onMuteChange} />
           </section>
 
-          <section className="rounded-lg border border-zinc-700 px-4 py-3">
+          <section className="rounded-lg border border-zinc-700 px-3 py-3 sm:px-4">
             <div className="mb-3">
               <h3 className="font-bold">Game Setup</h3>
               <p className="text-sm text-zinc-400">
