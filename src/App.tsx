@@ -37,6 +37,8 @@ function App() {
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
   const [targetScore, setTargetScore] = useState(DEFAULT_TARGET_SCORE);
+  const [pendingTargetScore, setPendingTargetScore] =
+    useState(DEFAULT_TARGET_SCORE);
   const [isMuted, setIsMuted] = useState(isSoundMuted);
 
   const [playerScore, setPlayerScore] = useState<PlayerScores>({
@@ -206,8 +208,7 @@ function App() {
     setIsTurnChanging(true);
   }
 
-  function resetGame() {
-    const message = winner ? "New Game" : "Game Reset";
+  function resetGame(message = winner ? "New Game" : "Game Reset") {
 
     setPlayerScore({
       player: 0,
@@ -228,6 +229,17 @@ function App() {
   function handleMuteChange(nextIsMuted: boolean) {
     setIsMuted(nextIsMuted);
     setSoundMuted(nextIsMuted);
+  }
+
+  function openSettings() {
+    setPendingTargetScore(targetScore);
+    setIsSettingsOpen(true);
+  }
+
+  function applyTargetScore() {
+    setTargetScore(pendingTargetScore);
+    setIsSettingsOpen(false);
+    resetGame("New Game");
   }
 
   useEffect(() => {
@@ -310,14 +322,16 @@ function App() {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
-      <SettingsButton onClick={() => setIsSettingsOpen(true)} />
+      <SettingsButton onClick={openSettings} />
       {isSettingsOpen && (
         <SettingsModal
+          currentTargetScore={targetScore}
           isMuted={isMuted}
+          onApplyTargetScore={applyTargetScore}
           onClose={() => setIsSettingsOpen(false)}
           onMuteChange={handleMuteChange}
-          onTargetScoreChange={setTargetScore}
-          targetScore={targetScore}
+          onPendingTargetScoreChange={setPendingTargetScore}
+          pendingTargetScore={pendingTargetScore}
         />
       )}
       <PlayerBoard

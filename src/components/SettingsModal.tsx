@@ -6,10 +6,12 @@ import Button from "./GameButton";
 
 type SettingsModalProps = {
   isMuted: boolean;
+  onApplyTargetScore: () => void;
   onClose: () => void;
   onMuteChange: (isMuted: boolean) => void;
-  onTargetScoreChange: (targetScore: number) => void;
-  targetScore: number;
+  onPendingTargetScoreChange: (targetScore: number) => void;
+  pendingTargetScore: number;
+  currentTargetScore: number;
 };
 
 function getClosestTargetScore(value: number): number {
@@ -20,11 +22,15 @@ function getClosestTargetScore(value: number): number {
 
 export function SettingsModal({
   isMuted,
+  onApplyTargetScore,
   onClose,
   onMuteChange,
-  onTargetScoreChange,
-  targetScore,
+  onPendingTargetScoreChange,
+  pendingTargetScore,
+  currentTargetScore,
 }: SettingsModalProps) {
+  const targetScoreChanged = pendingTargetScore !== currentTargetScore;
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -93,7 +99,7 @@ export function SettingsModal({
                 </p>
               </div>
               <span className="text-lg font-black text-white">
-                {targetScore}
+                {pendingTargetScore}
               </span>
             </div>
 
@@ -103,13 +109,13 @@ export function SettingsModal({
               max={TARGET_SCORE_OPTIONS[TARGET_SCORE_OPTIONS.length - 1]}
               min={TARGET_SCORE_OPTIONS[0]}
               onChange={(event) =>
-                onTargetScoreChange(
+                onPendingTargetScoreChange(
                   getClosestTargetScore(Number(event.target.value)),
                 )
               }
               step={1}
               type="range"
-              value={targetScore}
+              value={pendingTargetScore}
             />
             <datalist id="target-score-options">
               {TARGET_SCORE_OPTIONS.map((option) => (
@@ -121,6 +127,19 @@ export function SettingsModal({
                 <span key={option}>{option}</span>
               ))}
             </div>
+
+            {targetScoreChanged && (
+              <div className="mt-4 rounded-lg bg-yellow-500/10 p-3 text-sm text-yellow-100">
+                <p className="mb-3 font-bold">
+                  Changing target score starts a new game and clears progress.
+                </p>
+                <div className="flex justify-center">
+                  <Button onClick={onApplyTargetScore} color="yellow">
+                    Apply & Start New Game
+                  </Button>
+                </div>
+              </div>
+            )}
           </section>
 
           <a
