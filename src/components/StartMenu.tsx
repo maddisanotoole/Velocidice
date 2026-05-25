@@ -21,7 +21,7 @@ export function StartMenu({
   targetScore,
 }: StartMenuProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-950 px-3 py-4 text-white sm:items-center sm:px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-zinc-950 px-3 py-4 text-white sm:px-4">
       <section className="w-full max-w-md rounded-xl bg-zinc-800 p-4 shadow-2xl sm:p-6">
         <div className="text-center">
           <h1 className="text-3xl font-black uppercase tracking-wide sm:text-4xl">

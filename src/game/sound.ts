@@ -15,17 +15,40 @@ const soundSources = {
   lose: loseSound,
 };
 
-const rollSounds = [rollSound, rollSoundTwo, rollSoundThree];
+const rollSoundSources = [rollSound, rollSoundTwo, rollSoundThree];
+const audioCache = Object.fromEntries(
+  Object.entries(soundSources).map(([name, source]) => [
+    name,
+    createAudio(source),
+  ]),
+) as Record<keyof typeof soundSources, HTMLAudioElement>;
+const rollAudioCache = rollSoundSources.map(createAudio);
 let nextRollSoundIndex = 0;
 let muted = false;
 
 type SoundName = keyof typeof soundSources | "roll";
 
+function createAudio(source: string) {
+  const audio = new Audio(source);
+  audio.preload = "auto";
+
+  return audio;
+}
+
 function getNextRollSound() {
-  const sound = rollSounds[nextRollSoundIndex];
-  nextRollSoundIndex = (nextRollSoundIndex + 1) % rollSounds.length;
+  const sound = rollAudioCache[nextRollSoundIndex];
+  nextRollSoundIndex = (nextRollSoundIndex + 1) % rollAudioCache.length;
 
   return sound;
+}
+
+function playAudio(audio: HTMLAudioElement) {
+  const sound = audio.cloneNode() as HTMLAudioElement;
+
+  sound.volume = audio.volume;
+  sound.play().catch(() => {
+    // Browser may block sound until the user interacts with the page.
+  });
 }
 
 export function playSound(name: SoundName) {
@@ -33,11 +56,28 @@ export function playSound(name: SoundName) {
     return;
   }
 
-  const source = name === "roll" ? getNextRollSound() : soundSources[name];
-  const sound = new Audio(source);
+  const sound = name === "roll" ? getNextRollSound() : audioCache[name];
 
-  sound.play().catch(() => {
-    // Browser may block sound until the user interacts with the page.
+  playAudio(sound);
+}
+
+export function primeSounds() {
+  const sounds = [...Object.values(audioCache), ...rollAudioCache];
+
+  sounds.forEach((sound) => {
+    sound.load();
+
+    sound.muted = true;
+    sound
+      .play()
+      .then(() => {
+        sound.pause();
+        sound.currentTime = 0;
+        sound.muted = false;
+      })
+      .catch(() => {
+        sound.muted = false;
+      });
   });
 }
 

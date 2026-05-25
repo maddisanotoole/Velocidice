@@ -23,7 +23,12 @@ import {
   toggleDieSelection,
   type TurnState,
 } from "./game/turn";
-import { isSoundMuted, playSound, setSoundMuted } from "./game/sound";
+import {
+  isSoundMuted,
+  playSound,
+  primeSounds,
+  setSoundMuted,
+} from "./game/sound";
 import { useComputerTurn } from "./hooks/useComputerTurn";
 import { diceValuesText } from "./game/diceText";
 import {
@@ -210,7 +215,6 @@ function App() {
   }
 
   function resetGame(message = winner ? "New Game" : "Game Reset") {
-
     setPlayerScore({
       player: 0,
       computer: 0,
@@ -233,6 +237,7 @@ function App() {
   }
 
   function startGame() {
+    primeSounds();
     setHasStartedGame(true);
     playSound("roll");
   }
