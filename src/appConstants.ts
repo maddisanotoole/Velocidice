@@ -2,3 +2,4 @@ export const COMPUTER_TURN_DELAY_MS = 1400;
 export const ACTION_MESSAGE_DELAY_MS = 1200;
 export const SCORE_DELTA_DELAY_MS = 1200;
 export const TURN_SWITCH_DELAY_MS = 1200;
+export const HOLD_TO_END_GAME_MS = 1200;

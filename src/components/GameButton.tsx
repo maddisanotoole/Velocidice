@@ -2,6 +2,10 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
+  onPointerCancel?: () => void;
+  onPointerDown?: () => void;
+  onPointerLeave?: () => void;
+  onPointerUp?: () => void;
   title?: string;
   color?: "green" | "blue" | "red" | "yellow";
 }
@@ -20,6 +24,10 @@ const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   disabled = false,
+  onPointerCancel,
+  onPointerDown,
+  onPointerLeave,
+  onPointerUp,
   title,
   color = "green",
 }) => {
@@ -27,6 +35,10 @@ const Button: React.FC<ButtonProps> = ({
     <button
       type="button"
       onClick={onClick}
+      onPointerCancel={onPointerCancel}
+      onPointerDown={onPointerDown}
+      onPointerLeave={onPointerLeave}
+      onPointerUp={onPointerUp}
       className={`px-6 py-3 rounded-xl font-bold transition-colors duration-200 ${
         colorClasses[color]
       } ${disabledClasses}`}

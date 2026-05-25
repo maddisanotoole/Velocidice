@@ -29,6 +29,7 @@ import { playSound } from "./game/sound";
 import {
   ACTION_MESSAGE_DELAY_MS,
   COMPUTER_TURN_DELAY_MS,
+  HOLD_TO_END_GAME_MS,
   SCORE_DELTA_DELAY_MS,
   TURN_SWITCH_DELAY_MS,
 } from "./appConstants";
@@ -40,6 +41,9 @@ function diceValuesText(dice: { value: number }[]): string {
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
   const previousPlayerRef = useRef<PlayerId | null>(null);
+  const endGameHoldStartRef = useRef(0);
+  const endGameHoldIntervalRef = useRef<number | null>(null);
+  const endGameHoldTimeoutRef = useRef<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
 
@@ -55,6 +59,7 @@ function App() {
   const [totalScoreDelta, setTotalScoreDelta] = useState(0);
   const [isTurnChanging, setIsTurnChanging] = useState(false);
   const [rerollCount, setRerollCount] = useState(0);
+  const [endGameHoldProgress, setEndGameHoldProgress] = useState(0);
 
   const dice = turn.dice;
   const selectedDice = getSelectedDice(dice);
@@ -89,6 +94,7 @@ function App() {
         : !selectedDiceAreValid
           ? "Every selected die must contribute to the score."
           : undefined;
+  const endGameProgressCircleOffset = 50.27 * (1 - endGameHoldProgress);
 
   useEffect(() => {
     const previousPlayer = previousPlayerRef.current;
@@ -265,6 +271,8 @@ function App() {
     return () => clearTimeout(timeout);
   }, [roundScoreDelta, totalScoreDelta]);
 
+  useEffect(() => clearEndGameHold, []);
+
   function switchTurn() {
     setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
     setRoundScore(0);
@@ -385,6 +393,8 @@ function App() {
   }
 
   function resetGame() {
+    const message = winner ? "New Game" : "Game Reset";
+
     setPlayerScore({
       player: 0,
       computer: 0,
@@ -394,11 +404,52 @@ function App() {
     playSound("roll");
     setTurn(rollNewDice());
     setRoundScore(0);
-    setActionMessage("");
+    setActionMessage(message);
     setRoundScoreDelta(0);
     setTotalScoreDelta(0);
     setIsTurnChanging(false);
     setRerollCount(0);
+    clearEndGameHold();
+  }
+
+  function clearEndGameHold() {
+    if (endGameHoldIntervalRef.current !== null) {
+      window.clearInterval(endGameHoldIntervalRef.current);
+      endGameHoldIntervalRef.current = null;
+    }
+
+    if (endGameHoldTimeoutRef.current !== null) {
+      window.clearTimeout(endGameHoldTimeoutRef.current);
+      endGameHoldTimeoutRef.current = null;
+    }
+
+    endGameHoldStartRef.current = 0;
+    setEndGameHoldProgress(0);
+  }
+
+  function startEndGameHold() {
+    if (winner) {
+      return;
+    }
+
+    clearEndGameHold();
+    endGameHoldStartRef.current = Date.now();
+    setEndGameHoldProgress(0);
+
+    endGameHoldIntervalRef.current = window.setInterval(() => {
+      const elapsed = Date.now() - endGameHoldStartRef.current;
+      setEndGameHoldProgress(Math.min(elapsed / HOLD_TO_END_GAME_MS, 1));
+    }, 30);
+
+    endGameHoldTimeoutRef.current = window.setTimeout(() => {
+      resetGame();
+    }, HOLD_TO_END_GAME_MS);
+  }
+
+  function handleEndGameClick() {
+    if (winner) {
+      resetGame();
+    }
   }
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
@@ -493,8 +544,45 @@ function App() {
           Rules
         </Button>
         {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
-        <Button onClick={resetGame} color={winner ? "green" : "red"}>
-          {winner ? "New Game " : "End Game"}
+        <Button
+          onClick={handleEndGameClick}
+          color={winner ? "green" : "red"}
+          onPointerCancel={clearEndGameHold}
+          onPointerDown={startEndGameHold}
+          onPointerLeave={clearEndGameHold}
+          onPointerUp={clearEndGameHold}
+          title={winner ? undefined : "Hold to end this game and lose progress."}
+        >
+          {winner ? (
+            "New Game "
+          ) : (
+            <span className="flex items-center gap-2">
+              <span className="relative h-5 w-5" aria-hidden="true">
+                <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
+                  <circle
+                    className="stroke-red-200/40"
+                    cx="10"
+                    cy="10"
+                    fill="none"
+                    r="8"
+                    strokeWidth="3"
+                  />
+                  <circle
+                    className="stroke-white"
+                    cx="10"
+                    cy="10"
+                    fill="none"
+                    r="8"
+                    strokeDasharray="50.27"
+                    strokeDashoffset={endGameProgressCircleOffset}
+                    strokeLinecap="round"
+                    strokeWidth="3"
+                  />
+                </svg>
+              </span>
+              Hold to End Game
+            </span>
+          )}
         </Button>
       </Row>
     </div>
