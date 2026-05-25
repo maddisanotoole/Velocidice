@@ -26,11 +26,12 @@ import {
   type ComputerBankDecisionDetails,
 } from "./game/computer";
 import { playSound } from "./game/sound";
-
-const COMPUTER_TURN_DELAY_MS = 1400;
-const ACTION_MESSAGE_DELAY_MS = 1200;
-const SCORE_DELTA_DELAY_MS = 1200;
-const TURN_SWITCH_DELAY_MS = 1200;
+import {
+  ACTION_MESSAGE_DELAY_MS,
+  COMPUTER_TURN_DELAY_MS,
+  SCORE_DELTA_DELAY_MS,
+  TURN_SWITCH_DELAY_MS,
+} from "./appConstants";
 
 function diceValuesText(dice: { value: number }[]): string {
   return dice.map((die) => die.value).join("-");
@@ -67,6 +68,18 @@ function App() {
     currentPlayer === "player"
       ? "border-blue-300 bg-blue-500 text-white"
       : "border-purple-300 bg-purple-500 text-white";
+  const winnerTextClasses =
+    winner === "computer" ? "text-red-400" : "text-green-400";
+  const feedbackMessage = winner
+    ? `${winner} wins!`
+    : hasFarkled
+      ? "Farkle!"
+      : actionMessage;
+  const feedbackMessageClasses = winner
+    ? winnerTextClasses
+    : hasFarkled
+      ? "text-red-400"
+      : "text-white";
   const actionDisabledReason = winner
     ? `${winner} won the game. Reset to play again.`
     : hasFarkled
@@ -336,7 +349,9 @@ function App() {
     const willWin = playerScore[currentPlayer] + bankedScore >= WINNING_SCORE;
 
     if (!hasFarkled) {
-      playSound(willWin ? "win" : "bank");
+      playSound(
+        willWin ? (currentPlayer === "computer" ? "lose" : "win") : "bank",
+      );
 
       if (isComputerTurn) {
         console.info("[Computer] Banked turn", {
@@ -436,19 +451,11 @@ function App() {
           ></DieFace>
         ))}
       </div>
-      {hasFarkled && (
-        <p className="text-4xl font-black uppercase tracking-wide text-red-400">
-          Farkle!
-        </p>
-      )}
-      {winner && (
-        <p className="text-4xl font-black uppercase tracking-wide text-green-400">
-          {winner} wins!
-        </p>
-      )}
-      {actionMessage && (
-        <p className="pointer-events-none fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-xl bg-zinc-950/90 px-5 py-3 text-2xl font-black uppercase tracking-wide text-white shadow-2xl">
-          {actionMessage}
+      {feedbackMessage && (
+        <p
+          className={`pointer-events-none fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-xl bg-zinc-950/90 px-5 py-3 text-2xl font-black uppercase tracking-wide shadow-2xl ${feedbackMessageClasses}`}
+        >
+          {feedbackMessage}
         </p>
       )}
       <Row>

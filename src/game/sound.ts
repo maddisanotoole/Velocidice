@@ -1,55 +1,35 @@
 import bankSound from "../assets/sound/bank.mp3";
 import farkleSound from "../assets/sound/farkle.mp3";
+import loseSound from "../assets/sound/lose.mp3";
 import rollSound from "../assets/sound/roll.mp3";
+import rollSoundTwo from "../assets/sound/roll_2.mp3";
+import rollSoundThree from "../assets/sound/roll_3.mp3";
 import selectSound from "../assets/sound/select.mp3";
+import winSound from "../assets/sound/win.mp3";
 
 const soundSources = {
-  roll: rollSound,
   select: selectSound,
   bank: bankSound,
   farkle: farkleSound,
+  win: winSound,
+  lose: loseSound,
 };
 
-type SoundName = keyof typeof soundSources | "win";
+const rollSounds = [rollSound, rollSoundTwo, rollSoundThree];
+let nextRollSoundIndex = 0;
 
-function playWinSound() {
-  const AudioContextConstructor =
-    window.AudioContext ??
-    (window as typeof window & { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext;
+type SoundName = keyof typeof soundSources | "roll";
 
-  if (!AudioContextConstructor) {
-    return;
-  }
+function getNextRollSound() {
+  const sound = rollSounds[nextRollSoundIndex];
+  nextRollSoundIndex = (nextRollSoundIndex + 1) % rollSounds.length;
 
-  const audioContext = new AudioContextConstructor();
-  const gain = audioContext.createGain();
-  const notes = [523.25, 659.25, 783.99, 1046.5];
-
-  gain.connect(audioContext.destination);
-  gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-
-  notes.forEach((frequency, index) => {
-    const startTime = audioContext.currentTime + index * 0.12;
-    const oscillator = audioContext.createOscillator();
-
-    oscillator.type = "triangle";
-    oscillator.frequency.setValueAtTime(frequency, startTime);
-    oscillator.connect(gain);
-    gain.gain.exponentialRampToValueAtTime(0.25, startTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.18);
-    oscillator.start(startTime);
-    oscillator.stop(startTime + 0.22);
-  });
+  return sound;
 }
 
 export function playSound(name: SoundName) {
-  if (name === "win") {
-    playWinSound();
-    return;
-  }
-
-  const sound = new Audio(soundSources[name]);
+  const source = name === "roll" ? getNextRollSound() : soundSources[name];
+  const sound = new Audio(source);
 
   sound.play().catch(() => {
     // Browser may block sound until the user interacts with the page.
