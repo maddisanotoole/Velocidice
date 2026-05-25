@@ -10,6 +10,8 @@ import { SettingsButton } from "./components/SettingsButton";
 import { DiceTray } from "./components/DiceTray";
 import { FeedbackToast } from "./components/FeedbackToast";
 import { HoldToEndGameButton } from "./components/HoldToEndGameButton";
+import { StartMenu } from "./components/StartMenu";
+import { RulesButton } from "./components/RulesButton";
 import { Row } from "./components/Row";
 import {
   createRollingTurn,
@@ -37,9 +39,8 @@ function App() {
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
   const [targetScore, setTargetScore] = useState(DEFAULT_TARGET_SCORE);
-  const [pendingTargetScore, setPendingTargetScore] =
-    useState(DEFAULT_TARGET_SCORE);
   const [isMuted, setIsMuted] = useState(isSoundMuted);
+  const [hasStartedGame, setHasStartedGame] = useState(false);
 
   const [playerScore, setPlayerScore] = useState<PlayerScores>({
     player: 0,
@@ -231,15 +232,19 @@ function App() {
     setSoundMuted(nextIsMuted);
   }
 
+  function startGame() {
+    setHasStartedGame(true);
+    playSound("roll");
+  }
+
   function openSettings() {
-    setPendingTargetScore(targetScore);
     setIsSettingsOpen(true);
   }
 
-  function applyTargetScore() {
-    setTargetScore(pendingTargetScore);
+  function backToMenu() {
     setIsSettingsOpen(false);
-    resetGame("New Game");
+    setHasStartedGame(false);
+    resetGame("Back to Menu");
   }
 
   useEffect(() => {
@@ -322,16 +327,23 @@ function App() {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
+      {!hasStartedGame && (
+        <StartMenu
+          isMuted={isMuted}
+          onMuteChange={handleMuteChange}
+          onOpenRules={() => setIsRulesOpen(true)}
+          onStart={startGame}
+          onTargetScoreChange={setTargetScore}
+          targetScore={targetScore}
+        />
+      )}
       <SettingsButton onClick={openSettings} />
       {isSettingsOpen && (
         <SettingsModal
-          currentTargetScore={targetScore}
           isMuted={isMuted}
-          onApplyTargetScore={applyTargetScore}
+          onBackToMenu={backToMenu}
           onClose={() => setIsSettingsOpen(false)}
           onMuteChange={handleMuteChange}
-          onPendingTargetScoreChange={setPendingTargetScore}
-          pendingTargetScore={pendingTargetScore}
         />
       )}
       <PlayerBoard
@@ -359,7 +371,7 @@ function App() {
         dice={dice}
         isTurnChanging={isTurnChanging}
         onSelectDie={selectDie}
-        rerollCount={rerollCount}
+        rerollCount={hasStartedGame ? rerollCount : -1}
       />
       <FeedbackToast
         message={feedbackMessage}
@@ -396,9 +408,7 @@ function App() {
         </Button>
       </Row>
       <Row>
-        <Button onClick={() => setIsRulesOpen(true)} color="blue">
-          Rules
-        </Button>
+        <RulesButton onClick={() => setIsRulesOpen(true)} />
         {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
         <HoldToEndGameButton onReset={resetGame} winner={winner} />
       </Row>

@@ -1,36 +1,21 @@
 import { useEffect } from "react";
-import { GITHUB_REPOSITORY_URL, TARGET_SCORE_OPTIONS } from "../appConstants";
-import soundOffIcon from "../assets/sound_off.svg";
-import soundOnIcon from "../assets/sound_on.svg";
+import { GITHUB_REPOSITORY_URL } from "../appConstants";
 import Button from "./GameButton";
+import { MuteButton } from "./MuteButton";
 
 type SettingsModalProps = {
   isMuted: boolean;
-  onApplyTargetScore: () => void;
+  onBackToMenu: () => void;
   onClose: () => void;
   onMuteChange: (isMuted: boolean) => void;
-  onPendingTargetScoreChange: (targetScore: number) => void;
-  pendingTargetScore: number;
-  currentTargetScore: number;
 };
-
-function getClosestTargetScore(value: number): number {
-  return TARGET_SCORE_OPTIONS.reduce((closest, option) =>
-    Math.abs(option - value) < Math.abs(closest - value) ? option : closest,
-  );
-}
 
 export function SettingsModal({
   isMuted,
-  onApplyTargetScore,
+  onBackToMenu,
   onClose,
   onMuteChange,
-  onPendingTargetScoreChange,
-  pendingTargetScore,
-  currentTargetScore,
 }: SettingsModalProps) {
-  const targetScoreChanged = pendingTargetScore !== currentTargetScore;
-
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -75,71 +60,21 @@ export function SettingsModal({
                 Turn off game sound effects.
               </span>
             </span>
-            <button
-              aria-label={isMuted ? "Turn sound on" : "Mute sound"}
-              className="rounded-full bg-zinc-950 p-3 transition-colors hover:bg-zinc-700 active:bg-zinc-600"
-              onClick={() => onMuteChange(!isMuted)}
-              title={isMuted ? "Turn sound on" : "Mute sound"}
-              type="button"
-            >
-              <img
-                alt=""
-                className="h-6 w-6"
-                src={isMuted ? soundOffIcon : soundOnIcon}
-              />
-            </button>
+            <MuteButton isMuted={isMuted} onMuteChange={onMuteChange} />
           </section>
 
           <section className="rounded-lg border border-zinc-700 px-4 py-3">
-            <div className="mb-3 flex items-center justify-between gap-4">
-              <div>
-                <h3 className="font-bold">Target Score</h3>
-                <p className="text-sm text-zinc-400">
-                  Slider snaps to supported scores only.
-                </p>
-              </div>
-              <span className="text-lg font-black text-white">
-                {pendingTargetScore}
-              </span>
+            <div className="mb-3">
+              <h3 className="font-bold">Game Setup</h3>
+              <p className="text-sm text-zinc-400">
+                Return to the menu to change target score or restart setup.
+              </p>
             </div>
-
-            <input
-              className="w-full accent-blue-500"
-              list="target-score-options"
-              max={TARGET_SCORE_OPTIONS[TARGET_SCORE_OPTIONS.length - 1]}
-              min={TARGET_SCORE_OPTIONS[0]}
-              onChange={(event) =>
-                onPendingTargetScoreChange(
-                  getClosestTargetScore(Number(event.target.value)),
-                )
-              }
-              step={1}
-              type="range"
-              value={pendingTargetScore}
-            />
-            <datalist id="target-score-options">
-              {TARGET_SCORE_OPTIONS.map((option) => (
-                <option key={option} value={option} />
-              ))}
-            </datalist>
-            <div className="mt-2 flex justify-between text-xs font-bold text-zinc-400">
-              {TARGET_SCORE_OPTIONS.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
+            <div className="flex justify-center">
+              <Button onClick={onBackToMenu} color="yellow">
+                Back to Menu
+              </Button>
             </div>
-
-            {targetScoreChanged && (
-              <div className="mt-4 rounded-lg bg-yellow-500/10 p-3 text-sm text-yellow-100">
-                <p className="mb-3 font-bold">
-                  Changing target score starts a new game and clears progress.
-                </p>
-                <div className="flex justify-center">
-                  <Button onClick={onApplyTargetScore} color="yellow">
-                    Apply & Start New Game
-                  </Button>
-                </div>
-              </div>
-            )}
           </section>
 
           <a
