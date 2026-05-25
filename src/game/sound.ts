@@ -17,6 +17,7 @@ const soundSources = {
 
 const rollSounds = [rollSound, rollSoundTwo, rollSoundThree];
 let nextRollSoundIndex = 0;
+let muted = false;
 
 type SoundName = keyof typeof soundSources | "roll";
 
@@ -28,10 +29,22 @@ function getNextRollSound() {
 }
 
 export function playSound(name: SoundName) {
+  if (muted) {
+    return;
+  }
+
   const source = name === "roll" ? getNextRollSound() : soundSources[name];
   const sound = new Audio(source);
 
   sound.play().catch(() => {
     // Browser may block sound until the user interacts with the page.
   });
+}
+
+export function setSoundMuted(isMuted: boolean) {
+  muted = isMuted;
+}
+
+export function isSoundMuted() {
+  return muted;
 }

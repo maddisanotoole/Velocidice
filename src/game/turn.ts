@@ -2,8 +2,6 @@ import { DieStatus, type Die } from "../types";
 import { initializeDice, rollDie } from "./dice";
 import { scoreDice } from "./scoring";
 
-export const WINNING_SCORE = 5000;
-
 export type TurnStatus = "rolling" | "farkled";
 
 export type TurnState = {
@@ -24,8 +22,8 @@ export function getActiveDice(dice: Die[]): Die[] {
   return dice.filter((die) => die.status === DieStatus.ACTIVE);
 }
 
-export function pointsToWin(playerScore: number): number {
-  return WINNING_SCORE - playerScore;
+export function pointsToWin(playerScore: number, targetScore: number): number {
+  return targetScore - playerScore;
 }
 
 export function getSelectedDice(dice: Die[]): Die[] {

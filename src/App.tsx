@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "./components/GameButton";
-import { DieStatus, type PlayerId, type PlayerScores } from "./types";
-import { DieFace } from "./components/DiceFace";
+import { type PlayerId, type PlayerScores } from "./types";
 import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
 import { PlayerBoard } from "./components/PlayerBoard";
 import { RulesModal } from "./components/RulesModal";
+import { SettingsModal } from "./components/SettingsModal";
+import { SettingsButton } from "./components/SettingsButton";
+import { DiceTray } from "./components/DiceTray";
+import { FeedbackToast } from "./components/FeedbackToast";
+import { HoldToEndGameButton } from "./components/HoldToEndGameButton";
 import { Row } from "./components/Row";
 import {
-  WINNING_SCORE,
   createRollingTurn,
   didFarkle,
   getActiveDice,
@@ -16,36 +19,25 @@ import {
   holdSelectedAndRollActive,
   rollNewDice,
   toggleDieSelection,
-  pointsToWin,
   type TurnState,
 } from "./game/turn";
-import {
-  chooseAdditionalBankingDice,
-  chooseComputerDice,
-  getComputerBankDecision,
-  type ComputerBankDecisionDetails,
-} from "./game/computer";
-import { playSound } from "./game/sound";
+import { isSoundMuted, playSound, setSoundMuted } from "./game/sound";
+import { useComputerTurn } from "./hooks/useComputerTurn";
+import { diceValuesText } from "./game/diceText";
 import {
   ACTION_MESSAGE_DELAY_MS,
-  COMPUTER_TURN_DELAY_MS,
-  HOLD_TO_END_GAME_MS,
+  DEFAULT_TARGET_SCORE,
   SCORE_DELTA_DELAY_MS,
   TURN_SWITCH_DELAY_MS,
 } from "./appConstants";
 
-function diceValuesText(dice: { value: number }[]): string {
-  return dice.map((die) => die.value).join("-");
-}
-
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
   const previousPlayerRef = useRef<PlayerId | null>(null);
-  const endGameHoldStartRef = useRef(0);
-  const endGameHoldIntervalRef = useRef<number | null>(null);
-  const endGameHoldTimeoutRef = useRef<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
+  const [targetScore, setTargetScore] = useState(DEFAULT_TARGET_SCORE);
+  const [isMuted, setIsMuted] = useState(isSoundMuted);
 
   const [playerScore, setPlayerScore] = useState<PlayerScores>({
     player: 0,
@@ -54,12 +46,12 @@ function App() {
 
   const [roundScore, setRoundScore] = useState(0);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
   const [roundScoreDelta, setRoundScoreDelta] = useState(0);
   const [totalScoreDelta, setTotalScoreDelta] = useState(0);
   const [isTurnChanging, setIsTurnChanging] = useState(false);
   const [rerollCount, setRerollCount] = useState(0);
-  const [endGameHoldProgress, setEndGameHoldProgress] = useState(0);
 
   const dice = turn.dice;
   const selectedDice = getSelectedDice(dice);
@@ -73,18 +65,18 @@ function App() {
     currentPlayer === "player"
       ? "border-blue-300 bg-blue-500 text-white"
       : "border-purple-300 bg-purple-500 text-white";
-  const winnerTextClasses =
-    winner === "computer" ? "text-red-400" : "text-green-400";
   const feedbackMessage = winner
     ? `${winner} wins!`
     : hasFarkled
       ? "Farkle!"
       : actionMessage;
-  const feedbackMessageClasses = winner
-    ? winnerTextClasses
+  const feedbackMessageVariant = winner
+    ? winner === "computer"
+      ? "danger"
+      : "success"
     : hasFarkled
-      ? "text-red-400"
-      : "text-white";
+      ? "danger"
+      : "default";
   const actionDisabledReason = winner
     ? `${winner} won the game. Reset to play again.`
     : hasFarkled
@@ -94,184 +86,6 @@ function App() {
         : !selectedDiceAreValid
           ? "Every selected die must contribute to the score."
           : undefined;
-  const endGameProgressCircleOffset = 50.27 * (1 - endGameHoldProgress);
-
-  useEffect(() => {
-    const previousPlayer = previousPlayerRef.current;
-    previousPlayerRef.current = currentPlayer;
-
-    if (!isComputerTurn || previousPlayer === "computer" || winner) return;
-
-    console.info("[Computer] Turn started", {
-      computerScore: playerScore.computer,
-      playerScore: playerScore.player,
-      targetScore: WINNING_SCORE,
-      roll: diceValuesText(dice),
-    });
-  }, [currentPlayer, dice, isComputerTurn, playerScore, winner]);
-
-  useEffect(() => {
-    if (!isComputerTurn || hasFarkled || winner || isTurnChanging) return;
-
-    const timeout = setTimeout(() => {
-      if (hasFarkled) {
-        endTurn();
-        return;
-      }
-
-      if (selectedDice.length === 0) {
-        const selection = chooseComputerDice(dice);
-        const selectedIds = new Set(selection.map((die) => die.id));
-
-        console.info("[Computer] Evaluating roll", {
-          rollNumber: rerollCount + 1,
-          activeDice: diceValuesText(getActiveDice(dice)),
-          selectedDice: diceValuesText(selection),
-          selectedScore: scoreDice(selection.map((die) => die.value)).score,
-        });
-
-        if (selectedIds.size === 0) {
-          console.info("[Computer] Decision: no scoring dice, end turn");
-          endTurn();
-          return;
-        }
-
-        console.info("[Computer] Decision: select scoring dice", {
-          selectedDice: diceValuesText(selection),
-        });
-
-        playSound("select");
-        setTurn((prev) => ({
-          ...prev,
-          dice: prev.dice.map((die) =>
-            selectedIds.has(die.id)
-              ? { ...die, status: DieStatus.SELECTED }
-              : die,
-          ),
-        }));
-        return;
-      }
-
-      const remainingDice = getActiveDice(dice).length;
-      const computerPointsToWin = pointsToWin(playerScore.computer);
-      const playerPointsToWin = pointsToWin(playerScore.player);
-      const bankableScore = roundScore + selectedScore;
-      const bankDecision = getComputerBankDecision({
-        bankableScore,
-        computerPointsToWin,
-        playerPointsToWin,
-        remainingDice,
-        rerollCount,
-        selectedScore,
-      });
-
-      console.info("[Computer] Evaluating selected dice", {
-        rollNumber: rerollCount + 1,
-        selectedDice: diceValuesText(selectedDice),
-        selectedScore,
-        roundScore,
-        ...bankDecision.details,
-      });
-
-      if (remainingDice === 0) {
-        console.info("[Computer] Decision: hot dice, hold and reroll all dice");
-        holdDice();
-        return;
-      }
-
-      function bankOrSelectExtraDice(
-        message: string,
-        details?: ComputerBankDecisionDetails,
-      ) {
-        const additionalBankingDice = chooseAdditionalBankingDice(dice);
-
-        if (additionalBankingDice.length > 0) {
-          const selectedIds = new Set(
-            additionalBankingDice.map((die) => die.id),
-          );
-
-          console.info("[Computer] Decision: add scoring singles before banking", {
-            selectedDice: diceValuesText(additionalBankingDice),
-            reason: message,
-            ...details,
-          });
-
-          playSound("select");
-          setTurn((prev) => ({
-            ...prev,
-            dice: prev.dice.map((die) =>
-              selectedIds.has(die.id)
-                ? { ...die, status: DieStatus.SELECTED }
-                : die,
-            ),
-          }));
-          return;
-        }
-
-        console.info(message, details);
-        endTurn();
-      }
-
-      if (bankDecision.shouldBank) {
-        bankOrSelectExtraDice(bankDecision.message, bankDecision.details);
-        return;
-      }
-
-      console.info(bankDecision.message, bankDecision.details);
-      holdDice();
-    }, COMPUTER_TURN_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  });
-
-  useEffect(() => {
-    if (!hasFarkled || winner || isTurnChanging) return;
-
-    playSound("farkle");
-    const timeout = setTimeout(() => {
-      setTotalScoreDelta(0);
-      setRoundScoreDelta(0);
-      switchTurn();
-    }, TURN_SWITCH_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [hasFarkled, winner, isTurnChanging]);
-
-  useEffect(() => {
-    if (!isTurnChanging) return;
-
-    const timeout = setTimeout(() => {
-      setTotalScoreDelta(0);
-      setRoundScoreDelta(0);
-      switchTurn();
-      setIsTurnChanging(false);
-    }, TURN_SWITCH_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [isTurnChanging]);
-
-  useEffect(() => {
-    if (!actionMessage) return;
-
-    const timeout = setTimeout(() => {
-      setActionMessage("");
-    }, ACTION_MESSAGE_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [actionMessage]);
-
-  useEffect(() => {
-    if (roundScoreDelta === 0 && totalScoreDelta === 0) return;
-
-    const timeout = setTimeout(() => {
-      setRoundScoreDelta(0);
-      setTotalScoreDelta(0);
-    }, SCORE_DELTA_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [roundScoreDelta, totalScoreDelta]);
-
-  useEffect(() => clearEndGameHold, []);
 
   function switchTurn() {
     setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
@@ -354,7 +168,7 @@ function App() {
     }
 
     const bankedScore = hasFarkled ? 0 : roundScore + selectedScore;
-    const willWin = playerScore[currentPlayer] + bankedScore >= WINNING_SCORE;
+    const willWin = playerScore[currentPlayer] + bankedScore >= targetScore;
 
     if (!hasFarkled) {
       playSound(
@@ -409,69 +223,105 @@ function App() {
     setTotalScoreDelta(0);
     setIsTurnChanging(false);
     setRerollCount(0);
-    clearEndGameHold();
   }
 
-  function clearEndGameHold() {
-    if (endGameHoldIntervalRef.current !== null) {
-      window.clearInterval(endGameHoldIntervalRef.current);
-      endGameHoldIntervalRef.current = null;
-    }
-
-    if (endGameHoldTimeoutRef.current !== null) {
-      window.clearTimeout(endGameHoldTimeoutRef.current);
-      endGameHoldTimeoutRef.current = null;
-    }
-
-    endGameHoldStartRef.current = 0;
-    setEndGameHoldProgress(0);
+  function handleMuteChange(nextIsMuted: boolean) {
+    setIsMuted(nextIsMuted);
+    setSoundMuted(nextIsMuted);
   }
 
-  function startEndGameHold() {
-    if (winner) {
-      return;
-    }
+  useEffect(() => {
+    const previousPlayer = previousPlayerRef.current;
+    previousPlayerRef.current = currentPlayer;
 
-    clearEndGameHold();
-    endGameHoldStartRef.current = Date.now();
-    setEndGameHoldProgress(0);
+    if (!isComputerTurn || previousPlayer === "computer" || winner) return;
 
-    endGameHoldIntervalRef.current = window.setInterval(() => {
-      const elapsed = Date.now() - endGameHoldStartRef.current;
-      setEndGameHoldProgress(Math.min(elapsed / HOLD_TO_END_GAME_MS, 1));
-    }, 30);
+    console.info("[Computer] Turn started", {
+      computerScore: playerScore.computer,
+      playerScore: playerScore.player,
+      targetScore,
+      roll: diceValuesText(dice),
+    });
+  }, [currentPlayer, dice, isComputerTurn, playerScore, targetScore, winner]);
 
-    endGameHoldTimeoutRef.current = window.setTimeout(() => {
-      resetGame();
-    }, HOLD_TO_END_GAME_MS);
-  }
+  useComputerTurn({
+    currentPlayer,
+    dice,
+    endTurn,
+    hasFarkled,
+    holdDice,
+    isTurnChanging,
+    playerScore,
+    rerollCount,
+    roundScore,
+    selectedDice,
+    selectedScore,
+    setTurn,
+    targetScore,
+    winner,
+  });
 
-  function handleEndGameClick() {
-    if (winner) {
-      resetGame();
-    }
-  }
+  useEffect(() => {
+    if (!hasFarkled || winner || isTurnChanging) return;
+
+    playSound("farkle");
+    const timeout = setTimeout(() => {
+      setTotalScoreDelta(0);
+      setRoundScoreDelta(0);
+      switchTurn();
+    }, TURN_SWITCH_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [hasFarkled, winner, isTurnChanging]);
+
+  useEffect(() => {
+    if (!isTurnChanging) return;
+
+    const timeout = setTimeout(() => {
+      setTotalScoreDelta(0);
+      setRoundScoreDelta(0);
+      switchTurn();
+      setIsTurnChanging(false);
+    }, TURN_SWITCH_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [isTurnChanging]);
+
+  useEffect(() => {
+    if (!actionMessage) return;
+
+    const timeout = setTimeout(() => {
+      setActionMessage("");
+    }, ACTION_MESSAGE_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [actionMessage]);
+
+  useEffect(() => {
+    if (roundScoreDelta === 0 && totalScoreDelta === 0) return;
+
+    const timeout = setTimeout(() => {
+      setRoundScoreDelta(0);
+      setTotalScoreDelta(0);
+    }, SCORE_DELTA_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [roundScoreDelta, totalScoreDelta]);
+
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center gap-8">
-      <a
-        aria-label="View VelociDice on GitHub"
-        className="fixed right-4 top-4 z-40 rounded-full bg-zinc-800 p-3 text-white shadow-lg transition-colors hover:bg-zinc-700 active:bg-zinc-600"
-        href="https://github.com/maddisanotoole/Velocidice"
-        rel="noreferrer"
-        target="_blank"
-        title="View on GitHub"
-      >
-        <svg
-          aria-hidden="true"
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.17c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-        </svg>
-      </a>
+      <SettingsButton onClick={() => setIsSettingsOpen(true)} />
+      {isSettingsOpen && (
+        <SettingsModal
+          isMuted={isMuted}
+          onClose={() => setIsSettingsOpen(false)}
+          onMuteChange={handleMuteChange}
+          onTargetScoreChange={setTargetScore}
+          targetScore={targetScore}
+        />
+      )}
       <PlayerBoard
-        targetScore={WINNING_SCORE}
+        targetScore={targetScore}
         currentPlayer={currentPlayer}
         playerScores={playerScore}
       />
@@ -490,25 +340,17 @@ function App() {
         {turnLabel}
       </p>
 
-      <div className="grid grid-cols-3 gap-3 sm:flex sm:gap-4">
-        {dice.map((die) => (
-          <DieFace
-            key={`die_${die.id}`}
-            currentPlayer={currentPlayer}
-            isBanked={isTurnChanging && die.status === DieStatus.SELECTED}
-            rollAnimationKey={`${currentPlayer}_${rerollCount}`}
-            onClick={() => selectDie(die.id)}
-            die={die}
-          ></DieFace>
-        ))}
-      </div>
-      {feedbackMessage && (
-        <p
-          className={`pointer-events-none fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-xl bg-zinc-950/90 px-5 py-3 text-2xl font-black uppercase tracking-wide shadow-2xl ${feedbackMessageClasses}`}
-        >
-          {feedbackMessage}
-        </p>
-      )}
+      <DiceTray
+        currentPlayer={currentPlayer}
+        dice={dice}
+        isTurnChanging={isTurnChanging}
+        onSelectDie={selectDie}
+        rerollCount={rerollCount}
+      />
+      <FeedbackToast
+        message={feedbackMessage}
+        variant={feedbackMessageVariant}
+      />
       <Row>
         <Button
           onClick={holdDice}
@@ -544,46 +386,7 @@ function App() {
           Rules
         </Button>
         {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
-        <Button
-          onClick={handleEndGameClick}
-          color={winner ? "green" : "red"}
-          onPointerCancel={clearEndGameHold}
-          onPointerDown={startEndGameHold}
-          onPointerLeave={clearEndGameHold}
-          onPointerUp={clearEndGameHold}
-          title={winner ? undefined : "Hold to end this game and lose progress."}
-        >
-          {winner ? (
-            "New Game "
-          ) : (
-            <span className="flex items-center gap-2">
-              <span className="relative h-5 w-5" aria-hidden="true">
-                <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
-                  <circle
-                    className="stroke-red-200/40"
-                    cx="10"
-                    cy="10"
-                    fill="none"
-                    r="8"
-                    strokeWidth="3"
-                  />
-                  <circle
-                    className="stroke-white"
-                    cx="10"
-                    cy="10"
-                    fill="none"
-                    r="8"
-                    strokeDasharray="50.27"
-                    strokeDashoffset={endGameProgressCircleOffset}
-                    strokeLinecap="round"
-                    strokeWidth="3"
-                  />
-                </svg>
-              </span>
-              Hold to End Game
-            </span>
-          )}
-        </Button>
+        <HoldToEndGameButton onReset={resetGame} winner={winner} />
       </Row>
     </div>
   );
