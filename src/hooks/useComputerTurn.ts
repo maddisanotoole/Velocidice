@@ -22,6 +22,7 @@ type UseComputerTurnArgs = {
   endTurn: () => void;
   hasFarkled: boolean;
   holdDice: () => void;
+  isEnabled: boolean;
   isTurnChanging: boolean;
   playerScore: PlayerScores;
   rerollCount: number;
@@ -39,6 +40,7 @@ export function useComputerTurn({
   endTurn,
   hasFarkled,
   holdDice,
+  isEnabled,
   isTurnChanging,
   playerScore,
   rerollCount,
@@ -49,7 +51,7 @@ export function useComputerTurn({
   targetScore,
   winner,
 }: UseComputerTurnArgs) {
-  const isComputerTurn = currentPlayer === "computer";
+  const isComputerTurn = isEnabled && currentPlayer === "player2";
 
   useEffect(() => {
     if (!isComputerTurn || hasFarkled || winner || isTurnChanging) return;
@@ -95,7 +97,7 @@ export function useComputerTurn({
 
       const remainingDice = getActiveDice(dice).length;
       const computerPointsToWin = pointsToWin(
-        playerScore.computer,
+        playerScore.player2,
         targetScore,
       );
       const playerPointsToWin = pointsToWin(playerScore.player, targetScore);
@@ -171,6 +173,7 @@ export function useComputerTurn({
     endTurn,
     hasFarkled,
     holdDice,
+    isEnabled,
     isComputerTurn,
     isTurnChanging,
     playerScore,

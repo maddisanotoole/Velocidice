@@ -43,7 +43,7 @@ export const DieFace: React.FC<DieProps> = ({
   rollAnimationKey,
 }) => {
   const isHeld = die.status === DieStatus.HELD || isBanked;
-  const isComputerTurn = currentPlayer === "computer";
+  const isPlayer2Turn = currentPlayer === "player2";
   const shouldAnimateRoll = die.status === DieStatus.ACTIVE && !isBanked;
 
   return (
@@ -86,7 +86,7 @@ export const DieFace: React.FC<DieProps> = ({
       ? "bg-green-500"
       : die.status === DieStatus.SELECTED
         ? "bg-yellow-400"
-        : isComputerTurn
+        : isPlayer2Turn
           ? "bg-purple-400"
           : "bg-white"
   }

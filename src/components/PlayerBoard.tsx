@@ -12,11 +12,13 @@ type PlayerBoardProps = {
   targetScore: number;
   currentPlayer: PlayerId;
   playerScores: PlayerScores;
+  playerLabels: Record<PlayerId, string>;
 };
 export function PlayerBoard({
   targetScore,
   currentPlayer,
   playerScores,
+  playerLabels,
 }: PlayerBoardProps) {
   return (
     <Board size={BoardSize.SMALL}>
@@ -27,16 +29,16 @@ export function PlayerBoard({
           textSize={TextSize.SMALL}
         />
         <ScoreItem
-          label="Player"
+          label={playerLabels.player}
           value={playerScores.player}
           textSize={TextSize.SMALL}
           active={currentPlayer === "player"}
         />
         <ScoreItem
-          label="Computer"
-          value={playerScores.computer}
+          label={playerLabels.player2}
+          value={playerScores.player2}
           textSize={TextSize.SMALL}
-          active={currentPlayer === "computer"}
+          active={currentPlayer === "player2"}
         />
       </Row>
     </Board>

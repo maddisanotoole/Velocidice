@@ -37,9 +37,9 @@ Examples:
 
 - 1 is valid because it scores 100.
 - 5 is valid because it scores 50.
-- 1-5 is valid because both dice score.
-- 1-2 is not valid because the 2 does not score.
-- 2-2-2 is valid because three 2s score 200.
+- 1, 5 is valid because both dice score.
+- 1, 2 is not valid because the 2 does not score.
+- 2, 2, 2 is valid because three 2s score 200.
 
 ## Farkle
 
@@ -47,8 +47,8 @@ A Farkle happens when the active dice have no possible scoring dice.
 
 Example Farkle rolls:
 
-- 2-3-4-6
-- 2-2-3-3-4-6
+- 2, 3, 4, 6
+- 2, 2, 3, 3, 4, 6
 
 When you Farkle:
 
@@ -62,18 +62,18 @@ If all dice are held because they all scored, you get to roll all six dice again
 
 Example:
 
-1. You select 1-2-3-4-5-6 for 1,500 points.
+1. You select 1, 2, 3, 4, 5, 6 for 1,500 points.
 2. All dice scored, so all six dice are rolled again.
 3. Your round score remains 1,500.
 4. If the next roll Farkles, that 1,500 is lost.
 
 ## Example Turn
 
-1. You roll 1-2-3-4-6-6.
+1. You roll 1, 2, 3, 4, 6, 6.
 2. You select the 1 for 100 points.
 3. You choose Hold and Reroll.
 4. Your round score becomes 100, and the remaining dice reroll.
-5. You roll 5-5-2-3-4.
+5. You roll 5, 5, 2, 3, 4.
 6. You select both 5s for 100 points.
 7. You can bank 200 total round points, or risk another reroll.
 
@@ -102,8 +102,8 @@ Example:
 | Three 6s | 600 |
 | Three pairs | 750 |
 | Two triplets | 2,500 |
-| Five-die straight, 1-2-3-4-5 or 2-3-4-5-6 | 1,000 |
-| Six-die straight, 1-2-3-4-5-6 | 1,500 |
+| Five-die straight, 1, 2, 3, 4, 5 or 2, 3, 4, 5, 6 | 1,000 |
+| Six-die straight, 1, 2, 3, 4, 5, 6 | 1,500 |
 
 ## Four, Five, And Six Of A Kind
 
@@ -119,12 +119,12 @@ Examples:
 
 | Dice | Score |
 | --- | ---: |
-| 1-1-1-1 | 2,000 |
-| 1-1-1-1-1 | 3,000 |
-| 1-1-1-1-1-1 | 4,000 |
-| 2-2-2-2 | 400 |
-| 2-2-2-2-2 | 600 |
-| 2-2-2-2-2-2 | 800 |
+| 1, 1, 1, 1 | 2,000 |
+| 1, 1, 1, 1, 1 | 3,000 |
+| 1, 1, 1, 1, 1, 1 | 4,000 |
+| 2, 2, 2, 2 | 400 |
+| 2, 2, 2, 2, 2 | 600 |
+| 2, 2, 2, 2, 2, 2 | 800 |
 
 ## Five-Die Straight With Leftover Die
 
@@ -132,8 +132,8 @@ A five-die straight uses five dice. If a sixth selected die is also a scoring di
 
 | Dice | Score | Valid Selection |
 | --- | ---: | --- |
-| 1-2-3-4-5 | 1,000 | Yes |
-| 2-3-4-5-6 | 1,000 | Yes |
-| 1-2-3-4-5-1 | 1,100 | Yes |
-| 1-2-3-4-5-5 | 1,050 | Yes |
-| 1-2-3-4-5-2 | 1,000 | No, because the extra 2 does not score |
+| 1, 2, 3, 4, 5 | 1,000 | Yes |
+| 2, 3, 4, 5, 6 | 1,000 | Yes |
+| 1, 2, 3, 4, 5, 1 | 1,100 | Yes |
+| 1, 2, 3, 4, 5, 5 | 1,050 | Yes |
+| 1, 2, 3, 4, 5, 2 | 1,000 | No, because the extra 2 does not score |

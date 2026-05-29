@@ -12,11 +12,13 @@ export type Die = {
   group?: number;
 };
 
-export type PlayerId = "player" | "computer";
+export type PlayerId = "player" | "player2";
+
+export type GameMode = "computer" | "local";
 
 export type PlayerScores = {
   player: number;
-  computer: number;
+  player2: number;
 };
 
 export type ScoreBoardProps = {

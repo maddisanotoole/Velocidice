@@ -60,7 +60,7 @@ npm run preview
 
 Phase 4:
 
-- Sound effects
+- Sound effects (DONE)
 - Statistics
 - Local save data
 - Difficulty settings

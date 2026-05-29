@@ -28,9 +28,9 @@ const turnSteps = [
 const validSelectionExamples = [
   ["1", "Valid: scores 100"],
   ["5", "Valid: scores 50"],
-  ["1-5", "Valid: both dice score"],
-  ["1-2", "Invalid: the 2 does not score"],
-  ["2-2-2", "Valid: three 2s score 200"],
+  ["1, 5", "Valid: both dice score"],
+  ["1, 2", "Invalid: the 2 does not score"],
+  ["2, 2, 2", "Valid: three 2s score 200"],
 ];
 
 export function RulesModal({ onClose }: RulesModalProps) {

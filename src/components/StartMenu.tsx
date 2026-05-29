@@ -2,9 +2,12 @@ import Button from "./GameButton";
 import { MuteButton } from "./MuteButton";
 import { RulesButton } from "./RulesButton";
 import { TargetScoreSlider } from "./TargetScoreSlider";
+import type { GameMode } from "../types";
 
 type StartMenuProps = {
+  gameMode: GameMode;
   isMuted: boolean;
+  onGameModeChange: (gameMode: GameMode) => void;
   onMuteChange: (isMuted: boolean) => void;
   onOpenRules: () => void;
   onStart: () => void;
@@ -13,7 +16,9 @@ type StartMenuProps = {
 };
 
 export function StartMenu({
+  gameMode,
   isMuted,
+  onGameModeChange,
   onMuteChange,
   onOpenRules,
   onStart,
@@ -28,10 +33,37 @@ export function StartMenu({
             VelociDice
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm text-zinc-400">
-            Bank points, dodge Farkles, and race the computer to the target
+            Bank points, dodge Farkles, and race your opponent to the target
             score.
           </p>
         </div>
+        <section className="mt-5 rounded-lg border border-zinc-700 px-3 py-3 sm:mt-6 sm:px-4">
+          <h2 className="font-bold">Game Mode</h2>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => onGameModeChange("computer")}
+              className={`rounded-lg border px-3 py-3 text-sm font-black uppercase transition-colors ${
+                gameMode === "computer"
+                  ? "border-purple-300 bg-purple-500 text-white"
+                  : "border-zinc-600 bg-zinc-900 text-zinc-300 hover:bg-zinc-700"
+              }`}
+            >
+              Computer
+            </button>
+            <button
+              type="button"
+              onClick={() => onGameModeChange("local")}
+              className={`rounded-lg border px-3 py-3 text-sm font-black uppercase transition-colors ${
+                gameMode === "local"
+                  ? "border-purple-300 bg-purple-500 text-white"
+                  : "border-zinc-600 bg-zinc-900 text-zinc-300 hover:bg-zinc-700"
+              }`}
+            >
+              Local 2-Player
+            </button>
+          </div>
+        </section>
         <div className="mt-5 flex justify-center sm:mt-6">
           <Button onClick={onStart} color="green">
             Start Game

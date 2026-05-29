@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "./components/GameButton";
-import { type PlayerId, type PlayerScores } from "./types";
+import { type GameMode, type PlayerId, type PlayerScores } from "./types";
 import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
 import { PlayerBoard } from "./components/PlayerBoard";
@@ -46,10 +46,11 @@ function App() {
   const [targetScore, setTargetScore] = useState(DEFAULT_TARGET_SCORE);
   const [isMuted, setIsMuted] = useState(isSoundMuted);
   const [hasStartedGame, setHasStartedGame] = useState(false);
+  const [gameMode, setGameMode] = useState<GameMode>("computer");
 
   const [playerScore, setPlayerScore] = useState<PlayerScores>({
     player: 0,
-    computer: 0,
+    player2: 0,
   });
 
   const [roundScore, setRoundScore] = useState(0);
@@ -67,26 +68,34 @@ function App() {
   const selectedScore = selectedScoreResult.score;
   const selectedDiceAreValid = selectedScoreResult.allDiceScore;
   const hasFarkled = turn.status === "farkled";
-  const isComputerTurn = currentPlayer === "computer";
-  const turnLabel = currentPlayer === "player" ? "Your Turn" : "Computer Turn";
+  const isComputerControlledTurn =
+    gameMode === "computer" && currentPlayer === "player2";
+  const playerLabels: Record<PlayerId, string> =
+    gameMode === "local"
+      ? { player: "Player 1", player2: "Player 2" }
+      : { player: "You", player2: "Computer" };
+  const turnLabel =
+    gameMode === "computer" && currentPlayer === "player"
+      ? "Your Turn"
+      : `${playerLabels[currentPlayer]} Turn`;
   const turnBannerClasses =
     currentPlayer === "player"
       ? "border-blue-300 bg-blue-500 text-white"
       : "border-purple-300 bg-purple-500 text-white";
   const feedbackMessage = winner
-    ? `${winner} wins!`
+    ? `${playerLabels[winner]} wins!`
     : hasFarkled
       ? "Farkle!"
       : actionMessage;
   const feedbackMessageVariant = winner
-    ? winner === "computer"
+    ? winner === "player2" && gameMode === "computer"
       ? "danger"
       : "success"
     : hasFarkled
       ? "danger"
       : "default";
   const actionDisabledReason = winner
-    ? `${winner} won the game. Reset to play again.`
+    ? `${playerLabels[winner]} won the game. Reset to play again.`
     : hasFarkled
       ? "You farkled. End your turn."
       : selectedDice.length === 0
@@ -96,7 +105,7 @@ function App() {
           : undefined;
 
   function switchTurn() {
-    setCurrentPlayer((prev) => (prev === "player" ? "computer" : "player"));
+    setCurrentPlayer((prev) => (prev === "player" ? "player2" : "player"));
     setRoundScore(0);
     setRerollCount(0);
     playSound("roll");
@@ -115,7 +124,7 @@ function App() {
     if (nextActiveDice.length === 0) {
       const nextRoll = rollNewDice();
 
-      if (isComputerTurn) {
+      if (isComputerControlledTurn) {
         console.info("[Computer] Held dice and rolled hot dice", {
           heldScore: selectedScore,
           nextRoll: diceValuesText(nextRoll.dice),
@@ -134,7 +143,7 @@ function App() {
 
     const nextStatus = didFarkle(nextDice) ? "farkled" : "rolling";
 
-    if (isComputerTurn) {
+    if (isComputerControlledTurn) {
       console.info("[Computer] Held dice and rerolled", {
         heldScore: selectedScore,
         nextActiveDice: diceValuesText(getActiveDice(nextDice)),
@@ -159,7 +168,7 @@ function App() {
     );
   }
   function selectDie(id: number) {
-    if (winner || isTurnChanging || hasFarkled || isComputerTurn) {
+    if (winner || isTurnChanging || hasFarkled || isComputerControlledTurn) {
       return;
     }
 
@@ -180,15 +189,15 @@ function App() {
 
     if (!hasFarkled) {
       playSound(
-        willWin ? (currentPlayer === "computer" ? "lose" : "win") : "bank",
+        willWin && isComputerControlledTurn ? "lose" : willWin ? "win" : "bank",
       );
 
-      if (isComputerTurn) {
+      if (isComputerControlledTurn) {
         console.info("[Computer] Banked turn", {
           roundScore,
           selectedScore,
           bankedScore,
-          newTotal: playerScore.computer + bankedScore,
+          newTotal: playerScore.player2 + bankedScore,
         });
       }
 
@@ -217,7 +226,7 @@ function App() {
   function resetGame(message = winner ? "New Game" : "Game Reset") {
     setPlayerScore({
       player: 0,
-      computer: 0,
+      player2: 0,
     });
     setCurrentPlayer("player");
     setWinner(null);
@@ -256,15 +265,28 @@ function App() {
     const previousPlayer = previousPlayerRef.current;
     previousPlayerRef.current = currentPlayer;
 
-    if (!isComputerTurn || previousPlayer === "computer" || winner) return;
+    if (
+      !isComputerControlledTurn ||
+      previousPlayer === "player2" ||
+      winner
+    ) {
+      return;
+    }
 
     console.info("[Computer] Turn started", {
-      computerScore: playerScore.computer,
+      computerScore: playerScore.player2,
       playerScore: playerScore.player,
       targetScore,
       roll: diceValuesText(dice),
     });
-  }, [currentPlayer, dice, isComputerTurn, playerScore, targetScore, winner]);
+  }, [
+    currentPlayer,
+    dice,
+    isComputerControlledTurn,
+    playerScore,
+    targetScore,
+    winner,
+  ]);
 
   useComputerTurn({
     currentPlayer,
@@ -272,6 +294,7 @@ function App() {
     endTurn,
     hasFarkled,
     holdDice,
+    isEnabled: gameMode === "computer",
     isTurnChanging,
     playerScore,
     rerollCount,
@@ -334,7 +357,9 @@ function App() {
     <div className="flex min-h-dvh flex-col items-center justify-start gap-4 bg-zinc-900 px-3 py-16 text-white sm:justify-center sm:gap-8 sm:px-4 sm:py-8">
       {!hasStartedGame && (
         <StartMenu
+          gameMode={gameMode}
           isMuted={isMuted}
+          onGameModeChange={setGameMode}
           onMuteChange={handleMuteChange}
           onOpenRules={() => setIsRulesOpen(true)}
           onStart={startGame}
@@ -355,6 +380,7 @@ function App() {
         targetScore={targetScore}
         currentPlayer={currentPlayer}
         playerScores={playerScore}
+        playerLabels={playerLabels}
       />
       <ScoreBoard
         currentPlayer={currentPlayer}
@@ -388,7 +414,7 @@ function App() {
           disabled={
             Boolean(winner) ||
             isTurnChanging ||
-            isComputerTurn ||
+            isComputerControlledTurn ||
             hasFarkled ||
             !selectedDiceAreValid
           }
@@ -402,7 +428,7 @@ function App() {
           disabled={
             Boolean(winner) ||
             isTurnChanging ||
-            isComputerTurn ||
+            isComputerControlledTurn ||
             hasFarkled ||
             !selectedDiceAreValid
           }
