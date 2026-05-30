@@ -171,7 +171,7 @@ function App() {
         });
       }
 
-      setActionMessage("Held");
+      setActionMessage("Hot dice!");
       playSound("roll");
       setRoundScoreDelta(selectedScore);
       setRerollCount((prev) => prev + 1);
@@ -298,6 +298,19 @@ function App() {
 
   function startGame() {
     primeSounds();
+    setPlayerScore({
+      player: 0,
+      player2: 0,
+    });
+    setCurrentPlayer("player");
+    setWinner(null);
+    setTurn(rollNewDice());
+    setRoundScore(0);
+    setActionMessage("");
+    setRoundScoreDelta(0);
+    setTotalScoreDelta(0);
+    setIsTurnChanging(false);
+    setRerollCount(0);
     setHasStartedGame(true);
     playSound("roll");
   }
@@ -341,7 +354,7 @@ function App() {
     endTurn,
     hasFarkled,
     holdDice,
-    isEnabled: gameMode === "computer",
+    isEnabled: hasStartedGame && gameMode === "computer",
     isTurnChanging,
     playerScore,
     rerollCount,
@@ -354,7 +367,7 @@ function App() {
   });
 
   useEffect(() => {
-    if (!hasFarkled || winner || isTurnChanging) return;
+    if (!hasStartedGame || !hasFarkled || winner || isTurnChanging) return;
 
     playSound("farkle");
     const timeout = setTimeout(() => {
@@ -364,10 +377,10 @@ function App() {
     }, TURN_SWITCH_DELAY_MS);
 
     return () => clearTimeout(timeout);
-  }, [hasFarkled, winner, isTurnChanging]);
+  }, [hasFarkled, hasStartedGame, winner, isTurnChanging]);
 
   useEffect(() => {
-    if (!isTurnChanging) return;
+    if (!hasStartedGame || !isTurnChanging) return;
 
     const timeout = setTimeout(() => {
       setTotalScoreDelta(0);
@@ -377,7 +390,7 @@ function App() {
     }, TURN_SWITCH_DELAY_MS);
 
     return () => clearTimeout(timeout);
-  }, [isTurnChanging]);
+  }, [hasStartedGame, isTurnChanging]);
 
   useEffect(() => {
     if (!actionMessage) return;
