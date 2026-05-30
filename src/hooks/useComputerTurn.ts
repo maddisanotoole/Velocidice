@@ -102,6 +102,11 @@ export function useComputerTurn({
       );
       const playerPointsToWin = pointsToWin(playerScore.player, targetScore);
       const bankableScore = roundScore + selectedScore;
+      const additionalBankingDice = chooseAdditionalBankingDice(dice);
+      const additionalBankingScore = scoreDice(additionalBankingDice).score;
+      const canWinWithAdditionalBankingDice =
+        additionalBankingDice.length > 0 &&
+        bankableScore + additionalBankingScore >= computerPointsToWin;
       const bankDecision = getComputerBankDecision({
         bankableScore,
         computerPointsToWin,
@@ -116,6 +121,9 @@ export function useComputerTurn({
         selectedDice: diceValuesText(selectedDice),
         selectedScore,
         roundScore,
+        additionalBankingDice: diceValuesText(additionalBankingDice),
+        additionalBankingScore,
+        canWinWithAdditionalBankingDice,
         ...bankDecision.details,
       });
 
@@ -129,8 +137,6 @@ export function useComputerTurn({
         message: string,
         details?: ComputerBankDecisionDetails,
       ) {
-        const additionalBankingDice = chooseAdditionalBankingDice(dice);
-
         if (additionalBankingDice.length > 0) {
           const selectedIds = new Set(
             additionalBankingDice.map((die) => die.id),
@@ -156,6 +162,18 @@ export function useComputerTurn({
 
         console.info(message, details);
         endTurn();
+      }
+
+      if (canWinWithAdditionalBankingDice) {
+        bankOrSelectExtraDice(
+          "[Computer] Decision: add scoring singles because computer can win now",
+          {
+            additionalBankingScore,
+            bankableScore,
+            computerPointsToWin,
+          },
+        );
+        return;
       }
 
       if (bankDecision.shouldBank) {
