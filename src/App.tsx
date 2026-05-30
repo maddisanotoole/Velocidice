@@ -45,6 +45,7 @@ const INVALID_SELECTION_MESSAGE =
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
   const previousPlayerRef = useRef<PlayerId | null>(null);
+  const previousSelectedDiceKeyRef = useRef("");
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
   const [targetScore, setTargetScore] = useState(DEFAULT_TARGET_SCORE);
@@ -361,12 +362,28 @@ function App() {
   useEffect(() => {
     if (!actionMessage) return;
 
+    if (actionMessage === INVALID_SELECTION_MESSAGE) {
+      return;
+    }
+
     const timeout = setTimeout(() => {
       setActionMessage("");
     }, ACTION_MESSAGE_DELAY_MS);
 
     return () => clearTimeout(timeout);
   }, [actionMessage]);
+
+  useEffect(() => {
+    const previousSelectedDiceKey = previousSelectedDiceKeyRef.current;
+    previousSelectedDiceKeyRef.current = selectedDiceKey;
+
+    if (
+      previousSelectedDiceKey !== selectedDiceKey &&
+      actionMessage === INVALID_SELECTION_MESSAGE
+    ) {
+      setActionMessage("");
+    }
+  }, [actionMessage, selectedDiceKey]);
 
   useEffect(() => {
     if (
