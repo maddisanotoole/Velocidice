@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "./components/GameButton";
-import { type GameMode, type PlayerId, type PlayerScores } from "./types";
+import {
+  type GameMode,
+  type GameRecords,
+  type PlayerId,
+  type PlayerScores,
+} from "./types";
 import { ScoreBoard } from "./components/ScoreBoard";
 import { scoreDice } from "./game/scoring";
 import { PlayerBoard } from "./components/PlayerBoard";
@@ -10,6 +15,7 @@ import { SettingsButton } from "./components/SettingsButton";
 import { DiceTray } from "./components/DiceTray";
 import { FeedbackToast } from "./components/FeedbackToast";
 import { HoldToEndGameButton } from "./components/HoldToEndGameButton";
+import { RecordBoard } from "./components/RecordBoard";
 import { StartMenu } from "./components/StartMenu";
 import { RulesButton } from "./components/RulesButton";
 import { Row } from "./components/Row";
@@ -32,6 +38,11 @@ import {
 import { useComputerTurn } from "./hooks/useComputerTurn";
 import { diceValuesText } from "./game/diceText";
 import {
+  getRecordsWithVsComputerResult,
+  loadRecords,
+  saveRecords,
+} from "./game/records";
+import {
   ACTION_MESSAGE_DELAY_MS,
   DEFAULT_TARGET_SCORE,
   INVALID_SELECTION_HELP_DELAY_MS,
@@ -52,6 +63,7 @@ function App() {
   const [isMuted, setIsMuted] = useState(isSoundMuted);
   const [hasStartedGame, setHasStartedGame] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("computer");
+  const [records, setRecords] = useState<GameRecords>(loadRecords);
 
   const [playerScore, setPlayerScore] = useState<PlayerScores>({
     player: 0,
@@ -117,13 +129,13 @@ function App() {
       ? "Computer is taking its turn."
       : isTurnChanging
         ? "Changing turns."
-    : hasFarkled
-      ? "You farkled. End your turn."
-      : selectedDice.length === 0
-        ? "Select scoring dice first."
-        : !selectedDiceAreValid
-          ? INVALID_SELECTION_MESSAGE
-          : undefined;
+        : hasFarkled
+          ? "You farkled. End your turn."
+          : selectedDice.length === 0
+            ? "Select scoring dice first."
+            : !selectedDiceAreValid
+              ? INVALID_SELECTION_MESSAGE
+              : undefined;
   const actionButtonsDisabled =
     Boolean(winner) ||
     isTurnChanging ||
@@ -241,6 +253,18 @@ function App() {
     }
 
     if (willWin) {
+      if (gameMode === "computer") {
+        setRecords((prev) => {
+          const nextRecords = getRecordsWithVsComputerResult(
+            prev,
+            currentPlayer,
+          );
+
+          saveRecords(nextRecords);
+          return nextRecords;
+        });
+      }
+
       setWinner(currentPlayer);
       setRoundScore(0);
       setTurn(createRollingTurn());
@@ -292,11 +316,7 @@ function App() {
     const previousPlayer = previousPlayerRef.current;
     previousPlayerRef.current = currentPlayer;
 
-    if (
-      !isComputerControlledTurn ||
-      previousPlayer === "player2" ||
-      winner
-    ) {
+    if (!isComputerControlledTurn || previousPlayer === "player2" || winner) {
       return;
     }
 
@@ -434,6 +454,7 @@ function App() {
           onOpenRules={() => setIsRulesOpen(true)}
           onStart={startGame}
           onTargetScoreChange={setTargetScore}
+          records={records}
           targetScore={targetScore}
         />
       )}
@@ -446,6 +467,7 @@ function App() {
           onMuteChange={handleMuteChange}
         />
       )}
+      {gameMode === "computer" && <RecordBoard records={records} />}
       <PlayerBoard
         targetScore={targetScore}
         currentPlayer={currentPlayer}

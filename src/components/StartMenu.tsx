@@ -1,9 +1,10 @@
 import Button from "./GameButton";
 import { GITHUB_REPOSITORY_URL } from "../appConstants";
 import { MuteButton } from "./MuteButton";
+import { RecordBoard } from "./RecordBoard";
 import { RulesButton } from "./RulesButton";
 import { TargetScoreSlider } from "./TargetScoreSlider";
-import type { GameMode } from "../types";
+import type { GameMode, GameRecords } from "../types";
 
 type StartMenuProps = {
   gameMode: GameMode;
@@ -13,6 +14,7 @@ type StartMenuProps = {
   onOpenRules: () => void;
   onStart: () => void;
   onTargetScoreChange: (targetScore: number) => void;
+  records: GameRecords;
   targetScore: number;
 };
 
@@ -24,6 +26,7 @@ export function StartMenu({
   onOpenRules,
   onStart,
   onTargetScoreChange,
+  records,
   targetScore,
 }: StartMenuProps) {
   return (
@@ -33,6 +36,11 @@ export function StartMenu({
           <h1 className="text-3xl font-black uppercase tracking-wide sm:text-4xl">
             VelociDice
           </h1>
+          {gameMode === "computer" && (
+            <div className="mt-3 flex justify-center">
+              <RecordBoard records={records} />
+            </div>
+          )}
           <p className="mx-auto mt-3 max-w-xs text-sm text-zinc-400">
             Bank points, dodge Farkles, and race your opponent to the target
             score.

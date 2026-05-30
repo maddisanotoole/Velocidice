@@ -37,6 +37,15 @@ export type PlayerScores = {
   player2: number;
 };
 
+export type VsComputerRecord = {
+  wins: number;
+  losses: number;
+};
+
+export type GameRecords = {
+  vsComputer: VsComputerRecord;
+};
+
 export type ScoreBoardProps = {
   currentPlayer: PlayerId;
   playerScores: PlayerScores;
