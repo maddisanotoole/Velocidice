@@ -5,17 +5,59 @@ type RulesModalProps = {
   onClose: () => void;
 };
 
+const miniPipPositions = {
+  1: ["center"],
+  2: ["top-left", "bottom-right"],
+  3: ["top-left", "center", "bottom-right"],
+  4: ["top-left", "top-right", "bottom-left", "bottom-right"],
+  5: ["top-left", "top-right", "center", "bottom-left", "bottom-right"],
+  6: [
+    "top-left",
+    "top-right",
+    "middle-left",
+    "middle-right",
+    "bottom-left",
+    "bottom-right",
+  ],
+} as const;
+
+const miniPipClasses = {
+  "top-left": "left-1.5 top-1.5",
+  "top-right": "right-1.5 top-1.5",
+  "middle-left": "left-1.5 top-1/2 -translate-y-1/2",
+  "middle-right": "right-1.5 top-1/2 -translate-y-1/2",
+  center: "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+  "bottom-left": "bottom-1.5 left-1.5",
+  "bottom-right": "bottom-1.5 right-1.5",
+} as const;
+
 const scoringRules = [
-  ["Single 1", "100 points"],
-  ["Single 5", "50 points"],
-  ["Three pairs", "750 points"],
-  ["Five-die straight", "1,000 points"],
-  ["Six-die straight", "1,500 points"],
-  ["Three 1s", "1,000 points"],
-  ["Three of a kind", "Face value x 100"],
-  ["Four of a kind", "Three-of-a-kind score x 2"],
-  ["Five of a kind", "Three-of-a-kind score x 3"],
-  ["Six of a kind", "Three-of-a-kind score x 4"],
+  { label: "Single 1", dice: [1], value: "100 points" },
+  { label: "Single 5", dice: [5], value: "50 points" },
+  { label: "Three pairs", dice: [1, 1, 2, 2, 3, 3], value: "750 points" },
+  { label: "Five-die straight", dice: [1, 2, 3, 4, 5], value: "1,000 points" },
+  {
+    label: "Six-die straight",
+    dice: [1, 2, 3, 4, 5, 6],
+    value: "1,500 points",
+  },
+  { label: "Three 1s", dice: [1, 1, 1], value: "1,000 points" },
+  { label: "Three of a kind", dice: [2, 2, 2], value: "Face value x 100" },
+  {
+    label: "Four of a kind",
+    dice: [2, 2, 2, 2],
+    value: "Three-of-a-kind score x 2",
+  },
+  {
+    label: "Five of a kind",
+    dice: [2, 2, 2, 2, 2],
+    value: "Three-of-a-kind score x 3",
+  },
+  {
+    label: "Six of a kind",
+    dice: [2, 2, 2, 2, 2, 2],
+    value: "Three-of-a-kind score x 4",
+  },
 ];
 
 const turnSteps = [
@@ -26,12 +68,40 @@ const turnSteps = [
 ];
 
 const validSelectionExamples = [
-  ["1", "Valid: scores 100"],
-  ["5", "Valid: scores 50"],
-  ["1, 5", "Valid: both dice score"],
-  ["1, 2", "Invalid: the 2 does not score"],
-  ["2, 2, 2", "Valid: three 2s score 200"],
+  { dice: [1], result: "Valid: scores 100" },
+  { dice: [5], result: "Valid: scores 50" },
+  { dice: [1, 5], result: "Valid: both dice score" },
+  { dice: [1, 2], result: "Invalid: the 2 does not score" },
+  { dice: [2, 2, 2], result: "Valid: three 2s score 200" },
 ];
+
+function MiniDie({ value }: { value: number }) {
+  return (
+    <span
+      aria-label={`${value}`}
+      className="relative inline-block h-6 w-6 shrink-0 rounded-md bg-white shadow"
+    >
+      {miniPipPositions[value as keyof typeof miniPipPositions].map(
+        (position) => (
+          <span
+            className={`absolute h-1 w-1 rounded-full bg-zinc-950 ${miniPipClasses[position]}`}
+            key={position}
+          />
+        ),
+      )}
+    </span>
+  );
+}
+
+function MiniDiceGroup({ values }: { values: number[] }) {
+  return (
+    <span className="flex flex-wrap gap-1" aria-label={values.join(", ")}>
+      {values.map((value, index) => (
+        <MiniDie key={`${value}_${index}`} value={value} />
+      ))}
+    </span>
+  );
+}
 
 export function RulesModal({ onClose }: RulesModalProps) {
   useEffect(() => {
@@ -108,16 +178,15 @@ export function RulesModal({ onClose }: RulesModalProps) {
             </p>
             <p className="mt-2 text-amber-300">
               A selected die with a ! badge is selected, but is not adding
-              points. You will to select other die to make it scoring or
-              unselect it.
+              points. Select another die to make it scoring, or unselect it.
             </p>
             <div className="mt-3 divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
-              {validSelectionExamples.map(([dice, result]) => (
+              {validSelectionExamples.map(({ dice, result }) => (
                 <div
                   className="grid gap-1 px-4 py-2 sm:grid-cols-[1fr_auto] sm:gap-4"
-                  key={dice}
+                  key={`${dice.join("_")}_${result}`}
                 >
-                  <span className="font-bold text-zinc-100">{dice}</span>
+                  <MiniDiceGroup values={dice} />
                   <span className="text-zinc-300 sm:text-right">{result}</span>
                 </div>
               ))}
@@ -146,12 +215,15 @@ export function RulesModal({ onClose }: RulesModalProps) {
           Scoring Rules
         </h3>
         <div className="divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
-          {scoringRules.map(([label, value]) => (
+          {scoringRules.map(({ dice, label, value }) => (
             <div
               className="grid gap-1 px-4 py-3 sm:grid-cols-[1fr_auto] sm:gap-4"
               key={label}
             >
-              <span className="font-bold text-zinc-100">{label}</span>
+              <span className="flex flex-col gap-1 font-bold text-zinc-100 sm:flex-row sm:items-center sm:gap-3">
+                <MiniDiceGroup values={dice} />
+                <span>{label}</span>
+              </span>
               <span className="text-zinc-300 sm:text-right">{value}</span>
             </div>
           ))}
