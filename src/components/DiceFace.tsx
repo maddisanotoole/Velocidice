@@ -6,6 +6,7 @@ interface DieProps {
   die: Die;
   currentPlayer: PlayerId;
   isBanked?: boolean;
+  isInvalidSelection?: boolean;
   rollAnimationKey: string;
 }
 
@@ -40,6 +41,7 @@ export const DieFace: React.FC<DieProps> = ({
   die,
   currentPlayer,
   isBanked = false,
+  isInvalidSelection = false,
   rollAnimationKey,
 }) => {
   const isHeld = die.status === DieStatus.HELD || isBanked;
@@ -84,6 +86,8 @@ export const DieFace: React.FC<DieProps> = ({
   ${
     isHeld
       ? "bg-green-500"
+      : isInvalidSelection
+        ? "bg-yellow-400 outline-4 outline-offset-2 outline-amber-400"
       : die.status === DieStatus.SELECTED
         ? "bg-yellow-400"
         : isPlayer2Turn
@@ -100,6 +104,14 @@ export const DieFace: React.FC<DieProps> = ({
           key={position}
         />
       ))}
+      {isInvalidSelection && (
+        <span
+          aria-hidden="true"
+          className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border-2 border-zinc-950 bg-amber-400 text-sm font-black text-zinc-950 shadow-lg"
+        >
+          !
+        </span>
+      )}
     </motion.div>
   );
 };

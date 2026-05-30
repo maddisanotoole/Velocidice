@@ -1,9 +1,9 @@
-type ScoreResult = {
-  score: number;
-  allDiceScore: boolean;
-};
-
-export type DiceCounts = number[];
+import type {
+  DiceCounts,
+  ScoreDiceInput,
+  ScoreResult,
+  ScoringDieInput,
+} from "../types";
 
 export const LOW_STRAIGHT = [1, 2, 3, 4, 5] as const;
 export const HIGH_STRAIGHT = [2, 3, 4, 5, 6] as const;
@@ -44,22 +44,35 @@ export function countTriplets(counts: DiceCounts): number {
   return counts.slice(1).filter((count) => count === 3).length;
 }
 
-export function scoreDice(values: number[]): ScoreResult {
-  if (values.length === 0) {
+function normalizeScoringDice(dice: ScoreDiceInput[]): ScoringDieInput[] {
+  return dice.map((die, index) =>
+    typeof die === "number" ? { id: index, value: die } : die,
+  );
+}
+
+export function scoreDice(inputDice: ScoreDiceInput[]): ScoreResult {
+  if (inputDice.length === 0) {
     return {
       score: 0,
       allDiceScore: false,
+      scoringDice: [],
+      nonScoringDice: [],
     };
   }
+
+  const dice = normalizeScoringDice(inputDice);
+  const values = dice.map((die) => die.value);
   let score = 0;
-  let allDiceScore = true;
   const counts = countDiceValues(values);
+  const scoringDieIndexes = new Set<number>();
 
   if (values.length === 6) {
     if (isSixDieStraight(counts)) {
       return {
         score: 1500,
         allDiceScore: true,
+        scoringDice: dice,
+        nonScoringDice: [],
       };
     }
 
@@ -67,6 +80,8 @@ export function scoreDice(values: number[]): ScoreResult {
       return {
         score: 2500,
         allDiceScore: true,
+        scoringDice: dice,
+        nonScoringDice: [],
       };
     }
 
@@ -74,6 +89,8 @@ export function scoreDice(values: number[]): ScoreResult {
       return {
         score: 750,
         allDiceScore: true,
+        scoringDice: dice,
+        nonScoringDice: [],
       };
     }
   }
@@ -86,24 +103,44 @@ export function scoreDice(values: number[]): ScoreResult {
 
       // remove the value of the straight, so we can score the remaining die
       for (const value of straightValues) {
+        const scoringDieIndex = dice.findIndex(
+          (die, index) =>
+            die.value === value && !scoringDieIndexes.has(index),
+        );
+
+        if (scoringDieIndex >= 0) {
+          scoringDieIndexes.add(scoringDieIndex);
+        }
+
         counts[value]--;
       }
     }
   }
 
-  for (const index in counts) {
-    const count = counts[index];
-    const newScore = calculateScore(count, Number(index));
+  for (let value = 1; value < counts.length; value++) {
+    const count = counts[value];
+    const newScore = calculateScore(count, value);
     score += newScore;
 
-    if (count > 0 && newScore === 0) {
-      allDiceScore = false;
+    if (newScore > 0) {
+      for (const [index, die] of dice.entries()) {
+        if (die.value === value && !scoringDieIndexes.has(index)) {
+          scoringDieIndexes.add(index);
+        }
+      }
     }
   }
 
+  const scoringDice = dice.filter((_, index) => scoringDieIndexes.has(index));
+  const nonScoringDice = dice.filter(
+    (_, index) => !scoringDieIndexes.has(index),
+  );
+
   return {
     score,
-    allDiceScore: score > 0 && allDiceScore,
+    allDiceScore: score > 0 && nonScoringDice.length === 0,
+    scoringDice,
+    nonScoringDice,
   };
 }
 

@@ -89,9 +89,7 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-black text-white">
-              Score Areas
-            </h3>
+            <h3 className="mb-2 text-lg font-black text-white">Score Areas</h3>
             <ul className="list-disc space-y-1 pl-5">
               <li>Total is banked and safe.</li>
               <li>Round is unbanked and at risk.</li>
@@ -107,6 +105,11 @@ export function RulesModal({ onClose }: RulesModalProps) {
               Every selected die must contribute to the score. If one selected
               die does not score, you need to deselect it before holding or
               banking.
+            </p>
+            <p className="mt-2 text-amber-300">
+              A selected die with a ! badge is selected, but is not adding
+              points. You will to select other die to make it scoring or
+              unselect it.
             </p>
             <div className="mt-3 divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
               {validSelectionExamples.map(([dice, result]) => (

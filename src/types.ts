@@ -12,6 +12,22 @@ export type Die = {
   group?: number;
 };
 
+export type ScoringDieInput = {
+  id: number;
+  value: number;
+};
+
+export type ScoreDiceInput = number | ScoringDieInput;
+
+export type ScoreResult = {
+  score: number;
+  allDiceScore: boolean;
+  scoringDice: ScoringDieInput[];
+  nonScoringDice: ScoringDieInput[];
+};
+
+export type DiceCounts = number[];
+
 export type PlayerId = "player" | "player2";
 
 export type GameMode = "computer" | "local";

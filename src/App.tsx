@@ -34,9 +34,13 @@ import { diceValuesText } from "./game/diceText";
 import {
   ACTION_MESSAGE_DELAY_MS,
   DEFAULT_TARGET_SCORE,
+  INVALID_SELECTION_HELP_DELAY_MS,
   SCORE_DELTA_DELAY_MS,
   TURN_SWITCH_DELAY_MS,
 } from "./appConstants";
+
+const INVALID_SELECTION_MESSAGE =
+  "Every selected die must contribute to the score.";
 
 function App() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
@@ -64,9 +68,15 @@ function App() {
 
   const dice = turn.dice;
   const selectedDice = getSelectedDice(dice);
-  const selectedScoreResult = scoreDice(selectedDice.map((die) => die.value));
+  const selectedScoreResult = scoreDice(selectedDice);
   const selectedScore = selectedScoreResult.score;
   const selectedDiceAreValid = selectedScoreResult.allDiceScore;
+  const invalidSelectedDieIds = new Set(
+    selectedScoreResult.nonScoringDice.map((die) => die.id),
+  );
+  const selectedDiceKey = selectedDice
+    .map((die) => `${die.id}:${die.value}`)
+    .join("|");
   const hasFarkled = turn.status === "farkled";
   const isComputerControlledTurn =
     gameMode === "computer" && currentPlayer === "player2";
@@ -82,8 +92,14 @@ function App() {
     currentPlayer === "player"
       ? "border-blue-300 bg-blue-500 text-white"
       : "border-purple-300 bg-purple-500 text-white";
+  const winnerMessage =
+    winner === "player" && gameMode === "computer"
+      ? "You win!"
+      : winner
+        ? `${playerLabels[winner]} wins!`
+        : "";
   const feedbackMessage = winner
-    ? `${playerLabels[winner]} wins!`
+    ? winnerMessage
     : hasFarkled
       ? "Farkle!"
       : actionMessage;
@@ -96,13 +112,23 @@ function App() {
       : "default";
   const actionDisabledReason = winner
     ? `${playerLabels[winner]} won the game. Reset to play again.`
+    : isComputerControlledTurn
+      ? "Computer is taking its turn."
+      : isTurnChanging
+        ? "Changing turns."
     : hasFarkled
       ? "You farkled. End your turn."
       : selectedDice.length === 0
         ? "Select scoring dice first."
         : !selectedDiceAreValid
-          ? "Every selected die must contribute to the score."
+          ? INVALID_SELECTION_MESSAGE
           : undefined;
+  const actionButtonsDisabled =
+    Boolean(winner) ||
+    isTurnChanging ||
+    isComputerControlledTurn ||
+    hasFarkled ||
+    !selectedDiceAreValid;
 
   function switchTurn() {
     setCurrentPlayer((prev) => (prev === "player" ? "player2" : "player"));
@@ -343,6 +369,33 @@ function App() {
   }, [actionMessage]);
 
   useEffect(() => {
+    if (
+      !hasStartedGame ||
+      winner ||
+      isTurnChanging ||
+      hasFarkled ||
+      isComputerControlledTurn ||
+      invalidSelectedDieIds.size === 0
+    ) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setActionMessage(INVALID_SELECTION_MESSAGE);
+    }, INVALID_SELECTION_HELP_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [
+    hasFarkled,
+    hasStartedGame,
+    invalidSelectedDieIds.size,
+    isComputerControlledTurn,
+    isTurnChanging,
+    selectedDiceKey,
+    winner,
+  ]);
+
+  useEffect(() => {
     if (roundScoreDelta === 0 && totalScoreDelta === 0) return;
 
     const timeout = setTimeout(() => {
@@ -400,6 +453,7 @@ function App() {
       <DiceTray
         currentPlayer={currentPlayer}
         dice={dice}
+        invalidSelectedDieIds={invalidSelectedDieIds}
         isTurnChanging={isTurnChanging}
         onSelectDie={selectDie}
         rerollCount={hasStartedGame ? rerollCount : -1}
@@ -411,13 +465,7 @@ function App() {
       <Row>
         <Button
           onClick={holdDice}
-          disabled={
-            Boolean(winner) ||
-            isTurnChanging ||
-            isComputerControlledTurn ||
-            hasFarkled ||
-            !selectedDiceAreValid
-          }
+          disabled={actionButtonsDisabled}
           title={actionDisabledReason}
           color="blue"
         >
@@ -425,13 +473,7 @@ function App() {
         </Button>
         <Button
           onClick={endTurn}
-          disabled={
-            Boolean(winner) ||
-            isTurnChanging ||
-            isComputerControlledTurn ||
-            hasFarkled ||
-            !selectedDiceAreValid
-          }
+          disabled={actionButtonsDisabled}
           title={actionDisabledReason}
           color="yellow"
         >
