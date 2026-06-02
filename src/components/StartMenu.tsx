@@ -18,7 +18,6 @@ type StartMenuProps = {
   onOpenStatistics: () => void;
   onStart: () => void;
   onTargetScoreChange: (targetScore: number) => void;
-  records: GameRecords;
   targetScore: number;
 };
 
@@ -33,7 +32,6 @@ export function StartMenu({
   onOpenStatistics,
   onStart,
   onTargetScoreChange,
-  records,
   targetScore,
 }: StartMenuProps) {
   return (
@@ -43,11 +41,7 @@ export function StartMenu({
           <h1 className="text-3xl font-black uppercase tracking-wide sm:text-4xl">
             VelociDice
           </h1>
-          {gameMode === "computer" && (
-            <div className="mt-3 flex justify-center">
-              <RecordBoard records={records} />
-            </div>
-          )}
+
           <p className="mx-auto mt-3 max-w-xs text-sm text-zinc-400">
             Bank points, dodge Farkles, and race your opponent to the target
             score.
@@ -101,7 +95,11 @@ export function StartMenu({
           />
         </section>
         <div className="mt-5 flex justify-center sm:mt-6">
-          <Button onClick={onStart} color="green" className="min-w-44 sm:min-w-56">
+          <Button
+            onClick={onStart}
+            color="green"
+            className="min-w-44 sm:min-w-56"
+          >
             Start Game
           </Button>
         </div>

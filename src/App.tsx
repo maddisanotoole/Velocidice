@@ -57,7 +57,6 @@ function App() {
           onOpenStatistics={() => setIsStatisticsOpen(true)}
           onStart={game.startGame}
           onTargetScoreChange={game.setTargetScore}
-          records={game.records}
           targetScore={game.targetScore}
         />
       )}
