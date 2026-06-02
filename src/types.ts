@@ -46,6 +46,8 @@ export type PlayerScores = {
 export type VsComputerRecord = {
   wins: number;
   losses: number;
+  highestPlayerScore: number;
+  matchesWonByLength: Record<MatchLength, number>;
 };
 
 export type GameRecords = {

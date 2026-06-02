@@ -270,7 +270,11 @@ export function useGameState() {
     }
 
     const bankedScore = hasFarkled ? 0 : roundScore + selectedScore;
-    const willWin = playerScore[currentPlayer] + bankedScore >= targetScore;
+    const nextPlayerScore = {
+      ...playerScore,
+      [currentPlayer]: playerScore[currentPlayer] + bankedScore,
+    };
+    const willWin = nextPlayerScore[currentPlayer] >= targetScore;
 
     if (!hasFarkled) {
       playSound(
@@ -288,14 +292,7 @@ export function useGameState() {
 
       setActionMessage("Banked");
       setTotalScoreDelta(bankedScore);
-      setPlayerScore((prev) => {
-        const nextScore = prev[currentPlayer] + bankedScore;
-
-        return {
-          ...prev,
-          [currentPlayer]: nextScore,
-        };
-      });
+      setPlayerScore(nextPlayerScore);
     }
 
     if (willWin) {
@@ -310,6 +307,8 @@ export function useGameState() {
           const nextRecords = getRecordsWithVsComputerResult(
             prev,
             nextMatchWinner,
+            matchLength,
+            nextPlayerScore.player,
           );
 
           saveRecords(nextRecords);
@@ -352,7 +351,7 @@ export function useGameState() {
 
   function backToMenu() {
     setHasStartedGame(false);
-    resetGame("Back to Menu");
+    resetGame("");
   }
 
   function handleMuteChange(nextIsMuted: boolean) {

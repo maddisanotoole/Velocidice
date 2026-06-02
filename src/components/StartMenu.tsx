@@ -15,6 +15,7 @@ type StartMenuProps = {
   onMatchLengthChange: (matchLength: MatchLength) => void;
   onMuteChange: (isMuted: boolean) => void;
   onOpenRules: () => void;
+  onOpenStatistics: () => void;
   onStart: () => void;
   onTargetScoreChange: (targetScore: number) => void;
   records: GameRecords;
@@ -29,6 +30,7 @@ export function StartMenu({
   onMatchLengthChange,
   onMuteChange,
   onOpenRules,
+  onOpenStatistics,
   onStart,
   onTargetScoreChange,
   records,
@@ -82,11 +84,7 @@ export function StartMenu({
           matchLength={matchLength}
           onMatchLengthChange={onMatchLengthChange}
         />
-        <div className="mt-5 flex justify-center sm:mt-6">
-          <Button onClick={onStart} color="green">
-            Start Game
-          </Button>
-        </div>
+
         <section className="mt-5 rounded-lg border border-zinc-700 px-3 py-3 sm:mt-6 sm:px-4">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
@@ -102,9 +100,16 @@ export function StartMenu({
             targetScore={targetScore}
           />
         </section>
-
+        <div className="mt-5 flex justify-center sm:mt-6">
+          <Button onClick={onStart} color="green" className="min-w-44 sm:min-w-56">
+            Start Game
+          </Button>
+        </div>
         <div className="mt-5 flex items-center justify-center gap-3 sm:mt-6 sm:gap-4">
           <RulesButton onClick={onOpenRules} />
+          <Button onClick={onOpenStatistics} color="purple">
+            Stats
+          </Button>
           <a
             aria-label="Open GitHub repository"
             className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-white transition-colors hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"

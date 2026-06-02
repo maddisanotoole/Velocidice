@@ -1,5 +1,6 @@
 interface ButtonProps {
   children: React.ReactNode;
+  className?: string;
   onClick: () => void;
   disabled?: boolean;
   onPointerCancel?: () => void;
@@ -8,7 +9,7 @@ interface ButtonProps {
   onPointerUp?: () => void;
   size?: "normal" | "small";
   title?: string;
-  color?: "green" | "blue" | "red" | "yellow";
+  color?: "green" | "blue" | "red" | "yellow" | "purple";
 }
 
 const colorClasses = {
@@ -16,6 +17,7 @@ const colorClasses = {
   blue: "bg-blue-500 hover:bg-blue-600 active:bg-blue-700",
   red: "bg-red-500 hover:bg-red-600 active:bg-red-700",
   yellow: "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700",
+  purple: "bg-purple-500 hover:bg-purple-600 active:bg-purple-700",
 } as const;
 
 const disabledClasses =
@@ -28,6 +30,7 @@ const sizeClasses = {
 
 const Button: React.FC<ButtonProps> = ({
   children,
+  className = "",
   onClick,
   disabled = false,
   onPointerCancel,
@@ -50,7 +53,7 @@ const Button: React.FC<ButtonProps> = ({
         sizeClasses[size]
       } ${
         colorClasses[color]
-      } ${disabledClasses}`}
+      } ${disabledClasses} ${className}`}
       disabled={disabled}
       title={title}
     >

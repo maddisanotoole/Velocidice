@@ -66,7 +66,7 @@ export function HoldToMenuButton({
   return (
     <Button
       onClick={handleClick}
-      color="yellow"
+      color="purple"
       onPointerCancel={clearHold}
       onPointerDown={startHold}
       onPointerLeave={clearHold}
@@ -83,7 +83,7 @@ export function HoldToMenuButton({
           <span className="relative h-5 w-5" aria-hidden="true">
             <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
               <circle
-                className="stroke-yellow-100/50"
+                className="stroke-purple-100/50"
                 cx="10"
                 cy="10"
                 fill="none"

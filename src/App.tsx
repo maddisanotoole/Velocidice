@@ -13,6 +13,7 @@ import { RulesModal } from "./components/RulesModal";
 import { ScoreBoard } from "./components/ScoreBoard";
 import { SettingsButton } from "./components/SettingsButton";
 import { SettingsModal } from "./components/SettingsModal";
+import { StatisticsModal } from "./components/StatisticsModal";
 import { StartMenu } from "./components/StartMenu";
 import { useGameState } from "./hooks/useGameState";
 import { useGameViewState } from "./hooks/useGameViewState";
@@ -28,6 +29,7 @@ function isLocalDebugMode() {
 function App() {
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
   const game = useGameState();
   const gameView = useGameViewState(game);
   const isReturnToMenuHoldRequired = game.hasStartedGame && !game.winner;
@@ -52,6 +54,7 @@ function App() {
           onMatchLengthChange={game.setMatchLength}
           onMuteChange={game.handleMuteChange}
           onOpenRules={() => setIsRulesOpen(true)}
+          onOpenStatistics={() => setIsStatisticsOpen(true)}
           onStart={game.startGame}
           onTargetScoreChange={game.setTargetScore}
           records={game.records}
@@ -66,6 +69,12 @@ function App() {
           onBackToMenu={backToMenu}
           onClose={() => setIsSettingsOpen(false)}
           onMuteChange={game.handleMuteChange}
+        />
+      )}
+      {isStatisticsOpen && (
+        <StatisticsModal
+          onClose={() => setIsStatisticsOpen(false)}
+          records={game.records}
         />
       )}
       {game.matchLength > 1 && (
