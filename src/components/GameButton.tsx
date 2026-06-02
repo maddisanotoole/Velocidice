@@ -6,6 +6,7 @@ interface ButtonProps {
   onPointerDown?: () => void;
   onPointerLeave?: () => void;
   onPointerUp?: () => void;
+  size?: "normal" | "small";
   title?: string;
   color?: "green" | "blue" | "red" | "yellow";
 }
@@ -20,6 +21,11 @@ const colorClasses = {
 const disabledClasses =
   "disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-zinc-300 disabled:opacity-60 disabled:hover:bg-zinc-600 disabled:active:bg-zinc-600";
 
+const sizeClasses = {
+  normal: "px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base",
+  small: "px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm",
+} as const;
+
 const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
@@ -28,6 +34,7 @@ const Button: React.FC<ButtonProps> = ({
   onPointerDown,
   onPointerLeave,
   onPointerUp,
+  size = "normal",
   title,
   color = "green",
 }) => {
@@ -39,7 +46,9 @@ const Button: React.FC<ButtonProps> = ({
       onPointerDown={onPointerDown}
       onPointerLeave={onPointerLeave}
       onPointerUp={onPointerUp}
-      className={`select-none rounded-xl px-4 py-2 text-sm font-bold transition-colors duration-200 [-webkit-touch-callout:none] sm:px-6 sm:py-3 sm:text-base ${
+      className={`select-none rounded-xl font-bold transition-colors duration-200 [-webkit-touch-callout:none] ${
+        sizeClasses[size]
+      } ${
         colorClasses[color]
       } ${disabledClasses}`}
       disabled={disabled}

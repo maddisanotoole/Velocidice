@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { GITHUB_REPOSITORY_URL } from "../appConstants";
 import Button from "./GameButton";
+import { HoldToMenuButton } from "./HoldToMenuButton";
 import { MuteButton } from "./MuteButton";
 
 type SettingsModalProps = {
   isMuted: boolean;
+  isReturnToMenuHoldRequired: boolean;
   onBackToMenu: () => void;
   onClose: () => void;
   onMuteChange: (isMuted: boolean) => void;
@@ -12,6 +14,7 @@ type SettingsModalProps = {
 
 export function SettingsModal({
   isMuted,
+  isReturnToMenuHoldRequired,
   onBackToMenu,
   onClose,
   onMuteChange,
@@ -71,9 +74,10 @@ export function SettingsModal({
               </p>
             </div>
             <div className="flex justify-center">
-              <Button onClick={onBackToMenu} color="yellow">
-                Back to Menu
-              </Button>
+              <HoldToMenuButton
+                isHoldRequired={isReturnToMenuHoldRequired}
+                onReturnToMenu={onBackToMenu}
+              />
             </div>
           </section>
 

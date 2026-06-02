@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { HOLD_TO_END_GAME_MS } from "../appConstants";
-import type { PlayerId } from "../types";
 import Button from "./GameButton";
 
-type HoldToEndGameButtonProps = {
-  onReset: () => void;
-  winner: PlayerId | null;
+type HoldToMenuButtonProps = {
+  isHoldRequired: boolean;
+  onReturnToMenu: () => void;
+  size?: "normal" | "small";
 };
 
-export function HoldToEndGameButton({
-  onReset,
-  winner,
-}: HoldToEndGameButtonProps) {
+export function HoldToMenuButton({
+  isHoldRequired,
+  onReturnToMenu,
+  size = "normal",
+}: HoldToMenuButtonProps) {
   const holdStartRef = useRef(0);
   const holdIntervalRef = useRef<number | null>(null);
   const holdTimeoutRef = useRef<number | null>(null);
@@ -34,7 +35,7 @@ export function HoldToEndGameButton({
   }
 
   function startHold() {
-    if (winner) {
+    if (!isHoldRequired) {
       return;
     }
 
@@ -48,36 +49,41 @@ export function HoldToEndGameButton({
     }, 30);
 
     holdTimeoutRef.current = window.setTimeout(() => {
-      onReset();
+      onReturnToMenu();
     }, HOLD_TO_END_GAME_MS);
   }
 
   function handleClick() {
-    if (winner) {
-      onReset();
+    if (!isHoldRequired) {
+      onReturnToMenu();
     }
   }
 
   useEffect(() => clearHold, []);
 
+  const label = isHoldRequired ? "Hold for Menu" : "Return to Menu";
+
   return (
     <Button
       onClick={handleClick}
-      color={winner ? "green" : "red"}
+      color="yellow"
       onPointerCancel={clearHold}
       onPointerDown={startHold}
       onPointerLeave={clearHold}
       onPointerUp={clearHold}
-      title={winner ? undefined : "Hold to end this game and lose progress."}
+      size={size}
+      title={
+        isHoldRequired
+          ? "Hold to return to the menu and lose game progress."
+          : undefined
+      }
     >
-      {winner ? (
-        "New Game "
-      ) : (
+      {isHoldRequired ? (
         <span className="flex items-center gap-2">
           <span className="relative h-5 w-5" aria-hidden="true">
             <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
               <circle
-                className="stroke-red-200/40"
+                className="stroke-yellow-100/50"
                 cx="10"
                 cy="10"
                 fill="none"
@@ -97,9 +103,34 @@ export function HoldToEndGameButton({
               />
             </svg>
           </span>
-          Hold to End Game
+          <span className="sr-only">{label}</span>
+          <HomeIcon />
+        </span>
+      ) : (
+        <span className="flex items-center gap-2">
+          <span className="sr-only">{label}</span>
+          <HomeIcon />
         </span>
       )}
     </Button>
+  );
+}
+
+function HomeIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.2"
+      viewBox="0 0 24 24"
+    >
+      <path d="m3 10.5 9-7 9 7" />
+      <path d="M5 9.5V20h14V9.5" />
+      <path d="M9.5 20v-6h5v6" />
+    </svg>
   );
 }

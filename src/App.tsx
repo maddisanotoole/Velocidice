@@ -3,9 +3,10 @@ import Button from "./components/GameButton";
 import { DebugRollPanel } from "./components/DebugRollPanel";
 import { DiceTray } from "./components/DiceTray";
 import { FeedbackToast } from "./components/FeedbackToast";
-import { HoldToEndGameButton } from "./components/HoldToEndGameButton";
+import { HoldToMenuButton } from "./components/HoldToMenuButton";
+import { MatchBoard } from "./components/MatchBoard";
+import { NewGameButton } from "./components/NewGameButton";
 import { PlayerBoard } from "./components/PlayerBoard";
-import { RecordBoard } from "./components/RecordBoard";
 import { Row } from "./components/Row";
 import { RulesButton } from "./components/RulesButton";
 import { RulesModal } from "./components/RulesModal";
@@ -29,6 +30,7 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const game = useGameState();
   const gameView = useGameViewState(game);
+  const isReturnToMenuHoldRequired = game.hasStartedGame && !game.winner;
 
   function openSettings() {
     setIsSettingsOpen(true);
@@ -45,7 +47,9 @@ function App() {
         <StartMenu
           gameMode={game.gameMode}
           isMuted={game.isMuted}
+          matchLength={game.matchLength}
           onGameModeChange={game.setGameMode}
+          onMatchLengthChange={game.setMatchLength}
           onMuteChange={game.handleMuteChange}
           onOpenRules={() => setIsRulesOpen(true)}
           onStart={game.startGame}
@@ -58,12 +62,19 @@ function App() {
       {isSettingsOpen && (
         <SettingsModal
           isMuted={game.isMuted}
+          isReturnToMenuHoldRequired={isReturnToMenuHoldRequired}
           onBackToMenu={backToMenu}
           onClose={() => setIsSettingsOpen(false)}
           onMuteChange={game.handleMuteChange}
         />
       )}
-      {game.gameMode === "computer" && <RecordBoard records={game.records} />}
+      {game.matchLength > 1 && (
+        <MatchBoard
+          matchScore={game.matchScore}
+          playerLabels={gameView.playerLabels}
+          requiredWins={game.requiredMatchWins}
+        />
+      )}
       <PlayerBoard
         targetScore={game.targetScore}
         currentPlayer={game.currentPlayer}
@@ -115,9 +126,20 @@ function App() {
         </Button>
       </Row>
       <Row>
-        <RulesButton onClick={() => setIsRulesOpen(true)} />
+        <RulesButton onClick={() => setIsRulesOpen(true)} size="small" />
         {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
-        <HoldToEndGameButton onReset={game.resetGame} winner={game.winner} />
+        <HoldToMenuButton
+          isHoldRequired={isReturnToMenuHoldRequired}
+          onReturnToMenu={backToMenu}
+          size="small"
+        />
+        {game.winner && (
+          <NewGameButton
+            label={game.matchWinner ? "New Game" : "Next Game"}
+            onClick={game.resetGame}
+            size="small"
+          />
+        )}
       </Row>
       {isLocalDebugMode() && (
         <DebugRollPanel

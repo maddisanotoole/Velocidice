@@ -39,9 +39,16 @@ export function getTurnBannerClasses(currentPlayer: PlayerId): string {
 
 export function getWinnerMessage(
   winner: PlayerId | null,
+  matchWinner: PlayerId | null,
   gameMode: GameMode,
   playerLabels: PlayerLabels,
 ): string {
+  if (matchWinner) {
+    return matchWinner === "player" && gameMode === "computer"
+      ? "You win the match!"
+      : `${playerLabels[matchWinner]} wins the match!`;
+  }
+
   if (!winner) {
     return "";
   }
@@ -55,17 +62,19 @@ export function getFeedbackMessage({
   actionMessage,
   gameMode,
   hasFarkled,
+  matchWinner,
   playerLabels,
   winner,
 }: {
   actionMessage: string;
   gameMode: GameMode;
   hasFarkled: boolean;
+  matchWinner: PlayerId | null;
   playerLabels: PlayerLabels;
   winner: PlayerId | null;
 }): string {
   if (winner) {
-    return getWinnerMessage(winner, gameMode, playerLabels);
+    return getWinnerMessage(winner, matchWinner, gameMode, playerLabels);
   }
 
   return hasFarkled ? "Farkle!" : actionMessage;
@@ -73,11 +82,14 @@ export function getFeedbackMessage({
 
 export function getFeedbackMessageVariant(
   winner: PlayerId | null,
+  matchWinner: PlayerId | null,
   gameMode: GameMode,
   hasFarkled: boolean,
 ): FeedbackVariant {
-  if (winner) {
-    return winner === "player2" && gameMode === "computer"
+  const resultWinner = matchWinner ?? winner;
+
+  if (resultWinner) {
+    return resultWinner === "player2" && gameMode === "computer"
       ? "danger"
       : "success";
   }
@@ -89,6 +101,7 @@ export function getActionDisabledReason({
   hasFarkled,
   isComputerControlledTurn,
   isTurnChanging,
+  matchWinner,
   playerLabels,
   selectedDiceAreValid,
   selectedDiceCount,
@@ -97,11 +110,16 @@ export function getActionDisabledReason({
   hasFarkled: boolean;
   isComputerControlledTurn: boolean;
   isTurnChanging: boolean;
+  matchWinner: PlayerId | null;
   playerLabels: PlayerLabels;
   selectedDiceAreValid: boolean;
   selectedDiceCount: number;
   winner: PlayerId | null;
 }): string | undefined {
+  if (matchWinner) {
+    return `${playerLabels[matchWinner]} won the match. Reset to play again.`;
+  }
+
   if (winner) {
     return `${playerLabels[winner]} won the game. Reset to play again.`;
   }

@@ -6,5 +6,7 @@ export const HOLD_TO_END_GAME_MS = 1200;
 export const INVALID_SELECTION_HELP_DELAY_MS = 2000;
 export const DEFAULT_TARGET_SCORE = 2000;
 export const TARGET_SCORE_OPTIONS = [2000, 5000, 8000, 10000] as const;
+export const DEFAULT_MATCH_LENGTH = 1;
+export const MATCH_LENGTH_OPTIONS = [1, 3, 10] as const;
 export const GITHUB_REPOSITORY_URL =
   "https://github.com/maddisanotoole/Velocidice";

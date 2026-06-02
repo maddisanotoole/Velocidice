@@ -18,6 +18,7 @@ describe("view state helpers", () => {
       actionMessage: "",
       gameMode: "computer",
       hasFarkled: false,
+      matchWinner: null,
       playerLabels: labels,
       winner: "player",
     })).toBe("You win!");
@@ -31,18 +32,32 @@ describe("view state helpers", () => {
       actionMessage: "",
       gameMode: "local",
       hasFarkled: false,
+      matchWinner: null,
       playerLabels: labels,
       winner: "player",
     })).toBe("Player 1 wins!");
   });
 
   it("marks computer wins as danger feedback", () => {
-    expect(getFeedbackMessageVariant("player2", "computer", false)).toBe(
+    expect(getFeedbackMessageVariant("player2", null, "computer", false)).toBe(
       "danger",
     );
-    expect(getFeedbackMessageVariant("player2", "local", false)).toBe(
+    expect(getFeedbackMessageVariant("player2", null, "local", false)).toBe(
       "success",
     );
+  });
+
+  it("uses match winner messages when a match is complete", () => {
+    const labels = getPlayerLabels("computer");
+
+    expect(getFeedbackMessage({
+      actionMessage: "",
+      gameMode: "computer",
+      hasFarkled: false,
+      matchWinner: "player",
+      playerLabels: labels,
+      winner: "player",
+    })).toBe("You win the match!");
   });
 
   it("explains blocked actions in priority order", () => {
@@ -51,6 +66,7 @@ describe("view state helpers", () => {
         hasFarkled: false,
         isComputerControlledTurn: true,
         isTurnChanging: false,
+        matchWinner: null,
         playerLabels: getPlayerLabels("computer"),
         selectedDiceAreValid: false,
         selectedDiceCount: 0,
@@ -63,6 +79,7 @@ describe("view state helpers", () => {
         hasFarkled: false,
         isComputerControlledTurn: false,
         isTurnChanging: false,
+        matchWinner: null,
         playerLabels: getPlayerLabels("computer"),
         selectedDiceAreValid: false,
         selectedDiceCount: 2,

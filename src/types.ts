@@ -32,6 +32,8 @@ export type PlayerId = "player" | "player2";
 
 export type GameMode = "computer" | "local";
 
+export type MatchLength = 1 | 3 | 10;
+
 export type FeedbackVariant = "default" | "danger" | "success";
 
 export type PlayerLabels = Record<PlayerId, string>;

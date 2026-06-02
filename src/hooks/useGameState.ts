@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ACTION_MESSAGE_DELAY_MS,
+  DEFAULT_MATCH_LENGTH,
   DEFAULT_TARGET_SCORE,
   INVALID_SELECTION_HELP_DELAY_MS,
   SCORE_DELTA_DELAY_MS,
@@ -9,6 +10,7 @@ import {
 import {
   type GameMode,
   type GameRecords,
+  type MatchLength,
   type PlayerId,
   type PlayerScores,
 } from "../types";
@@ -19,6 +21,11 @@ import {
 } from "../game/debugRolls";
 import { logDebug } from "../game/debugLog";
 import { diceValuesText } from "../game/diceText";
+import {
+  getMatchWinner,
+  getNextMatchScore,
+  getRequiredMatchWins,
+} from "../game/match";
 import {
   getRecordsWithVsComputerResult,
   loadRecords,
@@ -66,12 +73,18 @@ export function useGameState() {
   const previousSelectedDiceKeyRef = useRef("");
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
+  const [matchWinner, setMatchWinner] = useState<PlayerId | null>(null);
+  const [matchLength, setMatchLength] =
+    useState<MatchLength>(DEFAULT_MATCH_LENGTH);
   const [targetScore, setTargetScore] = useState(DEFAULT_TARGET_SCORE);
   const [isMuted, setIsMuted] = useState(isSoundMuted);
   const [hasStartedGame, setHasStartedGame] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("computer");
   const [records, setRecords] = useState<GameRecords>(loadRecords);
   const [playerScore, setPlayerScore] = useState<PlayerScores>(
+    INITIAL_PLAYER_SCORES,
+  );
+  const [matchScore, setMatchScore] = useState<PlayerScores>(
     INITIAL_PLAYER_SCORES,
   );
   const [roundScore, setRoundScore] = useState(0);
@@ -95,6 +108,7 @@ export function useGameState() {
     .map((die) => `${die.id}:${die.value}`)
     .join("|");
   const hasFarkled = turn.status === "farkled";
+  const requiredMatchWins = getRequiredMatchWins(matchLength);
   const isComputerControlledTurn = getIsComputerControlledTurn(
     gameMode,
     currentPlayer,
@@ -153,6 +167,11 @@ export function useGameState() {
     setTotalScoreDelta(0);
     setIsTurnChanging(false);
     setRerollCount(0);
+  }
+
+  function resetMatchState() {
+    setMatchScore(INITIAL_PLAYER_SCORES);
+    setMatchWinner(null);
   }
 
   const switchTurn = useCallback(() => {
@@ -280,11 +299,17 @@ export function useGameState() {
     }
 
     if (willWin) {
-      if (gameMode === "computer") {
+      const nextMatchScore = getNextMatchScore(matchScore, currentPlayer);
+      const nextMatchWinner = getMatchWinner(nextMatchScore, matchLength);
+
+      setMatchScore(nextMatchScore);
+      setMatchWinner(nextMatchWinner);
+
+      if (gameMode === "computer" && nextMatchWinner) {
         setRecords((prev) => {
           const nextRecords = getRecordsWithVsComputerResult(
             prev,
-            currentPlayer,
+            nextMatchWinner,
           );
 
           saveRecords(nextRecords);
@@ -301,7 +326,13 @@ export function useGameState() {
     setIsTurnChanging(true);
   }
 
-  function resetGame(message = winner ? "New Game" : "Game Reset") {
+  function resetGame(
+    message = winner && !matchWinner ? "Next Game" : "Game Reset",
+  ) {
+    if (!winner || matchWinner) {
+      resetMatchState();
+    }
+
     resetGameState(message);
     playSound("roll");
   }
@@ -313,6 +344,7 @@ export function useGameState() {
     });
 
     primeSounds();
+    resetMatchState();
     resetGameState("");
     setHasStartedGame(true);
     playSound("roll");
@@ -522,8 +554,12 @@ export function useGameState() {
     isComputerControlledTurn,
     isMuted,
     isTurnChanging,
+    matchLength,
+    matchScore,
+    matchWinner,
     playerScore,
     records,
+    requiredMatchWins,
     rerollCount,
     resetGame,
     roundScore,
@@ -532,6 +568,7 @@ export function useGameState() {
     selectedDiceAreValid,
     selectedScore,
     setGameMode,
+    setMatchLength,
     setTargetScore,
     startGame,
     targetScore,

@@ -1,15 +1,18 @@
 import Button from "./GameButton";
 import { GITHUB_REPOSITORY_URL } from "../appConstants";
+import { MatchLengthSelector } from "./MatchLengthSelector";
 import { MuteButton } from "./MuteButton";
 import { RecordBoard } from "./RecordBoard";
 import { RulesButton } from "./RulesButton";
 import { TargetScoreSlider } from "./TargetScoreSlider";
-import type { GameMode, GameRecords } from "../types";
+import type { GameMode, GameRecords, MatchLength } from "../types";
 
 type StartMenuProps = {
   gameMode: GameMode;
   isMuted: boolean;
+  matchLength: MatchLength;
   onGameModeChange: (gameMode: GameMode) => void;
+  onMatchLengthChange: (matchLength: MatchLength) => void;
   onMuteChange: (isMuted: boolean) => void;
   onOpenRules: () => void;
   onStart: () => void;
@@ -21,7 +24,9 @@ type StartMenuProps = {
 export function StartMenu({
   gameMode,
   isMuted,
+  matchLength,
   onGameModeChange,
+  onMatchLengthChange,
   onMuteChange,
   onOpenRules,
   onStart,
@@ -73,6 +78,10 @@ export function StartMenu({
             </button>
           </div>
         </section>
+        <MatchLengthSelector
+          matchLength={matchLength}
+          onMatchLengthChange={onMatchLengthChange}
+        />
         <div className="mt-5 flex justify-center sm:mt-6">
           <Button onClick={onStart} color="green">
             Start Game
