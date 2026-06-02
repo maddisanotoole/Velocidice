@@ -8,6 +8,7 @@ import {
   getComputerBankDecision,
   type ComputerBankDecisionDetails,
 } from "../game/computer";
+import { logDebug } from "../game/debugLog";
 import { diceValuesText } from "../game/diceText";
 import { scoreDice } from "../game/scoring";
 import { playSound } from "../game/sound";
@@ -67,7 +68,7 @@ export function useComputerTurn({
         const selection = chooseComputerDice(dice);
         const selectedIds = new Set(selection.map((die) => die.id));
 
-        console.info("[Computer] Evaluating roll", {
+        logDebug("[Computer] Evaluating roll", {
           rollNumber: rerollCount + 1,
           activeDice: diceValuesText(getActiveDice(dice)),
           selectedDice: diceValuesText(selection),
@@ -75,12 +76,12 @@ export function useComputerTurn({
         });
 
         if (selectedIds.size === 0) {
-          console.info("[Computer] Decision: no scoring dice, end turn");
+          logDebug("[Computer] Decision: no scoring dice, end turn");
           endTurn();
           return;
         }
 
-        console.info("[Computer] Decision: select scoring dice", {
+        logDebug("[Computer] Decision: select scoring dice", {
           selectedDice: diceValuesText(selection),
         });
 
@@ -121,7 +122,7 @@ export function useComputerTurn({
         selectedScore,
       });
 
-      console.info("[Computer] Evaluating selected dice", {
+      logDebug("[Computer] Evaluating selected dice", {
         rollNumber: rerollCount + 1,
         selectedDice: diceValuesText(selectedDice),
         selectedScore,
@@ -133,7 +134,7 @@ export function useComputerTurn({
       });
 
       if (remainingDice === 0) {
-        console.info("[Computer] Decision: hot dice, hold and reroll all dice");
+        logDebug("[Computer] Decision: hot dice, hold and reroll all dice");
         holdDice();
         return;
       }
@@ -147,7 +148,7 @@ export function useComputerTurn({
             additionalBankingDice.map((die) => die.id),
           );
 
-          console.info("[Computer] Decision: add scoring singles before banking", {
+          logDebug("[Computer] Decision: add scoring singles before banking", {
             selectedDice: diceValuesText(additionalBankingDice),
             reason: message,
             ...details,
@@ -165,7 +166,7 @@ export function useComputerTurn({
           return;
         }
 
-        console.info(message, details);
+        logDebug(message, details);
         endTurn();
       }
 
@@ -186,7 +187,7 @@ export function useComputerTurn({
         return;
       }
 
-      console.info(bankDecision.message, bankDecision.details);
+      logDebug(bankDecision.message, bankDecision.details);
       holdDice();
     }, COMPUTER_TURN_DELAY_MS);
 

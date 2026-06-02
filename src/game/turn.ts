@@ -30,8 +30,8 @@ export function getSelectedDice(dice: Die[]): Die[] {
   return dice.filter((die) => die.status === DieStatus.SELECTED);
 }
 
-export function rollNewDice(): TurnState {
-  const dice = initializeDice();
+export function rollNewDice(values: number[] = []): TurnState {
+  const dice = initializeDice(values);
 
   return {
     dice,
@@ -39,21 +39,28 @@ export function rollNewDice(): TurnState {
   };
 }
 
-export function createRollingTurn(): TurnState {
+export function createRollingTurn(values: number[] = []): TurnState {
   return {
-    dice: initializeDice(),
+    dice: initializeDice(values),
     status: "rolling",
   };
 }
 
-export function holdSelectedAndRollActive(dice: Die[]): Die[] {
+export function holdSelectedAndRollActive(
+  dice: Die[],
+  rolledValues: number[] = [],
+): Die[] {
+  let rollIndex = 0;
+
   return dice.map((die) => {
     if (die.status === DieStatus.SELECTED) {
       return { ...die, status: DieStatus.HELD };
     }
 
     if (die.status === DieStatus.ACTIVE) {
-      return { ...die, value: rollDie() };
+      const value = rolledValues[rollIndex] ?? rollDie();
+      rollIndex += 1;
+      return { ...die, value };
     }
 
     return die;

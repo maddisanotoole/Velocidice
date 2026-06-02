@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ACTION_MESSAGE_DELAY_MS,
   DEFAULT_TARGET_SCORE,
@@ -12,6 +12,12 @@ import {
   type PlayerId,
   type PlayerScores,
 } from "../types";
+import {
+  debugRollsText,
+  parseDebugRolls,
+  takeDebugRoll,
+} from "../game/debugRolls";
+import { logDebug } from "../game/debugLog";
 import { diceValuesText } from "../game/diceText";
 import {
   getRecordsWithVsComputerResult,
@@ -35,6 +41,7 @@ import {
   toggleDieSelection,
   type TurnState,
 } from "../game/turn";
+import { getNextPlayer, shouldAutoSwitchAfterFarkle } from "../game/turnFlow";
 import {
   getIsComputerControlledTurn,
   INVALID_SELECTION_MESSAGE,
@@ -45,6 +52,13 @@ const INITIAL_PLAYER_SCORES: PlayerScores = {
   player: 0,
   player2: 0,
 };
+
+function turnDebugDetails(turn: TurnState) {
+  return {
+    dice: diceValuesText(turn.dice),
+    status: turn.status,
+  };
+}
 
 export function useGameState() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
@@ -66,6 +80,8 @@ export function useGameState() {
   const [totalScoreDelta, setTotalScoreDelta] = useState(0);
   const [isTurnChanging, setIsTurnChanging] = useState(false);
   const [rerollCount, setRerollCount] = useState(0);
+  const debugRollsRef = useRef(parseDebugRolls(""));
+  const [debugRollPresetText, setDebugRollPresetText] = useState("");
 
   const dice = turn.dice;
   const selectedDice = getSelectedDice(dice);
@@ -84,11 +100,53 @@ export function useGameState() {
     currentPlayer,
   );
 
+  const consumeDebugRollValues = useCallback((diceCount: number): number[] => {
+    if (diceCount <= 0 || debugRollsRef.current.length === 0) {
+      return [];
+    }
+
+    const { nextRolls, values } = takeDebugRoll(
+      debugRollsRef.current,
+      diceCount,
+    );
+
+    debugRollsRef.current = nextRolls;
+    setDebugRollPresetText(debugRollsText(nextRolls));
+
+    return values;
+  }, []);
+
+  const rollNewDebugDice = useCallback((reason: string) => {
+    const presetValues = consumeDebugRollValues(6);
+    const nextTurn = rollNewDice(presetValues);
+
+    logDebug("[Game Debug] Rolled new dice", {
+      reason,
+      presetValues,
+      ...turnDebugDetails(nextTurn),
+    });
+
+    return nextTurn;
+  }, [consumeDebugRollValues]);
+
+  function setDebugRollsText(nextText: string) {
+    debugRollsRef.current = parseDebugRolls(nextText);
+    setDebugRollPresetText(nextText);
+  }
+
   function resetGameState(message: string) {
+    const nextTurn = rollNewDebugDice("resetGameState");
+
+    logDebug("[Game Debug] Reset game state", {
+      currentPlayer: "player",
+      message,
+      ...turnDebugDetails(nextTurn),
+    });
+
     setPlayerScore(INITIAL_PLAYER_SCORES);
     setCurrentPlayer("player");
     setWinner(null);
-    setTurn(rollNewDice());
+    setTurn(nextTurn);
     setRoundScore(0);
     setActionMessage(message);
     setRoundScoreDelta(0);
@@ -97,27 +155,42 @@ export function useGameState() {
     setRerollCount(0);
   }
 
-  function switchTurn() {
-    setCurrentPlayer((prev) => (prev === "player" ? "player2" : "player"));
+  const switchTurn = useCallback(() => {
+    const nextTurn = rollNewDebugDice("switchTurn");
+
+    setCurrentPlayer((prev) => {
+      const nextPlayer = getNextPlayer(prev);
+
+      logDebug("[Game Debug] Switching turn", {
+        from: prev,
+        to: nextPlayer,
+        ...turnDebugDetails(nextTurn),
+      });
+
+      return nextPlayer;
+    });
     setRoundScore(0);
     setRerollCount(0);
     playSound("roll");
-    setTurn(rollNewDice());
-  }
+    setTurn(nextTurn);
+  }, [rollNewDebugDice]);
 
   function holdDice() {
     if (winner || isTurnChanging || hasFarkled || !selectedDiceAreValid) {
       return;
     }
 
-    const nextDice = holdSelectedAndRollActive(dice);
+    const nextDice = holdSelectedAndRollActive(
+      dice,
+      consumeDebugRollValues(getActiveDice(dice).length),
+    );
     const nextActiveDice = getActiveDice(nextDice);
 
     if (nextActiveDice.length === 0) {
-      const nextRoll = rollNewDice();
+      const nextRoll = rollNewDebugDice("hotDice");
 
       if (isComputerControlledTurn) {
-        console.info("[Computer] Held dice and rolled hot dice", {
+        logDebug("[Computer] Held dice and rolled hot dice", {
           heldScore: selectedScore,
           nextRoll: diceValuesText(nextRoll.dice),
           nextStatus: nextRoll.status,
@@ -136,7 +209,7 @@ export function useGameState() {
     const nextStatus = didFarkle(nextDice) ? "farkled" : "rolling";
 
     if (isComputerControlledTurn) {
-      console.info("[Computer] Held dice and rerolled", {
+      logDebug("[Computer] Held dice and rerolled", {
         heldScore: selectedScore,
         nextActiveDice: diceValuesText(getActiveDice(nextDice)),
         nextStatus,
@@ -186,7 +259,7 @@ export function useGameState() {
       );
 
       if (isComputerControlledTurn) {
-        console.info("[Computer] Banked turn", {
+        logDebug("[Computer] Banked turn", {
           roundScore,
           selectedScore,
           bankedScore,
@@ -234,6 +307,11 @@ export function useGameState() {
   }
 
   function startGame() {
+    logDebug("[Game Debug] Starting game", {
+      gameMode,
+      targetScore,
+    });
+
     primeSounds();
     resetGameState("");
     setHasStartedGame(true);
@@ -258,7 +336,7 @@ export function useGameState() {
       return;
     }
 
-    console.info("[Computer] Turn started", {
+    logDebug("[Computer] Turn started", {
       computerScore: playerScore.player2,
       playerScore: playerScore.player,
       targetScore,
@@ -292,17 +370,67 @@ export function useGameState() {
   });
 
   useEffect(() => {
-    if (!hasStartedGame || !hasFarkled || winner || isTurnChanging) return;
+    if (!hasFarkled) {
+      return;
+    }
+
+    logDebug("[Game Debug] Farkle observed", {
+      currentPlayer,
+      hasStartedGame,
+      isComputerControlledTurn,
+      isTurnChanging,
+      winner,
+      ...turnDebugDetails(turn),
+    });
+
+    if (
+      !shouldAutoSwitchAfterFarkle({
+        hasFarkled,
+        hasStartedGame,
+        isTurnChanging,
+        winner,
+      })
+    ) {
+      logDebug("[Game Debug] Farkle auto-switch skipped", {
+        currentPlayer,
+        hasStartedGame,
+        isTurnChanging,
+        winner,
+      });
+      return;
+    }
+
+    logDebug("[Game Debug] Farkle auto-switch scheduled", {
+      currentPlayer,
+      delayMs: TURN_SWITCH_DELAY_MS,
+    });
 
     playSound("farkle");
     const timeout = setTimeout(() => {
+      logDebug("[Game Debug] Farkle auto-switch fired", {
+        currentPlayer,
+      });
       setTotalScoreDelta(0);
       setRoundScoreDelta(0);
       switchTurn();
     }, TURN_SWITCH_DELAY_MS);
 
-    return () => clearTimeout(timeout);
-  }, [hasFarkled, hasStartedGame, winner, isTurnChanging]);
+    return () => {
+      logDebug("[Game Debug] Farkle auto-switch cleared", {
+        currentPlayer,
+      });
+      clearTimeout(timeout);
+    };
+  }, [
+    currentPlayer,
+    hasFarkled,
+    hasStartedGame,
+    isComputerControlledTurn,
+    isTurnChanging,
+    switchTurn,
+    turn,
+    winner,
+  ]);
 
   useEffect(() => {
     if (!hasStartedGame || !isTurnChanging) return;
@@ -315,7 +443,7 @@ export function useGameState() {
     }, TURN_SWITCH_DELAY_MS);
 
     return () => clearTimeout(timeout);
-  }, [hasStartedGame, isTurnChanging]);
+  }, [hasStartedGame, isTurnChanging, switchTurn]);
 
   useEffect(() => {
     if (!actionMessage) return;
@@ -412,5 +540,7 @@ export function useGameState() {
     holdDice,
     selectDie,
     endTurn,
+    debugRollPresetText,
+    setDebugRollsText,
   };
 }

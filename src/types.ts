@@ -50,6 +50,8 @@ export type GameRecords = {
   vsComputer: VsComputerRecord;
 };
 
+export type DebugRoll = number[];
+
 export type ScoreBoardProps = {
   currentPlayer: PlayerId;
   playerScores: PlayerScores;

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "./components/GameButton";
+import { DebugRollPanel } from "./components/DebugRollPanel";
 import { DiceTray } from "./components/DiceTray";
 import { FeedbackToast } from "./components/FeedbackToast";
 import { HoldToEndGameButton } from "./components/HoldToEndGameButton";
@@ -14,6 +15,14 @@ import { SettingsModal } from "./components/SettingsModal";
 import { StartMenu } from "./components/StartMenu";
 import { useGameState } from "./hooks/useGameState";
 import { useGameViewState } from "./hooks/useGameViewState";
+
+function isLocalDebugMode() {
+  if (!import.meta.env.DEV || typeof window === "undefined") {
+    return false;
+  }
+
+  return ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+}
 
 function App() {
   const [isRulesOpen, setIsRulesOpen] = useState(false);
@@ -110,6 +119,12 @@ function App() {
         {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
         <HoldToEndGameButton onReset={game.resetGame} winner={game.winner} />
       </Row>
+      {isLocalDebugMode() && (
+        <DebugRollPanel
+          onRollPresetTextChange={game.setDebugRollsText}
+          rollPresetText={game.debugRollPresetText}
+        />
+      )}
     </div>
   );
 }
