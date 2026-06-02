@@ -1,6 +1,8 @@
+import type { FeedbackVariant } from "../types";
+
 type FeedbackToastProps = {
   message?: string;
-  variant?: "default" | "danger" | "success";
+  variant?: FeedbackVariant;
 };
 
 const variantClasses = {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { DieStatus, type Die } from "../types";
 import {
   chooseAdditionalBankingDice,
+  chooseAdditionalBankingDiceToWin,
   chooseComputerDice,
   getComputerBankDecision,
   getComputerBankThreshold,
@@ -105,6 +106,30 @@ describe("chooseAdditionalBankingDice", () => {
     dice[1] = { ...dice[1], status: DieStatus.HELD };
 
     expect(valuesFor(chooseAdditionalBankingDice(dice))).toEqual([1, 5]);
+  });
+});
+
+describe("chooseAdditionalBankingDiceToWin", () => {
+  it("chooses active scoring singles when they let the computer win", () => {
+    const dice = diceFor([2, 2, 2, 1, 5]);
+    dice[0] = { ...dice[0], status: DieStatus.SELECTED };
+    dice[1] = { ...dice[1], status: DieStatus.SELECTED };
+    dice[2] = { ...dice[2], status: DieStatus.SELECTED };
+
+    expect(valuesFor(chooseAdditionalBankingDiceToWin(dice, 200, 350))).toEqual(
+      [1, 5],
+    );
+  });
+
+  it("returns no dice when active scoring singles are not enough to win", () => {
+    const dice = diceFor([2, 2, 2, 5]);
+    dice[0] = { ...dice[0], status: DieStatus.SELECTED };
+    dice[1] = { ...dice[1], status: DieStatus.SELECTED };
+    dice[2] = { ...dice[2], status: DieStatus.SELECTED };
+
+    expect(valuesFor(chooseAdditionalBankingDiceToWin(dice, 200, 400))).toEqual(
+      [],
+    );
   });
 });
 

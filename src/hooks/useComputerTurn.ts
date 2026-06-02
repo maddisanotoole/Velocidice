@@ -3,6 +3,7 @@ import { COMPUTER_TURN_DELAY_MS } from "../appConstants";
 import { DieStatus, type Die, type PlayerId, type PlayerScores } from "../types";
 import {
   chooseAdditionalBankingDice,
+  chooseAdditionalBankingDiceToWin,
   chooseComputerDice,
   getComputerBankDecision,
   type ComputerBankDecisionDetails,
@@ -104,9 +105,13 @@ export function useComputerTurn({
       const bankableScore = roundScore + selectedScore;
       const additionalBankingDice = chooseAdditionalBankingDice(dice);
       const additionalBankingScore = scoreDice(additionalBankingDice).score;
+      const winningAdditionalBankingDice = chooseAdditionalBankingDiceToWin(
+        dice,
+        bankableScore,
+        computerPointsToWin,
+      );
       const canWinWithAdditionalBankingDice =
-        additionalBankingDice.length > 0 &&
-        bankableScore + additionalBankingScore >= computerPointsToWin;
+        winningAdditionalBankingDice.length > 0;
       const bankDecision = getComputerBankDecision({
         bankableScore,
         computerPointsToWin,

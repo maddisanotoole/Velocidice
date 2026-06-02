@@ -172,6 +172,20 @@ export function chooseAdditionalBankingDice(dice: Die[]): Die[] {
   );
 }
 
+export function chooseAdditionalBankingDiceToWin(
+  dice: Die[],
+  bankableScore: number,
+  computerPointsToWin: number,
+): Die[] {
+  const additionalBankingDice = chooseAdditionalBankingDice(dice);
+  const additionalBankingScore = scoreDice(additionalBankingDice).score;
+
+  return additionalBankingDice.length > 0 &&
+    bankableScore + additionalBankingScore >= computerPointsToWin
+    ? additionalBankingDice
+    : [];
+}
+
 export function chooseComputerDice(dice: Die[]): Die[] {
   const activeDice = getActiveDice(dice);
   const values = activeDice.map((die) => die.value);

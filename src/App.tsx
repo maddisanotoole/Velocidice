@@ -1,319 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Button from "./components/GameButton";
-import {
-  type GameMode,
-  type GameRecords,
-  type PlayerId,
-  type PlayerScores,
-} from "./types";
-import { ScoreBoard } from "./components/ScoreBoard";
-import { scoreDice } from "./game/scoring";
-import { PlayerBoard } from "./components/PlayerBoard";
-import { RulesModal } from "./components/RulesModal";
-import { SettingsModal } from "./components/SettingsModal";
-import { SettingsButton } from "./components/SettingsButton";
 import { DiceTray } from "./components/DiceTray";
 import { FeedbackToast } from "./components/FeedbackToast";
 import { HoldToEndGameButton } from "./components/HoldToEndGameButton";
+import { PlayerBoard } from "./components/PlayerBoard";
 import { RecordBoard } from "./components/RecordBoard";
-import { StartMenu } from "./components/StartMenu";
-import { RulesButton } from "./components/RulesButton";
 import { Row } from "./components/Row";
-import {
-  createRollingTurn,
-  didFarkle,
-  getActiveDice,
-  getSelectedDice,
-  holdSelectedAndRollActive,
-  rollNewDice,
-  toggleDieSelection,
-  type TurnState,
-} from "./game/turn";
-import {
-  isSoundMuted,
-  playSound,
-  primeSounds,
-  setSoundMuted,
-} from "./game/sound";
-import { useComputerTurn } from "./hooks/useComputerTurn";
-import { diceValuesText } from "./game/diceText";
-import {
-  getRecordsWithVsComputerResult,
-  loadRecords,
-  saveRecords,
-} from "./game/records";
-import {
-  ACTION_MESSAGE_DELAY_MS,
-  DEFAULT_TARGET_SCORE,
-  INVALID_SELECTION_HELP_DELAY_MS,
-  SCORE_DELTA_DELAY_MS,
-  TURN_SWITCH_DELAY_MS,
-} from "./appConstants";
-
-const INVALID_SELECTION_MESSAGE =
-  "Every selected die must contribute to the score.";
+import { RulesButton } from "./components/RulesButton";
+import { RulesModal } from "./components/RulesModal";
+import { ScoreBoard } from "./components/ScoreBoard";
+import { SettingsButton } from "./components/SettingsButton";
+import { SettingsModal } from "./components/SettingsModal";
+import { StartMenu } from "./components/StartMenu";
+import { useGameState } from "./hooks/useGameState";
+import { useGameViewState } from "./hooks/useGameViewState";
 
 function App() {
-  const [turn, setTurn] = useState<TurnState>(rollNewDice);
-  const previousPlayerRef = useRef<PlayerId | null>(null);
-  const previousSelectedDiceKeyRef = useRef("");
-  const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
-  const [winner, setWinner] = useState<PlayerId | null>(null);
-  const [targetScore, setTargetScore] = useState(DEFAULT_TARGET_SCORE);
-  const [isMuted, setIsMuted] = useState(isSoundMuted);
-  const [hasStartedGame, setHasStartedGame] = useState(false);
-  const [gameMode, setGameMode] = useState<GameMode>("computer");
-  const [records, setRecords] = useState<GameRecords>(loadRecords);
-
-  const [playerScore, setPlayerScore] = useState<PlayerScores>({
-    player: 0,
-    player2: 0,
-  });
-
-  const [roundScore, setRoundScore] = useState(0);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [actionMessage, setActionMessage] = useState("");
-  const [roundScoreDelta, setRoundScoreDelta] = useState(0);
-  const [totalScoreDelta, setTotalScoreDelta] = useState(0);
-  const [isTurnChanging, setIsTurnChanging] = useState(false);
-  const [rerollCount, setRerollCount] = useState(0);
-
-  const dice = turn.dice;
-  const selectedDice = getSelectedDice(dice);
-  const selectedScoreResult = scoreDice(selectedDice);
-  const selectedScore = selectedScoreResult.score;
-  const selectedDiceAreValid = selectedScoreResult.allDiceScore;
-  const invalidSelectedDieIds = new Set(
-    selectedScoreResult.nonScoringDice.map((die) => die.id),
-  );
-  const selectedDiceKey = selectedDice
-    .map((die) => `${die.id}:${die.value}`)
-    .join("|");
-  const hasFarkled = turn.status === "farkled";
-  const isComputerControlledTurn =
-    gameMode === "computer" && currentPlayer === "player2";
-  const playerLabels: Record<PlayerId, string> =
-    gameMode === "local"
-      ? { player: "Player 1", player2: "Player 2" }
-      : { player: "You", player2: "Computer" };
-  const turnLabel =
-    gameMode === "computer" && currentPlayer === "player"
-      ? "Your Turn"
-      : `${playerLabels[currentPlayer]} Turn`;
-  const turnBannerClasses =
-    currentPlayer === "player"
-      ? "border-blue-300 bg-blue-500 text-white"
-      : "border-purple-300 bg-purple-500 text-white";
-  const winnerMessage =
-    winner === "player" && gameMode === "computer"
-      ? "You win!"
-      : winner
-        ? `${playerLabels[winner]} wins!`
-        : "";
-  const feedbackMessage = winner
-    ? winnerMessage
-    : hasFarkled
-      ? "Farkle!"
-      : actionMessage;
-  const feedbackMessageVariant = winner
-    ? winner === "player2" && gameMode === "computer"
-      ? "danger"
-      : "success"
-    : hasFarkled
-      ? "danger"
-      : "default";
-  const actionDisabledReason = winner
-    ? `${playerLabels[winner]} won the game. Reset to play again.`
-    : isComputerControlledTurn
-      ? "Computer is taking its turn."
-      : isTurnChanging
-        ? "Changing turns."
-        : hasFarkled
-          ? "You farkled. End your turn."
-          : selectedDice.length === 0
-            ? "Select scoring dice first."
-            : !selectedDiceAreValid
-              ? INVALID_SELECTION_MESSAGE
-              : undefined;
-  const actionButtonsDisabled =
-    Boolean(winner) ||
-    isTurnChanging ||
-    isComputerControlledTurn ||
-    hasFarkled ||
-    !selectedDiceAreValid;
-
-  function switchTurn() {
-    setCurrentPlayer((prev) => (prev === "player" ? "player2" : "player"));
-    setRoundScore(0);
-    setRerollCount(0);
-    playSound("roll");
-    setTurn(rollNewDice());
-  }
-
-  function holdDice() {
-    if (winner || isTurnChanging || hasFarkled || !selectedDiceAreValid) {
-      return;
-    }
-
-    const nextDice = holdSelectedAndRollActive(dice);
-    const nextActiveDice = getActiveDice(nextDice);
-
-    // rerolls if all die have been held
-    if (nextActiveDice.length === 0) {
-      const nextRoll = rollNewDice();
-
-      if (isComputerControlledTurn) {
-        console.info("[Computer] Held dice and rolled hot dice", {
-          heldScore: selectedScore,
-          nextRoll: diceValuesText(nextRoll.dice),
-          nextStatus: nextRoll.status,
-        });
-      }
-
-      setActionMessage("Hot dice!");
-      playSound("roll");
-      setRoundScoreDelta(selectedScore);
-      setRerollCount((prev) => prev + 1);
-      setRoundScore((prev) => prev + selectedScore);
-      setTurn(nextRoll);
-      return;
-    }
-
-    const nextStatus = didFarkle(nextDice) ? "farkled" : "rolling";
-
-    if (isComputerControlledTurn) {
-      console.info("[Computer] Held dice and rerolled", {
-        heldScore: selectedScore,
-        nextActiveDice: diceValuesText(getActiveDice(nextDice)),
-        nextStatus,
-      });
-    }
-
-    setTurn({
-      dice: nextDice,
-      status: nextStatus,
-    });
-
-    playSound("roll");
-    if (nextStatus === "rolling") {
-      setActionMessage("Held");
-      setRoundScoreDelta(selectedScore);
-      setRerollCount((prev) => prev + 1);
-    }
-
-    setRoundScore((prev) =>
-      nextStatus === "farkled" ? 0 : prev + selectedScore,
-    );
-  }
-  function selectDie(id: number) {
-    if (winner || isTurnChanging || hasFarkled || isComputerControlledTurn) {
-      return;
-    }
-
-    playSound("select");
-    setTurn((prev) => ({
-      ...prev,
-      dice: toggleDieSelection(prev.dice, id),
-    }));
-  }
-
-  function endTurn() {
-    if (winner || isTurnChanging || (!hasFarkled && !selectedDiceAreValid)) {
-      return;
-    }
-
-    const bankedScore = hasFarkled ? 0 : roundScore + selectedScore;
-    const willWin = playerScore[currentPlayer] + bankedScore >= targetScore;
-
-    if (!hasFarkled) {
-      playSound(
-        willWin && isComputerControlledTurn ? "lose" : willWin ? "win" : "bank",
-      );
-
-      if (isComputerControlledTurn) {
-        console.info("[Computer] Banked turn", {
-          roundScore,
-          selectedScore,
-          bankedScore,
-          newTotal: playerScore.player2 + bankedScore,
-        });
-      }
-
-      setActionMessage("Banked");
-      setTotalScoreDelta(bankedScore);
-      setPlayerScore((prev) => {
-        const nextScore = prev[currentPlayer] + bankedScore;
-
-        return {
-          ...prev,
-          [currentPlayer]: nextScore,
-        };
-      });
-    }
-
-    if (willWin) {
-      if (gameMode === "computer") {
-        setRecords((prev) => {
-          const nextRecords = getRecordsWithVsComputerResult(
-            prev,
-            currentPlayer,
-          );
-
-          saveRecords(nextRecords);
-          return nextRecords;
-        });
-      }
-
-      setWinner(currentPlayer);
-      setRoundScore(0);
-      setTurn(createRollingTurn());
-      return;
-    }
-
-    setIsTurnChanging(true);
-  }
-
-  function resetGame(message = winner ? "New Game" : "Game Reset") {
-    setPlayerScore({
-      player: 0,
-      player2: 0,
-    });
-    setCurrentPlayer("player");
-    setWinner(null);
-    playSound("roll");
-    setTurn(rollNewDice());
-    setRoundScore(0);
-    setActionMessage(message);
-    setRoundScoreDelta(0);
-    setTotalScoreDelta(0);
-    setIsTurnChanging(false);
-    setRerollCount(0);
-  }
-
-  function handleMuteChange(nextIsMuted: boolean) {
-    setIsMuted(nextIsMuted);
-    setSoundMuted(nextIsMuted);
-  }
-
-  function startGame() {
-    primeSounds();
-    setPlayerScore({
-      player: 0,
-      player2: 0,
-    });
-    setCurrentPlayer("player");
-    setWinner(null);
-    setTurn(rollNewDice());
-    setRoundScore(0);
-    setActionMessage("");
-    setRoundScoreDelta(0);
-    setTotalScoreDelta(0);
-    setIsTurnChanging(false);
-    setRerollCount(0);
-    setHasStartedGame(true);
-    playSound("roll");
-  }
+  const game = useGameState();
+  const gameView = useGameViewState(game);
 
   function openSettings() {
     setIsSettingsOpen(true);
@@ -321,212 +27,79 @@ function App() {
 
   function backToMenu() {
     setIsSettingsOpen(false);
-    setHasStartedGame(false);
-    resetGame("Back to Menu");
+    game.backToMenu();
   }
-
-  useEffect(() => {
-    const previousPlayer = previousPlayerRef.current;
-    previousPlayerRef.current = currentPlayer;
-
-    if (!isComputerControlledTurn || previousPlayer === "player2" || winner) {
-      return;
-    }
-
-    console.info("[Computer] Turn started", {
-      computerScore: playerScore.player2,
-      playerScore: playerScore.player,
-      targetScore,
-      roll: diceValuesText(dice),
-    });
-  }, [
-    currentPlayer,
-    dice,
-    isComputerControlledTurn,
-    playerScore,
-    targetScore,
-    winner,
-  ]);
-
-  useComputerTurn({
-    currentPlayer,
-    dice,
-    endTurn,
-    hasFarkled,
-    holdDice,
-    isEnabled: hasStartedGame && gameMode === "computer",
-    isTurnChanging,
-    playerScore,
-    rerollCount,
-    roundScore,
-    selectedDice,
-    selectedScore,
-    setTurn,
-    targetScore,
-    winner,
-  });
-
-  useEffect(() => {
-    if (!hasStartedGame || !hasFarkled || winner || isTurnChanging) return;
-
-    playSound("farkle");
-    const timeout = setTimeout(() => {
-      setTotalScoreDelta(0);
-      setRoundScoreDelta(0);
-      switchTurn();
-    }, TURN_SWITCH_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [hasFarkled, hasStartedGame, winner, isTurnChanging]);
-
-  useEffect(() => {
-    if (!hasStartedGame || !isTurnChanging) return;
-
-    const timeout = setTimeout(() => {
-      setTotalScoreDelta(0);
-      setRoundScoreDelta(0);
-      switchTurn();
-      setIsTurnChanging(false);
-    }, TURN_SWITCH_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [hasStartedGame, isTurnChanging]);
-
-  useEffect(() => {
-    if (!actionMessage) return;
-
-    if (actionMessage === INVALID_SELECTION_MESSAGE) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setActionMessage("");
-    }, ACTION_MESSAGE_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [actionMessage]);
-
-  useEffect(() => {
-    const previousSelectedDiceKey = previousSelectedDiceKeyRef.current;
-    previousSelectedDiceKeyRef.current = selectedDiceKey;
-
-    if (
-      previousSelectedDiceKey !== selectedDiceKey &&
-      actionMessage === INVALID_SELECTION_MESSAGE
-    ) {
-      setActionMessage("");
-    }
-  }, [actionMessage, selectedDiceKey]);
-
-  useEffect(() => {
-    if (
-      !hasStartedGame ||
-      winner ||
-      isTurnChanging ||
-      hasFarkled ||
-      isComputerControlledTurn ||
-      invalidSelectedDieIds.size === 0
-    ) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setActionMessage(INVALID_SELECTION_MESSAGE);
-    }, INVALID_SELECTION_HELP_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [
-    hasFarkled,
-    hasStartedGame,
-    invalidSelectedDieIds.size,
-    isComputerControlledTurn,
-    isTurnChanging,
-    selectedDiceKey,
-    winner,
-  ]);
-
-  useEffect(() => {
-    if (roundScoreDelta === 0 && totalScoreDelta === 0) return;
-
-    const timeout = setTimeout(() => {
-      setRoundScoreDelta(0);
-      setTotalScoreDelta(0);
-    }, SCORE_DELTA_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [roundScoreDelta, totalScoreDelta]);
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-start gap-4 bg-zinc-900 px-3 py-16 text-white sm:justify-center sm:gap-8 sm:px-4 sm:py-8">
-      {!hasStartedGame && (
+      {!game.hasStartedGame && (
         <StartMenu
-          gameMode={gameMode}
-          isMuted={isMuted}
-          onGameModeChange={setGameMode}
-          onMuteChange={handleMuteChange}
+          gameMode={game.gameMode}
+          isMuted={game.isMuted}
+          onGameModeChange={game.setGameMode}
+          onMuteChange={game.handleMuteChange}
           onOpenRules={() => setIsRulesOpen(true)}
-          onStart={startGame}
-          onTargetScoreChange={setTargetScore}
-          records={records}
-          targetScore={targetScore}
+          onStart={game.startGame}
+          onTargetScoreChange={game.setTargetScore}
+          records={game.records}
+          targetScore={game.targetScore}
         />
       )}
       <SettingsButton onClick={openSettings} />
       {isSettingsOpen && (
         <SettingsModal
-          isMuted={isMuted}
+          isMuted={game.isMuted}
           onBackToMenu={backToMenu}
           onClose={() => setIsSettingsOpen(false)}
-          onMuteChange={handleMuteChange}
+          onMuteChange={game.handleMuteChange}
         />
       )}
-      {gameMode === "computer" && <RecordBoard records={records} />}
+      {game.gameMode === "computer" && <RecordBoard records={game.records} />}
       <PlayerBoard
-        targetScore={targetScore}
-        currentPlayer={currentPlayer}
-        playerScores={playerScore}
-        playerLabels={playerLabels}
+        targetScore={game.targetScore}
+        currentPlayer={game.currentPlayer}
+        playerScores={game.playerScore}
+        playerLabels={gameView.playerLabels}
       />
       <ScoreBoard
-        currentPlayer={currentPlayer}
-        playerScores={playerScore}
-        roundScore={roundScore}
-        roundScoreDelta={roundScoreDelta}
-        selectedScore={selectedScore}
-        totalScoreDelta={totalScoreDelta}
+        currentPlayer={game.currentPlayer}
+        playerScores={game.playerScore}
+        roundScore={game.roundScore}
+        roundScoreDelta={game.roundScoreDelta}
+        selectedScore={game.selectedScore}
+        totalScoreDelta={game.totalScoreDelta}
       />
 
       <p
-        className={`rounded-xl border-2 px-4 py-1.5 text-base font-black uppercase tracking-wide shadow-lg sm:px-5 sm:py-2 sm:text-lg ${turnBannerClasses}`}
+        className={`rounded-xl border-2 px-4 py-1.5 text-base font-black uppercase tracking-wide shadow-lg sm:px-5 sm:py-2 sm:text-lg ${gameView.turnBannerClasses}`}
       >
-        {turnLabel}
+        {gameView.turnLabel}
       </p>
-
       <DiceTray
-        currentPlayer={currentPlayer}
-        dice={dice}
-        invalidSelectedDieIds={invalidSelectedDieIds}
-        isTurnChanging={isTurnChanging}
-        onSelectDie={selectDie}
-        rerollCount={hasStartedGame ? rerollCount : -1}
+        currentPlayer={game.currentPlayer}
+        dice={game.dice}
+        invalidSelectedDieIds={game.invalidSelectedDieIds}
+        isTurnChanging={game.isTurnChanging}
+        onSelectDie={game.selectDie}
+        rerollCount={game.hasStartedGame ? game.rerollCount : -1}
       />
       <FeedbackToast
-        message={feedbackMessage}
-        variant={feedbackMessageVariant}
+        message={gameView.feedbackMessage}
+        variant={gameView.feedbackMessageVariant}
       />
       <Row>
         <Button
-          onClick={holdDice}
-          disabled={actionButtonsDisabled}
-          title={actionDisabledReason}
+          onClick={game.holdDice}
+          disabled={gameView.actionButtonsDisabled}
+          title={gameView.actionDisabledReason}
           color="blue"
         >
           Hold & Reroll
         </Button>
         <Button
-          onClick={endTurn}
-          disabled={actionButtonsDisabled}
-          title={actionDisabledReason}
+          onClick={game.endTurn}
+          disabled={gameView.actionButtonsDisabled}
+          title={gameView.actionDisabledReason}
           color="yellow"
         >
           Bank & End Turn
@@ -535,7 +108,7 @@ function App() {
       <Row>
         <RulesButton onClick={() => setIsRulesOpen(true)} />
         {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
-        <HoldToEndGameButton onReset={resetGame} winner={winner} />
+        <HoldToEndGameButton onReset={game.resetGame} winner={game.winner} />
       </Row>
     </div>
   );
