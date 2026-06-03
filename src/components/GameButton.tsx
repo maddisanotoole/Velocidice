@@ -1,3 +1,10 @@
+import {
+  cx,
+  theme,
+  type ThemeButtonColor,
+  type ThemeButtonSize,
+} from "../theme/classes";
+
 interface ButtonProps {
   children: React.ReactNode;
   className?: string;
@@ -7,26 +14,10 @@ interface ButtonProps {
   onPointerDown?: () => void;
   onPointerLeave?: () => void;
   onPointerUp?: () => void;
-  size?: "normal" | "small";
+  size?: ThemeButtonSize;
   title?: string;
-  color?: "green" | "blue" | "red" | "yellow" | "purple";
+  color?: ThemeButtonColor;
 }
-
-const colorClasses = {
-  green: "bg-green-500 hover:bg-green-600 active:bg-green-700",
-  blue: "bg-blue-500 hover:bg-blue-600 active:bg-blue-700",
-  red: "bg-red-500 hover:bg-red-600 active:bg-red-700",
-  yellow: "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700",
-  purple: "bg-purple-500 hover:bg-purple-600 active:bg-purple-700",
-} as const;
-
-const disabledClasses =
-  "disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-zinc-300 disabled:opacity-60 disabled:hover:bg-zinc-600 disabled:active:bg-zinc-600";
-
-const sizeClasses = {
-  normal: "px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base",
-  small: "px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm",
-} as const;
 
 const Button: React.FC<ButtonProps> = ({
   children,
@@ -49,11 +40,13 @@ const Button: React.FC<ButtonProps> = ({
       onPointerDown={onPointerDown}
       onPointerLeave={onPointerLeave}
       onPointerUp={onPointerUp}
-      className={`select-none rounded-xl font-bold transition-colors duration-200 [-webkit-touch-callout:none] ${
-        sizeClasses[size]
-      } ${
-        colorClasses[color]
-      } ${disabledClasses} ${className}`}
+      className={cx(
+        theme.button.base,
+        theme.button.size[size],
+        theme.button.color[color],
+        theme.button.disabled,
+        className,
+      )}
       disabled={disabled}
       title={title}
     >

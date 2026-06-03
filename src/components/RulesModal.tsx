@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Button from "./GameButton";
+import { cx, theme } from "../theme/classes";
 
 type RulesModalProps = {
   onClose: () => void;
@@ -118,19 +119,19 @@ export function RulesModal({ onClose }: RulesModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 px-3 py-4 sm:items-center sm:px-4"
+      className={theme.modal.overlay}
       onClick={onClose}
     >
       <section
         aria-modal="true"
-        className="max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-y-auto rounded-xl bg-zinc-800 p-4 text-white shadow-2xl sm:p-6"
+        className={cx(theme.modal.panel, "max-w-xl")}
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-2xl font-black sm:text-3xl">Rules</h2>
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className={cx("mt-1 text-sm", theme.text.muted)}>
               Select only dice that contribute to the score.
             </p>
           </div>
@@ -140,9 +141,11 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </Button>
         </div>
 
-        <div className="space-y-5 text-sm text-zinc-300">
+        <div className={cx("space-y-5 text-sm", theme.text.body)}>
           <section>
-            <h3 className="mb-2 text-lg font-black text-white">Goal</h3>
+            <h3 className={cx("mb-2 text-lg font-black", theme.text.heading)}>
+              Goal
+            </h3>
             <p>
               Build points by selecting scoring dice, then bank before a Farkle
               wipes out your round score. First player to the target score wins.
@@ -150,7 +153,9 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-black text-white">How To Play</h3>
+            <h3 className={cx("mb-2 text-lg font-black", theme.text.heading)}>
+              How To Play
+            </h3>
             <ol className="list-decimal space-y-1 pl-5">
               {turnSteps.map((step) => (
                 <li key={step}>{step}</li>
@@ -159,7 +164,9 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-black text-white">Score Areas</h3>
+            <h3 className={cx("mb-2 text-lg font-black", theme.text.heading)}>
+              Score Areas
+            </h3>
             <ul className="list-disc space-y-1 pl-5">
               <li>Total is banked and safe.</li>
               <li>Round is unbanked and at risk.</li>
@@ -168,7 +175,7 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-black text-white">
+            <h3 className={cx("mb-2 text-lg font-black", theme.text.heading)}>
               Selecting Dice
             </h3>
             <p>
@@ -180,21 +187,25 @@ export function RulesModal({ onClose }: RulesModalProps) {
               A selected die with a ! badge is selected, but is not adding
               points. Select another die to make it scoring, or unselect it.
             </p>
-            <div className="mt-3 divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
+            <div className={cx("mt-3", theme.divider.table)}>
               {validSelectionExamples.map(({ dice, result }) => (
                 <div
                   className="grid gap-1 px-4 py-2 sm:grid-cols-[1fr_auto] sm:gap-4"
                   key={`${dice.join("_")}_${result}`}
                 >
                   <MiniDiceGroup values={dice} />
-                  <span className="text-zinc-300 sm:text-right">{result}</span>
+                  <span className={cx("sm:text-right", theme.text.body)}>
+                    {result}
+                  </span>
                 </div>
               ))}
             </div>
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-black text-white">Farkle</h3>
+            <h3 className={cx("mb-2 text-lg font-black", theme.text.heading)}>
+              Farkle
+            </h3>
             <p>
               A Farkle happens when the active dice have no possible scoring
               dice. Your round score becomes 0, and the only available action is
@@ -203,7 +214,9 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-black text-white">Hot Dice</h3>
+            <h3 className={cx("mb-2 text-lg font-black", theme.text.heading)}>
+              Hot Dice
+            </h3>
             <p>
               If all dice are held because they all scored, all six dice are
               rolled again and your round score stays active.
@@ -211,10 +224,10 @@ export function RulesModal({ onClose }: RulesModalProps) {
           </section>
         </div>
 
-        <h3 className="mb-3 mt-6 text-lg font-black text-white">
+        <h3 className={cx("mb-3 mt-6 text-lg font-black", theme.text.heading)}>
           Scoring Rules
         </h3>
-        <div className="divide-y divide-zinc-700 overflow-hidden rounded-lg border border-zinc-700">
+        <div className={theme.divider.table}>
           {scoringRules.map(({ dice, label, value }) => (
             <div
               className="grid gap-1 px-4 py-3 sm:grid-cols-[1fr_auto] sm:gap-4"
@@ -224,7 +237,9 @@ export function RulesModal({ onClose }: RulesModalProps) {
                 <MiniDiceGroup values={dice} />
                 <span>{label}</span>
               </span>
-              <span className="text-zinc-300 sm:text-right">{value}</span>
+              <span className={cx("sm:text-right", theme.text.body)}>
+                {value}
+              </span>
             </div>
           ))}
         </div>

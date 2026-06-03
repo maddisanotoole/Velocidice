@@ -1,5 +1,6 @@
 import soundOffIcon from "../assets/sound_off.svg";
 import soundOnIcon from "../assets/sound_on.svg";
+import { cx, theme } from "../theme/classes";
 
 type MuteButtonProps = {
   isMuted: boolean;
@@ -10,7 +11,11 @@ export function MuteButton({ isMuted, onMuteChange }: MuteButtonProps) {
   return (
     <button
       aria-label={isMuted ? "Turn sound on" : "Mute sound"}
-      className="rounded-full bg-zinc-950 p-2.5 transition-colors hover:bg-zinc-700 active:bg-zinc-600 sm:p-3"
+      className={cx(
+        theme.iconButton.base,
+        theme.iconButton.dark,
+        theme.iconButton.size,
+      )}
       onClick={() => onMuteChange(!isMuted)}
       title={isMuted ? "Turn sound on" : "Mute sound"}
       type="button"

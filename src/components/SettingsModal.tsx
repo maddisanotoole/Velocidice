@@ -3,6 +3,7 @@ import { GITHUB_REPOSITORY_URL } from "../appConstants";
 import Button from "./GameButton";
 import { HoldToMenuButton } from "./HoldToMenuButton";
 import { MuteButton } from "./MuteButton";
+import { cx, theme } from "../theme/classes";
 
 type SettingsModalProps = {
   isMuted: boolean;
@@ -33,19 +34,19 @@ export function SettingsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 px-3 py-4 sm:items-center sm:px-4"
+      className={theme.modal.overlay}
       onClick={onClose}
     >
       <section
         aria-modal="true"
-        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-xl bg-zinc-800 p-4 text-white shadow-2xl sm:p-6"
+        className={cx(theme.modal.panel, "max-w-md")}
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
-        <div className="mb-5 flex items-start justify-between gap-3 sm:mb-6 sm:gap-4">
+        <div className={theme.modal.header}>
           <div>
             <h2 className="text-2xl font-black sm:text-3xl">Settings</h2>
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className={cx("mt-1 text-sm", theme.text.muted)}>
               Adjust game preferences.
             </p>
           </div>
@@ -56,20 +57,25 @@ export function SettingsModal({
         </div>
 
         <div className="space-y-4 sm:space-y-6">
-          <section className="flex items-center justify-between gap-3 rounded-lg border border-zinc-700 px-3 py-3 sm:gap-4 sm:px-4">
+          <section
+            className={cx(
+              "flex items-center justify-between gap-3 sm:gap-4",
+              theme.panel.compact,
+            )}
+          >
             <span>
               <span className="block font-bold">Mute Sound</span>
-              <span className="block text-sm text-zinc-400">
+              <span className={cx("block text-sm", theme.text.muted)}>
                 Turn off game sound effects.
               </span>
             </span>
             <MuteButton isMuted={isMuted} onMuteChange={onMuteChange} />
           </section>
 
-          <section className="rounded-lg border border-zinc-700 px-3 py-3 sm:px-4">
+          <section className={theme.panel.compact}>
             <div className="mb-3">
               <h3 className="font-bold">Game Setup</h3>
-              <p className="text-sm text-zinc-400">
+              <p className={cx("text-sm", theme.text.muted)}>
                 Return to the menu to change target score or restart setup.
               </p>
             </div>
@@ -82,7 +88,7 @@ export function SettingsModal({
           </section>
 
           <a
-            className="flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-3 font-bold text-white transition-colors hover:bg-zinc-700"
+            className={theme.linkButton}
             href={GITHUB_REPOSITORY_URL}
             rel="noreferrer"
             target="_blank"

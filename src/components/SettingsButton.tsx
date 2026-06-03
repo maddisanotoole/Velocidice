@@ -1,4 +1,5 @@
 import settingsIcon from "../assets/settings.svg";
+import { cx, theme } from "../theme/classes";
 
 type SettingsButtonProps = {
   onClick: () => void;
@@ -8,7 +9,12 @@ export function SettingsButton({ onClick }: SettingsButtonProps) {
   return (
     <button
       aria-label="Open settings"
-      className="fixed right-3 top-3 z-40 rounded-full bg-zinc-800 p-2.5 text-white shadow-lg transition-colors hover:bg-zinc-700 active:bg-zinc-600 sm:right-4 sm:top-4 sm:p-3"
+      className={cx(
+        theme.iconButton.base,
+        theme.iconButton.raised,
+        theme.iconButton.size,
+        theme.iconButton.fixedTopRight,
+      )}
       onClick={onClick}
       title="Settings"
       type="button"

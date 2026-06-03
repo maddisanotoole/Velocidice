@@ -4,6 +4,7 @@ import { MatchLengthSelector } from "./MatchLengthSelector";
 import { MuteButton } from "./MuteButton";
 import { RulesButton } from "./RulesButton";
 import { TargetScoreSlider } from "./TargetScoreSlider";
+import { cx, theme } from "../theme/classes";
 import type { GameMode, MatchLength } from "../types";
 
 type StartMenuProps = {
@@ -34,40 +35,44 @@ export function StartMenu({
   targetScore,
 }: StartMenuProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-zinc-950 px-3 py-4 text-white sm:px-4">
-      <section className="w-full max-w-md rounded-xl bg-zinc-800 p-4 shadow-2xl sm:p-6">
+    <div className={theme.menu.overlay}>
+      <section className={theme.menu.panel}>
         <div className="text-center">
           <h1 className="text-3xl font-black uppercase tracking-wide sm:text-4xl">
             VelociDice
           </h1>
 
-          <p className="mx-auto mt-3 max-w-xs text-sm text-zinc-400">
+          <p className={cx("mx-auto mt-3 max-w-xs text-sm", theme.text.muted)}>
             Bank points, dodge Farkles, and race your opponent to the target
             score.
           </p>
         </div>
-        <section className="mt-5 rounded-lg border border-zinc-700 px-3 py-3 sm:mt-6 sm:px-4">
+        <section className={theme.panel.section}>
           <h2 className="font-bold">Game Mode</h2>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => onGameModeChange("computer")}
-              className={`rounded-lg border px-3 py-3 text-sm font-black uppercase transition-colors ${
+              className={cx(
+                theme.option.base,
+                "px-3 py-3 text-sm",
                 gameMode === "computer"
-                  ? "border-purple-300 bg-purple-500 text-white"
-                  : "border-zinc-600 bg-zinc-900 text-zinc-300 hover:bg-zinc-700"
-              }`}
+                  ? theme.option.selected
+                  : theme.option.unselected,
+              )}
             >
               Computer
             </button>
             <button
               type="button"
               onClick={() => onGameModeChange("local")}
-              className={`rounded-lg border px-3 py-3 text-sm font-black uppercase transition-colors ${
+              className={cx(
+                theme.option.base,
+                "px-3 py-3 text-sm",
                 gameMode === "local"
-                  ? "border-purple-300 bg-purple-500 text-white"
-                  : "border-zinc-600 bg-zinc-900 text-zinc-300 hover:bg-zinc-700"
-              }`}
+                  ? theme.option.selected
+                  : theme.option.unselected,
+              )}
             >
               Local 2-Player
             </button>
@@ -78,15 +83,17 @@ export function StartMenu({
           onMatchLengthChange={onMatchLengthChange}
         />
 
-        <section className="mt-5 rounded-lg border border-zinc-700 px-3 py-3 sm:mt-6 sm:px-4">
+        <section className={theme.panel.section}>
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h2 className="font-bold">Target Score</h2>
-              <p className="text-sm text-zinc-400">
+              <p className={cx("text-sm", theme.text.muted)}>
                 Choose the score needed to win.
               </p>
             </div>
-            <span className="text-lg font-black text-white">{targetScore}</span>
+            <span className={cx("text-lg font-black", theme.text.heading)}>
+              {targetScore}
+            </span>
           </div>
           <TargetScoreSlider
             onTargetScoreChange={onTargetScoreChange}
@@ -109,7 +116,11 @@ export function StartMenu({
           </Button>
           <a
             aria-label="Open GitHub repository"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-white transition-colors hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className={cx(
+              "h-10 w-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+              "flex items-center justify-center rounded-xl text-white transition-colors",
+              theme.iconButton.dark,
+            )}
             href={GITHUB_REPOSITORY_URL}
             rel="noreferrer"
             target="_blank"

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { GameRecords } from "../types";
 import Button from "./GameButton";
+import { cx, theme } from "../theme/classes";
 
 type StatisticsModalProps = {
   onClose: () => void;
@@ -24,19 +25,21 @@ export function StatisticsModal({ onClose, records }: StatisticsModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 px-3 py-4 sm:items-center sm:px-4"
+      className={theme.modal.overlay}
       onClick={onClose}
     >
       <section
         aria-modal="true"
-        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-xl bg-zinc-800 p-4 text-white shadow-2xl sm:p-6"
+        className={cx(theme.modal.panel, "max-w-md")}
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
-        <div className="mb-5 flex items-start justify-between gap-3 sm:mb-6 sm:gap-4">
+        <div className={theme.modal.header}>
           <div>
             <h2 className="text-2xl font-black sm:text-3xl">Statistics</h2>
-            <p className="mt-1 text-sm text-zinc-400">Vs computer records.</p>
+            <p className={cx("mt-1 text-sm", theme.text.muted)}>
+              Vs computer records.
+            </p>
           </div>
           <Button onClick={onClose} color="red" size="small">
             Close
@@ -70,11 +73,18 @@ export function StatisticsModal({ onClose, records }: StatisticsModalProps) {
 
 function StatisticTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-3">
-      <span className="block text-xs font-bold uppercase tracking-wide text-zinc-400">
+    <div className={theme.panel.tile}>
+      <span
+        className={cx(
+          "block text-xs font-bold uppercase tracking-wide",
+          theme.text.muted,
+        )}
+      >
         {label}
       </span>
-      <span className="mt-1 block text-2xl font-black text-white">
+      <span
+        className={cx("mt-1 block text-2xl font-black", theme.text.heading)}
+      >
         {value}
       </span>
     </div>

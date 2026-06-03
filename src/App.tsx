@@ -17,6 +17,7 @@ import { StatisticsModal } from "./components/StatisticsModal";
 import { StartMenu } from "./components/StartMenu";
 import { useGameState } from "./hooks/useGameState";
 import { useGameViewState } from "./hooks/useGameViewState";
+import { theme } from "./theme/classes";
 
 function isLocalDebugMode() {
   if (!import.meta.env.DEV || typeof window === "undefined") {
@@ -44,7 +45,7 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-start gap-4 bg-zinc-900 px-3 py-16 text-white sm:justify-center sm:gap-8 sm:px-4 sm:py-8">
+    <div className={theme.app.shell}>
       {!game.hasStartedGame && (
         <StartMenu
           gameMode={game.gameMode}
