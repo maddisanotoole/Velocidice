@@ -2,10 +2,9 @@ import Button from "./GameButton";
 import { GITHUB_REPOSITORY_URL } from "../appConstants";
 import { MatchLengthSelector } from "./MatchLengthSelector";
 import { MuteButton } from "./MuteButton";
-import { RecordBoard } from "./RecordBoard";
 import { RulesButton } from "./RulesButton";
 import { TargetScoreSlider } from "./TargetScoreSlider";
-import type { GameMode, GameRecords, MatchLength } from "../types";
+import type { GameMode, MatchLength } from "../types";
 
 type StartMenuProps = {
   gameMode: GameMode;
