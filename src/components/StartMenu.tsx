@@ -3,6 +3,7 @@ import { GITHUB_REPOSITORY_URL } from "../appConstants";
 import { MatchLengthSelector } from "./MatchLengthSelector";
 import { MuteButton } from "./MuteButton";
 import { RulesButton } from "./RulesButton";
+import { DieFace } from "./DiceFace";
 import { TargetScoreSlider } from "./TargetScoreSlider";
 import type { GameMode, MatchLength } from "../types";
 
