@@ -144,7 +144,7 @@ function App() {
         {game.winner && (
           <NewGameButton
             label={game.matchWinner ? "New Game" : "Next Game"}
-            onClick={game.resetGame}
+            onClick={() => game.resetGame()}
             size="small"
           />
         )}

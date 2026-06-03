@@ -325,14 +325,19 @@ export function useGameState() {
     setIsTurnChanging(true);
   }
 
-  function resetGame(
-    message = winner && !matchWinner ? "Next Game" : "Game Reset",
-  ) {
+  function resetGame(message?: unknown) {
+    const nextMessage =
+      typeof message === "string"
+        ? message
+        : winner && !matchWinner
+          ? "Next Game"
+          : "Game Reset";
+
     if (!winner || matchWinner) {
       resetMatchState();
     }
 
-    resetGameState(message);
+    resetGameState(nextMessage);
     playSound("roll");
   }
 
