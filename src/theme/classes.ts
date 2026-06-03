@@ -41,8 +41,10 @@ export const theme = {
   },
   menu: {
     overlay:
-      "fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-zinc-950 px-3 py-4 text-white sm:px-4",
-    panel: "w-full max-w-md rounded-xl bg-zinc-800 p-4 shadow-2xl sm:p-6",
+      "fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-950 px-3 py-3 text-white sm:items-center sm:px-4 sm:py-4",
+    panel:
+      "flex min-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col overflow-y-auto rounded-xl bg-zinc-800 p-3 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:min-h-[42rem] sm:p-6",
+    footer: "mt-auto pt-5 sm:pt-6",
   },
   brand: {
     logoTile:
@@ -51,7 +53,7 @@ export const theme = {
   },
   panel: {
     section:
-      "mt-5 rounded-lg border border-zinc-700 px-3 py-3 sm:mt-6 sm:px-4",
+      "mt-4 rounded-lg border border-zinc-700 px-3 py-3 sm:mt-6 sm:px-4",
     compact: "rounded-lg border border-zinc-700 px-3 py-3 sm:px-4",
     tile: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-3",
   },
