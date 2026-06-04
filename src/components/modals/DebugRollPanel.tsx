@@ -14,7 +14,7 @@ export function DebugRollPanel({
   const queuedRollCount = parseDebugRolls(rollPresetText).length;
 
   return (
-    <aside className="fixed bottom-3 left-3 z-40 w-[min(22rem,calc(100vw-1.5rem))] rounded-lg border border-amber-300 bg-zinc-950/95 text-white shadow-2xl">
+    <aside className="rounded-lg border border-amber-300 bg-zinc-950/95 text-white shadow-2xl">
       <button
         type="button"
         className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs font-black uppercase tracking-wide text-amber-200"

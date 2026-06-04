@@ -1,24 +1,31 @@
 import { useEffect } from "react";
 import { GITHUB_REPOSITORY_URL } from "../../appConstants";
 import Button from "../buttons/GameButton";
+import { DebugRollPanel } from "./DebugRollPanel";
 import { HoldToMenuButton } from "../buttons/HoldToMenuButton";
 import { MuteButton } from "../buttons/MuteButton";
 import { cx, theme } from "../../theme/classes";
 
 type SettingsModalProps = {
+  isLocalDebugMode: boolean;
   isMuted: boolean;
   isReturnToMenuHoldRequired: boolean;
   onBackToMenu: () => void;
   onClose: () => void;
   onMuteChange: (isMuted: boolean) => void;
+  onRollPresetTextChange: (text: string) => void;
+  rollPresetText: string;
 };
 
 export function SettingsModal({
+  isLocalDebugMode,
   isMuted,
   isReturnToMenuHoldRequired,
   onBackToMenu,
   onClose,
   onMuteChange,
+  onRollPresetTextChange,
+  rollPresetText,
 }: SettingsModalProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -33,7 +40,7 @@ export function SettingsModal({
   }, [onClose]);
 
   return (
-    <div className={theme.modal.overlay} onClick={onClose}>
+    <div className={theme.modal.centeredOverlay} onClick={onClose}>
       <section
         aria-modal="true"
         className={cx(theme.modal.panel, "max-w-md")}
@@ -83,6 +90,21 @@ export function SettingsModal({
               />
             </div>
           </section>
+
+          {isLocalDebugMode && (
+            <section className={theme.panel.compact}>
+              <div className="mb-3">
+                <h3 className="font-bold">Developer Tools</h3>
+                <p className={cx("text-sm", theme.text.muted)}>
+                  Queue exact dice rolls while testing locally.
+                </p>
+              </div>
+              <DebugRollPanel
+                onRollPresetTextChange={onRollPresetTextChange}
+                rollPresetText={rollPresetText}
+              />
+            </section>
+          )}
 
           <a
             className={theme.linkButton}

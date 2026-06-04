@@ -24,6 +24,7 @@ function App() {
   const [isGameSummaryDismissed, setIsGameSummaryDismissed] = useState(false);
   const game = useGameState();
   const gameView = useGameViewState(game);
+  const localDebugMode = isLocalDebugMode();
   const isReturnToMenuHoldRequired = game.hasStartedGame && !game.winner;
   const shouldShowGameSummary = Boolean(game.winner) && !isGameSummaryDismissed;
 
@@ -62,11 +63,14 @@ function App() {
       <SettingsButton onClick={openSettings} />
       {isSettingsOpen && (
         <SettingsModal
+          isLocalDebugMode={localDebugMode}
           isMuted={game.isMuted}
           isReturnToMenuHoldRequired={isReturnToMenuHoldRequired}
           onBackToMenu={backToMenu}
           onClose={() => setIsSettingsOpen(false)}
           onMuteChange={game.handleMuteChange}
+          onRollPresetTextChange={game.setDebugRollsText}
+          rollPresetText={game.debugRollPresetText}
         />
       )}
       {isStatisticsOpen && (
@@ -92,7 +96,6 @@ function App() {
       <GameScreen
         game={game}
         gameView={gameView}
-        isLocalDebugMode={isLocalDebugMode()}
         isReturnToMenuHoldRequired={isReturnToMenuHoldRequired}
         isRulesOpen={isRulesOpen}
         onBackToMenu={backToMenu}

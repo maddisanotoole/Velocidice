@@ -1,5 +1,4 @@
 import Button from "../buttons/GameButton";
-import { DebugRollPanel } from "../modals/DebugRollPanel";
 import { DiceTray } from "../dice/DiceTray";
 import { FeedbackToast } from "../modals/FeedbackToast";
 import { HoldToMenuButton } from "../buttons/HoldToMenuButton";
@@ -19,7 +18,6 @@ type GameViewState = ReturnType<typeof useGameViewState>;
 type GameScreenProps = {
   game: GameState;
   gameView: GameViewState;
-  isLocalDebugMode: boolean;
   isReturnToMenuHoldRequired: boolean;
   isRulesOpen: boolean;
   onBackToMenu: () => void;
@@ -31,7 +29,6 @@ type GameScreenProps = {
 export function GameScreen({
   game,
   gameView,
-  isLocalDebugMode,
   isReturnToMenuHoldRequired,
   isRulesOpen,
   onBackToMenu,
@@ -40,86 +37,91 @@ export function GameScreen({
   onRulesClose,
 }: GameScreenProps) {
   return (
-    <>
-      {game.matchLength > 1 && (
-        <MatchBoard
-          matchLength={game.matchLength}
-          matchScore={game.matchScore}
-          playerLabels={gameView.playerLabels}
-        />
-      )}
-      <PlayerBoard
-        targetScore={game.targetScore}
-        currentPlayer={game.currentPlayer}
-        playerScores={game.playerScore}
-        playerLabels={gameView.playerLabels}
-      />
-      <ScoreBoard
-        currentPlayer={game.currentPlayer}
-        playerScores={game.playerScore}
-        roundScore={game.roundScore}
-        roundScoreDelta={game.roundScoreDelta}
-        selectedScore={game.selectedScore}
-        totalScoreDelta={game.totalScoreDelta}
-      />
+    <main className="flex min-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col items-center sm:min-h-[calc(100dvh-4rem)] sm:max-w-lg">
+      <div className="h-12 w-full shrink-0 sm:h-14" />
 
-      <p
-        className={`rounded-xl border-2 px-4 py-1.5 text-base font-black uppercase tracking-wide shadow-lg sm:px-5 sm:py-2 sm:text-lg ${gameView.turnBannerClasses}`}
-      >
-        {gameView.turnLabel}
-      </p>
-      <DiceTray
-        currentPlayer={game.currentPlayer}
-        dice={game.dice}
-        invalidSelectedDieIds={game.invalidSelectedDieIds}
-        isTurnChanging={game.isTurnChanging}
-        onSelectDie={game.selectDie}
-        rerollCount={game.hasStartedGame ? game.rerollCount : -1}
-      />
-      <FeedbackToast
-        message={gameView.feedbackMessage}
-        variant={gameView.feedbackMessageVariant}
-      />
-      <Row>
-        <Button
-          onClick={game.holdDice}
-          disabled={gameView.actionButtonsDisabled}
-          title={gameView.actionDisabledReason}
-          color="blue"
-        >
-          Hold & Reroll
-        </Button>
-        <Button
-          onClick={game.endTurn}
-          disabled={gameView.actionButtonsDisabled}
-          title={gameView.actionDisabledReason}
-          color="yellow"
-        >
-          Bank & End Turn
-        </Button>
-      </Row>
-      <Row>
-        <RulesButton onClick={onOpenRules} size="small" />
-        {isRulesOpen && <RulesModal onClose={onRulesClose} />}
-        <HoldToMenuButton
-          isHoldRequired={isReturnToMenuHoldRequired}
-          onReturnToMenu={onBackToMenu}
-          size="small"
-        />
-        {game.winner && (
-          <NewGameButton
-            label={game.matchWinner ? "New Game" : "Next Game"}
-            onClick={onResetGame}
-            size="small"
+      <section className="flex w-full flex-1 flex-col items-center justify-center gap-3 sm:gap-5">
+        {game.matchLength > 1 && (
+          <MatchBoard
+            matchLength={game.matchLength}
+            matchScore={game.matchScore}
+            playerLabels={gameView.playerLabels}
           />
         )}
-      </Row>
-      {isLocalDebugMode && (
-        <DebugRollPanel
-          onRollPresetTextChange={game.setDebugRollsText}
-          rollPresetText={game.debugRollPresetText}
+        <PlayerBoard
+          targetScore={game.targetScore}
+          currentPlayer={game.currentPlayer}
+          playerScores={game.playerScore}
+          playerLabels={gameView.playerLabels}
         />
-      )}
-    </>
+        <ScoreBoard
+          currentPlayer={game.currentPlayer}
+          playerScores={game.playerScore}
+          roundScore={game.roundScore}
+          roundScoreDelta={game.roundScoreDelta}
+          selectedScore={game.selectedScore}
+          totalScoreDelta={game.totalScoreDelta}
+        />
+
+        <p
+          className={`rounded-xl border-2 px-4 py-1.5 text-base font-black uppercase tracking-wide shadow-lg sm:px-5 sm:py-2 sm:text-lg ${gameView.turnBannerClasses}`}
+        >
+          {gameView.turnLabel}
+        </p>
+        <DiceTray
+          currentPlayer={game.currentPlayer}
+          dice={game.dice}
+          invalidSelectedDieIds={game.invalidSelectedDieIds}
+          isTurnChanging={game.isTurnChanging}
+          onSelectDie={game.selectDie}
+          rerollCount={game.hasStartedGame ? game.rerollCount : -1}
+        />
+        <FeedbackToast
+          message={gameView.feedbackMessage}
+          variant={gameView.feedbackMessageVariant}
+        />
+        <div className="pt-4 sm:pt-6">
+          <Row>
+          <Button
+            onClick={game.holdDice}
+            disabled={gameView.actionButtonsDisabled}
+            title={gameView.actionDisabledReason}
+            color="blue"
+          >
+            Hold & Reroll
+          </Button>
+          <Button
+            onClick={game.endTurn}
+            disabled={gameView.actionButtonsDisabled}
+            title={gameView.actionDisabledReason}
+            color="yellow"
+          >
+            Bank & End Turn
+          </Button>
+          </Row>
+        </div>
+      </section>
+
+      <nav className="w-full shrink-0 pb-[env(safe-area-inset-bottom)] pt-3 sm:pt-5">
+        <div className="flex items-center justify-between gap-3">
+          <RulesButton onClick={onOpenRules} size="small" />
+          <div className="flex flex-wrap justify-end gap-3 sm:gap-4">
+            <HoldToMenuButton
+              isHoldRequired={isReturnToMenuHoldRequired}
+              onReturnToMenu={onBackToMenu}
+              size="small"
+            />
+            {game.winner && (
+              <NewGameButton
+                label={game.matchWinner ? "New Game" : "Next Game"}
+                onClick={onResetGame}
+                size="small"
+              />
+            )}
+          </div>
+        </div>
+        {isRulesOpen && <RulesModal onClose={onRulesClose} />}
+      </nav>
+    </main>
   );
 }

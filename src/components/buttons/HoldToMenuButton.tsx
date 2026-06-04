@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { HOLD_TO_END_GAME_MS } from "../../appConstants";
 import Button from "./GameButton";
+import { cx, theme } from "../../theme/classes";
 
 type HoldToMenuButtonProps = {
   isHoldRequired: boolean;
   onReturnToMenu: () => void;
   size?: "normal" | "small";
 };
-
+// TODO - CREATE A BASE BUTTON COMPONENT
 export function HoldToMenuButton({
   isHoldRequired,
   onReturnToMenu,
@@ -77,6 +78,7 @@ export function HoldToMenuButton({
           ? "Hold to return to the menu and lose game progress."
           : undefined
       }
+      className={cx(theme.button.base)}
     >
       {isHoldRequired ? (
         <span className="flex items-center gap-2">
