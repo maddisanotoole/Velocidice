@@ -5,6 +5,7 @@ import { DiceTray } from "./components/DiceTray";
 import { FeedbackToast } from "./components/FeedbackToast";
 import { HoldToMenuButton } from "./components/HoldToMenuButton";
 import { MatchBoard } from "./components/MatchBoard";
+import { MatchSummaryModal } from "./components/MatchSummaryModal";
 import { NewGameButton } from "./components/NewGameButton";
 import { PlayerBoard } from "./components/PlayerBoard";
 import { Row } from "./components/Row";
@@ -31,9 +32,14 @@ function App() {
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
+  const [isMatchSummaryDismissed, setIsMatchSummaryDismissed] = useState(false);
   const game = useGameState();
   const gameView = useGameViewState(game);
   const isReturnToMenuHoldRequired = game.hasStartedGame && !game.winner;
+  const shouldShowMatchSummary =
+    Boolean(game.matchWinner) &&
+    game.matchLength > 1 &&
+    !isMatchSummaryDismissed;
 
   function openSettings() {
     setIsSettingsOpen(true);
@@ -41,7 +47,13 @@ function App() {
 
   function backToMenu() {
     setIsSettingsOpen(false);
+    setIsMatchSummaryDismissed(false);
     game.backToMenu();
+  }
+
+  function resetGame() {
+    setIsMatchSummaryDismissed(false);
+    game.resetGame();
   }
 
   return (
@@ -77,11 +89,22 @@ function App() {
           records={game.records}
         />
       )}
+      {shouldShowMatchSummary && game.matchWinner && (
+        <MatchSummaryModal
+          matchLength={game.matchLength}
+          matchScore={game.matchScore}
+          onClose={() => setIsMatchSummaryDismissed(true)}
+          onNewGame={resetGame}
+          playerLabels={gameView.playerLabels}
+          playerScore={game.playerScore}
+          targetScore={game.targetScore}
+        />
+      )}
       {game.matchLength > 1 && (
         <MatchBoard
+          matchLength={game.matchLength}
           matchScore={game.matchScore}
           playerLabels={gameView.playerLabels}
-          requiredWins={game.requiredMatchWins}
         />
       )}
       <PlayerBoard
@@ -145,7 +168,7 @@ function App() {
         {game.winner && (
           <NewGameButton
             label={game.matchWinner ? "New Game" : "Next Game"}
-            onClick={() => game.resetGame()}
+            onClick={resetGame}
             size="small"
           />
         )}

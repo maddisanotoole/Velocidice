@@ -1,4 +1,5 @@
 import { TARGET_SCORE_OPTIONS } from "../appConstants";
+import { playSound } from "../game/sound";
 
 type TargetScoreSliderProps = {
   onTargetScoreChange: (targetScore: number) => void;
@@ -15,6 +16,16 @@ export function TargetScoreSlider({
   onTargetScoreChange,
   targetScore,
 }: TargetScoreSliderProps) {
+  function changeTargetScore(value: number) {
+    const nextTargetScore = getClosestTargetScore(value);
+
+    if (nextTargetScore !== targetScore) {
+      playSound("select");
+    }
+
+    onTargetScoreChange(nextTargetScore);
+  }
+
   return (
     <>
       <input
@@ -22,9 +33,7 @@ export function TargetScoreSlider({
         list="target-score-options"
         max={TARGET_SCORE_OPTIONS[TARGET_SCORE_OPTIONS.length - 1]}
         min={TARGET_SCORE_OPTIONS[0]}
-        onChange={(event) =>
-          onTargetScoreChange(getClosestTargetScore(Number(event.target.value)))
-        }
+        onChange={(event) => changeTargetScore(Number(event.target.value))}
         step={1}
         type="range"
         value={targetScore}

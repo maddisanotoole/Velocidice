@@ -4,6 +4,7 @@ import { MatchLengthSelector } from "./MatchLengthSelector";
 import { MuteButton } from "./MuteButton";
 import { RulesButton } from "./RulesButton";
 import { TargetScoreSlider } from "./TargetScoreSlider";
+import { playSound } from "../game/sound";
 import { cx, theme } from "../theme/classes";
 import type { GameMode, MatchLength } from "../types";
 
@@ -34,6 +35,14 @@ export function StartMenu({
   onTargetScoreChange,
   targetScore,
 }: StartMenuProps) {
+  function changeGameMode(nextGameMode: GameMode) {
+    if (nextGameMode !== gameMode) {
+      playSound("select");
+    }
+
+    onGameModeChange(nextGameMode);
+  }
+
   return (
     <div className={theme.menu.overlay}>
       <section className={theme.menu.panel}>
@@ -52,7 +61,7 @@ export function StartMenu({
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => onGameModeChange("computer")}
+              onClick={() => changeGameMode("computer")}
               className={cx(
                 theme.option.base,
                 "px-3 py-3 text-sm",
@@ -65,7 +74,7 @@ export function StartMenu({
             </button>
             <button
               type="button"
-              onClick={() => onGameModeChange("local")}
+              onClick={() => changeGameMode("local")}
               className={cx(
                 theme.option.base,
                 "px-3 py-3 text-sm",

@@ -1,16 +1,27 @@
-import { BoardSize, type PlayerLabels, type PlayerScores } from "../types";
+import {
+  BoardSize,
+  type MatchLength,
+  type PlayerLabels,
+  type PlayerScores,
+} from "../types";
 import { Board } from "./Board";
 
 type MatchBoardProps = {
+  matchLength: MatchLength;
   matchScore: PlayerScores;
   playerLabels: PlayerLabels;
-  requiredWins: number;
+};
+
+const matchLengthLabels: Record<MatchLength, string> = {
+  1: "Single Game",
+  3: "Best of 3",
+  10: "Best of 10",
 };
 
 export function MatchBoard({
+  matchLength,
   matchScore,
   playerLabels,
-  requiredWins,
 }: MatchBoardProps) {
   return (
     <Board size={BoardSize.SMALL}>
@@ -19,7 +30,7 @@ export function MatchBoard({
           Match
         </span>
         <span className="text-sm font-black text-white">
-          First to {requiredWins}
+          {matchLengthLabels[matchLength]}
         </span>
       </div>
       <div className="flex flex-wrap items-baseline justify-center gap-3 sm:gap-4">

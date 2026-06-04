@@ -1,6 +1,7 @@
 import bankSound from "../assets/sound/bank.mp3";
 import farkleSound from "../assets/sound/farkle.mp3";
 import loseSound from "../assets/sound/lose.mp3";
+import matchWinSound from "../assets/sound/match_win.mp3";
 import rollSound from "../assets/sound/roll.mp3";
 import rollSoundTwo from "../assets/sound/roll_2.mp3";
 import rollSoundThree from "../assets/sound/roll_3.mp3";
@@ -12,6 +13,7 @@ const soundSources = {
   bank: bankSound,
   farkle: farkleSound,
   win: winSound,
+  match_win: matchWinSound,
   lose: loseSound,
 };
 
@@ -23,6 +25,7 @@ const audioCache = Object.fromEntries(
   ]),
 ) as Record<keyof typeof soundSources, HTMLAudioElement>;
 const rollAudioCache = rollSoundSources.map(createAudio);
+const activeSounds = new Set<HTMLAudioElement>();
 let nextRollSoundIndex = 0;
 let muted = false;
 
@@ -46,8 +49,21 @@ function playAudio(audio: HTMLAudioElement) {
   const sound = audio.cloneNode() as HTMLAudioElement;
 
   sound.volume = audio.volume;
-  sound.play().catch(() => {
-    // Browser may block sound until the user interacts with the page.
+  sound.currentTime = 0;
+  activeSounds.add(sound);
+  sound.addEventListener(
+    "ended",
+    () => {
+      activeSounds.delete(sound);
+    },
+    { once: true },
+  );
+  sound.play().catch((error: unknown) => {
+    activeSounds.delete(sound);
+
+    if (import.meta.env.DEV) {
+      console.warn("[Sound] Playback blocked", error);
+    }
   });
 }
 

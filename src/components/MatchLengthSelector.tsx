@@ -1,4 +1,5 @@
 import { MATCH_LENGTH_OPTIONS } from "../appConstants";
+import { playSound } from "../game/sound";
 import { cx, theme } from "../theme/classes";
 import type { MatchLength } from "../types";
 
@@ -17,6 +18,14 @@ export function MatchLengthSelector({
   matchLength,
   onMatchLengthChange,
 }: MatchLengthSelectorProps) {
+  function changeMatchLength(nextMatchLength: MatchLength) {
+    if (nextMatchLength !== matchLength) {
+      playSound("select");
+    }
+
+    onMatchLengthChange(nextMatchLength);
+  }
+
   return (
     <section className={theme.panel.section}>
       <h2 className="font-bold">Match Length</h2>
@@ -25,7 +34,7 @@ export function MatchLengthSelector({
           <button
             type="button"
             key={option}
-            onClick={() => onMatchLengthChange(option)}
+            onClick={() => changeMatchLength(option)}
             className={cx(
               theme.option.base,
               "px-2 py-3 text-xs sm:text-sm",

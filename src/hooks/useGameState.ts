@@ -67,6 +67,26 @@ function turnDebugDetails(turn: TurnState) {
   };
 }
 
+function getWinningSound({
+  isComputerControlledTurn,
+  matchLength,
+  nextMatchWinner,
+}: {
+  isComputerControlledTurn: boolean;
+  matchLength: MatchLength;
+  nextMatchWinner: PlayerId | null;
+}) {
+  if (nextMatchWinner && matchLength > 1) {
+    return "match_win";
+  }
+
+  if (isComputerControlledTurn) {
+    return "lose";
+  }
+
+  return "win";
+}
+
 export function useGameState() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
   const previousPlayerRef = useRef<PlayerId | null>(null);
@@ -277,9 +297,9 @@ export function useGameState() {
     const willWin = nextPlayerScore[currentPlayer] >= targetScore;
 
     if (!hasFarkled) {
-      playSound(
-        willWin && isComputerControlledTurn ? "lose" : willWin ? "win" : "bank",
-      );
+      if (!willWin) {
+        playSound("bank");
+      }
 
       if (isComputerControlledTurn) {
         logDebug("[Computer] Banked turn", {
@@ -298,6 +318,18 @@ export function useGameState() {
     if (willWin) {
       const nextMatchScore = getNextMatchScore(matchScore, currentPlayer);
       const nextMatchWinner = getMatchWinner(nextMatchScore, matchLength);
+      const winningSound = getWinningSound({
+        isComputerControlledTurn,
+        matchLength,
+        nextMatchWinner,
+      });
+
+      logDebug("[Game Debug] Playing winning sound", {
+        sound: winningSound,
+        matchLength,
+        nextMatchWinner,
+      });
+      playSound(winningSound);
 
       setMatchScore(nextMatchScore);
       setMatchWinner(nextMatchWinner);
