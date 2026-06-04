@@ -1,9 +1,9 @@
-import { MATCH_LENGTH_OPTIONS } from "../appConstants";
-import { playSound } from "../game/sound";
-import { cx, theme } from "../theme/classes";
-import type { MatchLength } from "../types";
+import { MATCH_LENGTH_OPTIONS } from "../../appConstants";
+import { playSound } from "../../game/sound";
+import { cx, theme } from "../../theme/classes";
+import type { MatchLength } from "../../types";
 
-type MatchLengthSelectorProps = {
+type MatchLengthSliderProps = {
   matchLength: MatchLength;
   onMatchLengthChange: (matchLength: MatchLength) => void;
 };
@@ -14,10 +14,10 @@ const matchLengthLabels: Record<MatchLength, string> = {
   10: "Best of 10",
 };
 
-export function MatchLengthSelector({
+export function MatchLengthSlider({
   matchLength,
   onMatchLengthChange,
-}: MatchLengthSelectorProps) {
+}: MatchLengthSliderProps) {
   function changeMatchLength(nextMatchLength: MatchLength) {
     if (nextMatchLength !== matchLength) {
       playSound("select");

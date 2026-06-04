@@ -1,4 +1,4 @@
-import { BoardSize, type BoardSizeType } from "../types";
+import { BoardSize, type BoardSizeType } from "../../types";
 
 type BoardProps = {
   children: React.ReactNode;

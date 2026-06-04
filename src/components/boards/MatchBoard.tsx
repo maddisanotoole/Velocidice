@@ -3,7 +3,7 @@ import {
   type MatchLength,
   type PlayerLabels,
   type PlayerScores,
-} from "../types";
+} from "../../types";
 import { Board } from "./Board";
 
 type MatchBoardProps = {

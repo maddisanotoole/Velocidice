@@ -6,6 +6,7 @@ import rollSound from "../assets/sound/roll.mp3";
 import rollSoundTwo from "../assets/sound/roll_2.mp3";
 import rollSoundThree from "../assets/sound/roll_3.mp3";
 import selectSound from "../assets/sound/select.mp3";
+import startSound from "../assets/sound/start.mp3";
 import winSound from "../assets/sound/win.mp3";
 
 const soundSources = {
@@ -15,6 +16,7 @@ const soundSources = {
   win: winSound,
   match_win: matchWinSound,
   lose: loseSound,
+  start: startSound,
 };
 
 const rollSoundSources = [rollSound, rollSoundTwo, rollSoundThree];

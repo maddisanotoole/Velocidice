@@ -1,6 +1,6 @@
-import soundOffIcon from "../assets/sound_off.svg";
-import soundOnIcon from "../assets/sound_on.svg";
-import { cx, theme } from "../theme/classes";
+import soundOffIcon from "../../assets/images/sound_off.svg";
+import soundOnIcon from "../../assets/images/sound_on.svg";
+import { cx, theme } from "../../theme/classes";
 
 type MuteButtonProps = {
   isMuted: boolean;

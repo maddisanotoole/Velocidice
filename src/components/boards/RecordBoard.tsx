@@ -1,6 +1,6 @@
-import { BoardSize, type GameRecords } from "../types";
+import { BoardSize, type GameRecords } from "../../types";
 import { Board } from "./Board";
-import { Row } from "./Row";
+import { Row } from "../Row";
 
 type RecordBoardProps = {
   records: GameRecords;

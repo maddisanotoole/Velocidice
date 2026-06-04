@@ -1,7 +1,7 @@
-import type { ScoreBoardProps } from "../types";
+import type { ScoreBoardProps } from "../../types";
 import { Board } from "./Board";
-import { Row } from "./Row";
-import { ScoreItem } from "./ScoreItem";
+import { Row } from "../Row";
+import { ScoreItem } from "../ScoreItem";
 
 export function ScoreBoard({
   currentPlayer,

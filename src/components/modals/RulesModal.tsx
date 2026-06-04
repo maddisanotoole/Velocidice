@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import Button from "./GameButton";
-import { cx, theme } from "../theme/classes";
+import Button from "../buttons/GameButton";
+import { cx, theme } from "../../theme/classes";
 
 type RulesModalProps = {
   onClose: () => void;
@@ -118,10 +118,7 @@ export function RulesModal({ onClose }: RulesModalProps) {
   }, [onClose]);
 
   return (
-    <div
-      className={theme.modal.overlay}
-      onClick={onClose}
-    >
+    <div className={theme.modal.overlay} onClick={onClose}>
       <section
         aria-modal="true"
         className={cx(theme.modal.panel, "max-w-xl")}

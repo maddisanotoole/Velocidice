@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import type { GameRecords } from "../types";
-import Button from "./GameButton";
-import { cx, theme } from "../theme/classes";
+import type { GameRecords } from "../../types";
+import Button from "../buttons/GameButton";
+import { cx, theme } from "../../theme/classes";
 
 type StatisticsModalProps = {
   onClose: () => void;
@@ -24,10 +24,7 @@ export function StatisticsModal({ onClose, records }: StatisticsModalProps) {
   }, [onClose]);
 
   return (
-    <div
-      className={theme.modal.overlay}
-      onClick={onClose}
-    >
+    <div className={theme.modal.overlay} onClick={onClose}>
       <section
         aria-modal="true"
         className={cx(theme.modal.panel, "max-w-md")}

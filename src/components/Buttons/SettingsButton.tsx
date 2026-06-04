@@ -1,5 +1,5 @@
-import settingsIcon from "../assets/settings.svg";
-import { cx, theme } from "../theme/classes";
+import settingsIcon from "../../assets/images/settings.svg";
+import { cx, theme } from "../../theme/classes";
 
 type SettingsButtonProps = {
   onClick: () => void;

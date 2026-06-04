@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { HOLD_TO_END_GAME_MS } from "../appConstants";
+import { HOLD_TO_END_GAME_MS } from "../../appConstants";
 import Button from "./GameButton";
 
 type HoldToMenuButtonProps = {

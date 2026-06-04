@@ -1,5 +1,5 @@
-import { TARGET_SCORE_OPTIONS } from "../appConstants";
-import { playSound } from "../game/sound";
+import { TARGET_SCORE_OPTIONS } from "../../appConstants";
+import { playSound } from "../../game/sound";
 
 type TargetScoreSliderProps = {
   onTargetScoreChange: (targetScore: number) => void;

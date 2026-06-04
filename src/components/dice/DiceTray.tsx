@@ -1,4 +1,4 @@
-import { DieStatus, type Die, type PlayerId } from "../types";
+import { DieStatus, type Die, type PlayerId } from "../../types";
 import { DieFace } from "./DiceFace";
 
 type DiceTrayProps = {

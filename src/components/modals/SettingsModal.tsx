@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { GITHUB_REPOSITORY_URL } from "../appConstants";
-import Button from "./GameButton";
-import { HoldToMenuButton } from "./HoldToMenuButton";
-import { MuteButton } from "./MuteButton";
-import { cx, theme } from "../theme/classes";
+import { GITHUB_REPOSITORY_URL } from "../../appConstants";
+import Button from "../buttons/GameButton";
+import { HoldToMenuButton } from "../buttons/HoldToMenuButton";
+import { MuteButton } from "../buttons/MuteButton";
+import { cx, theme } from "../../theme/classes";
 
 type SettingsModalProps = {
   isMuted: boolean;
@@ -33,10 +33,7 @@ export function SettingsModal({
   }, [onClose]);
 
   return (
-    <div
-      className={theme.modal.overlay}
-      onClick={onClose}
-    >
+    <div className={theme.modal.overlay} onClick={onClose}>
       <section
         aria-modal="true"
         className={cx(theme.modal.panel, "max-w-md")}

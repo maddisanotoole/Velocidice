@@ -3,10 +3,10 @@ import {
   TextSize,
   type PlayerId,
   type PlayerScores,
-} from "../types";
+} from "../../types";
 import { Board } from "./Board";
-import { Row } from "./Row";
-import { ScoreItem } from "./ScoreItem";
+import { Row } from "../Row";
+import { ScoreItem } from "../ScoreItem";
 
 type PlayerBoardProps = {
   targetScore: number;

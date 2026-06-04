@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { type Die, DieStatus, type PlayerId } from "../types";
+import { type Die, DieStatus, type PlayerId } from "../../types";
 
 interface DieProps {
   onClick: () => void;

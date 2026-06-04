@@ -3,7 +3,7 @@ import {
   theme,
   type ThemeButtonColor,
   type ThemeButtonSize,
-} from "../theme/classes";
+} from "../../theme/classes";
 
 interface ButtonProps {
   children: React.ReactNode;

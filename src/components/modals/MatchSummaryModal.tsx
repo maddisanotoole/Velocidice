@@ -3,9 +3,9 @@ import {
   type MatchLength,
   type PlayerLabels,
   type PlayerScores,
-} from "../types";
-import { cx, theme } from "../theme/classes";
-import Button from "./GameButton";
+} from "../../types";
+import { cx, theme } from "../../theme/classes";
+import Button from "../buttons/GameButton";
 
 type MatchSummaryModalProps = {
   matchLength: MatchLength;

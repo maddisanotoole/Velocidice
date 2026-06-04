@@ -1,5 +1,5 @@
-import { cx, theme } from "../theme/classes";
-import type { FeedbackVariant } from "../types";
+import { cx, theme } from "../../theme/classes";
+import type { FeedbackVariant } from "../../types";
 
 type FeedbackToastProps = {
   message?: string;

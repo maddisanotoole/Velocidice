@@ -1,9 +1,9 @@
-import Button from "./GameButton";
+import Button from "./buttons/GameButton";
 import { GITHUB_REPOSITORY_URL } from "../appConstants";
-import { MatchLengthSelector } from "./MatchLengthSelector";
-import { MuteButton } from "./MuteButton";
-import { RulesButton } from "./RulesButton";
-import { TargetScoreSlider } from "./TargetScoreSlider";
+import { MatchLengthSlider } from "./sliders/MatchLengthSlider";
+import { MuteButton } from "./buttons/MuteButton";
+import { RulesButton } from "./buttons/RulesButton";
+import { TargetScoreSlider } from "./sliders/TargetScoreSlider";
 import { playSound } from "../game/sound";
 import { cx, theme } from "../theme/classes";
 import type { GameMode, MatchLength } from "../types";
@@ -41,6 +41,11 @@ export function StartMenu({
     }
 
     onGameModeChange(nextGameMode);
+  }
+
+  function startGame() {
+    playSound("start");
+    onStart();
   }
 
   return (
@@ -87,7 +92,7 @@ export function StartMenu({
             </button>
           </div>
         </section>
-        <MatchLengthSelector
+        <MatchLengthSlider
           matchLength={matchLength}
           onMatchLengthChange={onMatchLengthChange}
         />
@@ -112,7 +117,7 @@ export function StartMenu({
         <div className={theme.menu.footer}>
           <div className="flex justify-center">
             <Button
-              onClick={onStart}
+              onClick={startGame}
               color="green"
               className="min-w-44 sm:min-w-56"
             >

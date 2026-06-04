@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { parseDebugRolls } from "../game/debugRolls";
+import { parseDebugRolls } from "../../game/debugRolls";
 
 type DebugRollPanelProps = {
   onRollPresetTextChange: (text: string) => void;
