@@ -1,12 +1,12 @@
-import Button from "./buttons/GameButton";
-import { GITHUB_REPOSITORY_URL } from "../appConstants";
-import { MatchLengthSlider } from "./sliders/MatchLengthSlider";
-import { MuteButton } from "./buttons/MuteButton";
-import { RulesButton } from "./buttons/RulesButton";
-import { TargetScoreSlider } from "./sliders/TargetScoreSlider";
-import { playSound } from "../game/sound";
-import { cx, theme } from "../theme/classes";
-import type { GameMode, MatchLength } from "../types";
+import Button from "../buttons/GameButton";
+import { GITHUB_REPOSITORY_URL } from "../../appConstants";
+import { MatchLengthSlider } from "../sliders/MatchLengthSlider";
+import { MuteButton } from "../buttons/MuteButton";
+import { RulesButton } from "../buttons/RulesButton";
+import { TargetScoreSlider } from "../sliders/TargetScoreSlider";
+import { playSound } from "../../game/sound";
+import { cx, theme } from "../../theme/classes";
+import type { GameMode, MatchLength } from "../../types";
 
 type StartMenuProps = {
   gameMode: GameMode;

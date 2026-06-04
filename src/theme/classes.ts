@@ -35,6 +35,8 @@ export const theme = {
   modal: {
     overlay:
       "fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 px-3 py-4 sm:items-center sm:px-4",
+    centeredOverlay:
+      "fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/70 px-3 py-4 sm:px-4",
     panel:
       "max-h-[calc(100dvh-2rem)] w-full overflow-y-auto rounded-xl bg-zinc-800 p-4 text-white shadow-2xl sm:p-6",
     header: "mb-5 flex items-start justify-between gap-3 sm:mb-6 sm:gap-4",

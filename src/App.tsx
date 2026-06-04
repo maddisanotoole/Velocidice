@@ -1,21 +1,10 @@
 import { useState } from "react";
-import Button from "./components/buttons/GameButton";
-import { DebugRollPanel } from "./components/modals/DebugRollPanel";
-import { DiceTray } from "./components/dice/DiceTray";
-import { FeedbackToast } from "./components/modals/FeedbackToast";
-import { HoldToMenuButton } from "./components/buttons/HoldToMenuButton";
-import { MatchBoard } from "./components/boards/MatchBoard";
 import { GameSummaryModal } from "./components/modals/GameSummaryModal";
-import { NewGameButton } from "./components/buttons/NewGameButton";
-import { PlayerBoard } from "./components/boards/PlayerBoard";
-import { Row } from "./components/Row";
-import { RulesButton } from "./components/buttons/RulesButton";
-import { RulesModal } from "./components/modals/RulesModal";
-import { ScoreBoard } from "./components/boards/ScoreBoard";
+import { GameScreen } from "./components/screens/GameScreen";
 import { SettingsButton } from "./components/buttons/SettingsButton";
 import { SettingsModal } from "./components/modals/SettingsModal";
 import { StatisticsModal } from "./components/modals/StatisticsModal";
-import { StartMenu } from "./components/StartMenu";
+import { StartMenu } from "./components/screens/StartMenu";
 import { useGameState } from "./hooks/useGameState";
 import { useGameViewState } from "./hooks/useGameViewState";
 import { theme } from "./theme/classes";
@@ -100,85 +89,17 @@ function App() {
           winner={game.winner}
         />
       )}
-      {game.matchLength > 1 && (
-        <MatchBoard
-          matchLength={game.matchLength}
-          matchScore={game.matchScore}
-          playerLabels={gameView.playerLabels}
-        />
-      )}
-      <PlayerBoard
-        targetScore={game.targetScore}
-        currentPlayer={game.currentPlayer}
-        playerScores={game.playerScore}
-        playerLabels={gameView.playerLabels}
+      <GameScreen
+        game={game}
+        gameView={gameView}
+        isLocalDebugMode={isLocalDebugMode()}
+        isReturnToMenuHoldRequired={isReturnToMenuHoldRequired}
+        isRulesOpen={isRulesOpen}
+        onBackToMenu={backToMenu}
+        onOpenRules={() => setIsRulesOpen(true)}
+        onResetGame={resetGame}
+        onRulesClose={() => setIsRulesOpen(false)}
       />
-      <ScoreBoard
-        currentPlayer={game.currentPlayer}
-        playerScores={game.playerScore}
-        roundScore={game.roundScore}
-        roundScoreDelta={game.roundScoreDelta}
-        selectedScore={game.selectedScore}
-        totalScoreDelta={game.totalScoreDelta}
-      />
-
-      <p
-        className={`rounded-xl border-2 px-4 py-1.5 text-base font-black uppercase tracking-wide shadow-lg sm:px-5 sm:py-2 sm:text-lg ${gameView.turnBannerClasses}`}
-      >
-        {gameView.turnLabel}
-      </p>
-      <DiceTray
-        currentPlayer={game.currentPlayer}
-        dice={game.dice}
-        invalidSelectedDieIds={game.invalidSelectedDieIds}
-        isTurnChanging={game.isTurnChanging}
-        onSelectDie={game.selectDie}
-        rerollCount={game.hasStartedGame ? game.rerollCount : -1}
-      />
-      <FeedbackToast
-        message={gameView.feedbackMessage}
-        variant={gameView.feedbackMessageVariant}
-      />
-      <Row>
-        <Button
-          onClick={game.holdDice}
-          disabled={gameView.actionButtonsDisabled}
-          title={gameView.actionDisabledReason}
-          color="blue"
-        >
-          Hold & Reroll
-        </Button>
-        <Button
-          onClick={game.endTurn}
-          disabled={gameView.actionButtonsDisabled}
-          title={gameView.actionDisabledReason}
-          color="yellow"
-        >
-          Bank & End Turn
-        </Button>
-      </Row>
-      <Row>
-        <RulesButton onClick={() => setIsRulesOpen(true)} size="small" />
-        {isRulesOpen && <RulesModal onClose={() => setIsRulesOpen(false)} />}
-        <HoldToMenuButton
-          isHoldRequired={isReturnToMenuHoldRequired}
-          onReturnToMenu={backToMenu}
-          size="small"
-        />
-        {game.winner && (
-          <NewGameButton
-            label={game.matchWinner ? "New Game" : "Next Game"}
-            onClick={resetGame}
-            size="small"
-          />
-        )}
-      </Row>
-      {isLocalDebugMode() && (
-        <DebugRollPanel
-          onRollPresetTextChange={game.setDebugRollsText}
-          rollPresetText={game.debugRollPresetText}
-        />
-      )}
     </div>
   );
 }

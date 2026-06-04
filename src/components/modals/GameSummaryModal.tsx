@@ -117,7 +117,7 @@ export function GameSummaryModal({
   }, [onClose]);
 
   return (
-    <div className={theme.modal.overlay}>
+    <div className={theme.modal.centeredOverlay}>
       <section
         aria-modal="true"
         className={cx(theme.modal.panel, "max-w-md")}
