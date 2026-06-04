@@ -5,7 +5,7 @@ export function cx(...classes: Array<string | false | null | undefined>) {
 export const theme = {
   app: {
     shell:
-      "flex min-h-dvh flex-col items-center justify-start gap-4 bg-zinc-900 px-3 py-16 text-white sm:justify-center sm:gap-8 sm:px-4 sm:py-8",
+      "flex min-h-dvh flex-col items-center justify-start gap-3 bg-zinc-900 px-3 py-3 text-white sm:justify-center sm:gap-8 sm:px-4 sm:py-8",
   },
   button: {
     base: "select-none rounded-xl font-bold transition-colors duration-200 [-webkit-touch-callout:none]",

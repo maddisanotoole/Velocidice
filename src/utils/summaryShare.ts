@@ -10,9 +10,15 @@ type SummaryImageOptions = {
   title: string;
 };
 
-type ShareSummaryOptions = SummaryImageOptions & {
+type DownloadSummaryImageOptions = SummaryImageOptions & {
   fileName?: string;
-  shareTitle?: string;
+};
+
+type ShareSummaryTextOptions = {
+  gameUrl: string;
+  resultText: string;
+  tiles: SummaryShareTile[];
+  title: string;
 };
 
 function drawRoundRect(
@@ -66,7 +72,10 @@ async function createSummaryImage({
   const tileHeight = 112;
   const gap = 24;
   const rows = Math.ceil(tiles.length / 2);
-  const height = 326 + rows * tileHeight + (rows - 1) * gap;
+  const tilesTop = 258;
+  const tilesBottom = tilesTop + rows * tileHeight + (rows - 1) * gap;
+  const footerTop = tilesBottom + 48;
+  const height = footerTop + 100;
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
 
@@ -105,7 +114,7 @@ async function createSummaryImage({
     const col = index % 2;
     const row = Math.floor(index / 2);
     const x = 56 + col * (tileWidth + gap);
-    const y = 258 + row * (tileHeight + gap);
+    const y = tilesTop + row * (tileHeight + gap);
 
     context.fillStyle = "#18181b";
     drawRoundRect(context, x, y, tileWidth, tileHeight, 14);
@@ -127,16 +136,16 @@ async function createSummaryImage({
 
   context.fillStyle = "#a1a1aa";
   context.font = "800 20px system-ui, -apple-system, Segoe UI, sans-serif";
-  context.fillText("Play at", 56, height - 72);
+  context.fillText("Play at", 56, footerTop);
 
   context.fillStyle = "#ffffff";
   context.font = "900 24px system-ui, -apple-system, Segoe UI, sans-serif";
-  context.fillText(gameUrl, 56, height - 40);
+  context.fillText(gameUrl, 56, footerTop + 32);
 
   return canvasToBlob(canvas);
 }
 
-function downloadSummaryImage(blob: Blob, fileName: string) {
+function downloadBlob(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 
@@ -146,35 +155,47 @@ function downloadSummaryImage(blob: Blob, fileName: string) {
   URL.revokeObjectURL(url);
 }
 
-export async function shareSummaryImage({
+function formatSummaryText({
+  gameUrl,
+  resultText,
+  tiles,
+  title,
+}: ShareSummaryTextOptions) {
+  const tileText = tiles.map(({ label, value }) => `${label}: ${value}`);
+
+  return [`VelociDice - ${title}`, resultText, ...tileText, `Play: ${gameUrl}`]
+    .filter(Boolean)
+    .join("\n");
+}
+
+export async function shareSummaryText(options: ShareSummaryTextOptions) {
+  const text = formatSummaryText(options);
+  const shareData = {
+    text,
+    title: "VelociDice summary",
+  };
+
+  if (navigator.share) {
+    await navigator.share(shareData);
+    return;
+  }
+
+  await navigator.clipboard.writeText(text);
+}
+
+export async function downloadSummaryImage({
   fileName = "velocidice-summary.png",
   gameUrl,
   resultText,
-  shareTitle = "VelociDice summary",
   tiles,
   title,
-}: ShareSummaryOptions) {
+}: DownloadSummaryImageOptions) {
   const blob = await createSummaryImage({
     gameUrl,
     resultText,
     tiles,
     title,
   });
-  const file = new File([blob], fileName, {
-    type: "image/png",
-  });
-  const shareData = {
-    files: [file],
-    text: `${resultText} Play VelociDice: ${gameUrl}`,
-    title: shareTitle,
-    url: gameUrl,
-  };
 
-  if (navigator.canShare?.(shareData)) {
-    await navigator.share(shareData);
-    return "shared";
-  }
-
-  downloadSummaryImage(blob, fileName);
-  return "downloaded";
+  downloadBlob(blob, fileName);
 }

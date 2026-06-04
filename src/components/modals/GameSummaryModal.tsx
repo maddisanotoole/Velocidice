@@ -6,9 +6,12 @@ import {
   type PlayerScores,
 } from "../../types";
 import {
-  shareSummaryImage,
+  downloadSummaryImage,
+  shareSummaryText,
   type SummaryShareTile,
 } from "../../utils/summaryShare";
+import downloadIcon from "../../assets/images/download.svg";
+import shareIcon from "../../assets/images/share.svg";
 import { cx, theme } from "../../theme/classes";
 import Button from "../buttons/GameButton";
 
@@ -30,6 +33,8 @@ const matchLengthLabels: Record<MatchLength, string> = {
   3: "Best of 3",
   10: "Best of 10",
 };
+
+const gameUrl = "https://velocidice.vercel.app/";
 
 function getPossessiveLabel(label: string) {
   return label === "You" ? "Your" : label;
@@ -58,8 +63,12 @@ export function GameSummaryModal({
         matchLengthLabels[matchLength]
       } match.`
     : `${playerLabels[winner]} won the game.`;
-  const gameUrl =
-    typeof window === "undefined" ? "VelociDice" : window.location.origin;
+  const didPlayerWin = (matchWinner ?? winner) === "player";
+  const sharedResultText = isMatchComplete
+    ? `I ${didPlayerWin ? "won" : "lost"} the ${
+        matchLengthLabels[matchLength]
+      } match!`
+    : `I ${didPlayerWin ? "won" : "lost"}!`;
   const summaryTiles: SummaryShareTile[] = [
     ...(shouldShowMatchScore
       ? [
@@ -90,17 +99,59 @@ export function GameSummaryModal({
       value: matchLengthLabels[matchLength],
     },
   ];
-
-  async function shareSummary() {
+  const sharedSummaryTiles: SummaryShareTile[] = [
+    ...(shouldShowMatchScore
+      ? [
+          {
+            label: "My Games",
+            value: matchScore.player,
+          },
+          {
+            label: `${playerLabels.player2} Games`,
+            value: matchScore.player2,
+          },
+        ]
+      : []),
+    {
+      label: "My Score",
+      value: playerScore.player,
+    },
+    {
+      label: `${playerLabels.player2} Score`,
+      value: playerScore.player2,
+    },
+    {
+      label: "Target",
+      value: targetScore,
+    },
+    {
+      label: "Format",
+      value: matchLengthLabels[matchLength],
+    },
+  ];
+  async function shareSummaryTextResult() {
     try {
-      await shareSummaryImage({
+      await shareSummaryText({
         gameUrl,
-        resultText,
-        tiles: summaryTiles,
+        resultText: sharedResultText,
+        tiles: sharedSummaryTiles,
         title,
       });
     } catch {
       // Sharing can be cancelled or blocked by the browser.
+    }
+  }
+
+  async function downloadSummary() {
+    try {
+      await downloadSummaryImage({
+        gameUrl,
+        resultText: sharedResultText,
+        tiles: sharedSummaryTiles,
+        title,
+      });
+    } catch {
+      // Download can be blocked by the browser.
     }
   }
 
@@ -155,13 +206,40 @@ export function GameSummaryModal({
 
         <div className="mt-5 flex flex-wrap justify-center gap-3 sm:mt-6">
           {canShareSummary && (
-            <Button
-              className="min-w-32 sm:min-w-40"
-              color="blue"
-              onClick={shareSummary}
-            >
-              Share
-            </Button>
+            <>
+              <button
+                aria-label="Share summary"
+                className={cx(
+                  "flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors sm:h-11 sm:w-11",
+                  theme.iconButton.dark,
+                )}
+                onClick={shareSummaryTextResult}
+                title="Share summary"
+                type="button"
+              >
+                <img
+                  alt=""
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                  src={shareIcon}
+                />
+              </button>
+              <button
+                aria-label="Download summary image"
+                className={cx(
+                  "flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors sm:h-11 sm:w-11",
+                  theme.iconButton.dark,
+                )}
+                onClick={downloadSummary}
+                title="Download summary image"
+                type="button"
+              >
+                <img
+                  alt=""
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                  src={downloadIcon}
+                />
+              </button>
+            </>
           )}
           <Button
             className="min-w-32 sm:min-w-40"
