@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GameSummaryModal } from "./components/modals/GameSummaryModal";
 import { GameScreen } from "./components/screens/GameScreen";
 import { SettingsButton } from "./components/buttons/SettingsButton";
+import { MuteButton } from "./components/buttons/MuteButton";
 import { SettingsModal } from "./components/modals/SettingsModal";
 import { StatisticsModal } from "./components/modals/StatisticsModal";
 import { StartMenu } from "./components/screens/StartMenu";
@@ -59,11 +60,9 @@ function App() {
         <StartMenu
           onOpenTheme={() => setIsThemePickerOpen(true)}
           gameMode={game.gameMode}
-          isMuted={game.isMuted}
           matchLength={game.matchLength}
           onGameModeChange={game.setGameMode}
           onMatchLengthChange={game.setMatchLength}
-          onMuteChange={game.handleMuteChange}
           onOpenRules={() => setIsRulesOpen(true)}
           onOpenStatistics={() => setIsStatisticsOpen(true)}
           onStart={game.startGame}
@@ -72,6 +71,7 @@ function App() {
         />
       )}
       <SettingsButton onClick={openSettings} />
+      <MuteButton isMuted={game.isMuted} onMuteChange={game.handleMuteChange} placement="top-left" />
       {isThemePickerOpen && <ThemePicker themeId={themeId} onApply={changeTheme} onClose={() => {
         setIsThemePickerOpen(false);
         requestAnimationFrame(() => document.getElementById("menu-theme-button")?.focus());

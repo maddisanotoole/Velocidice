@@ -29,6 +29,7 @@ export const theme = {
     raised: "bg-[var(--surface)] text-[var(--ink)] shadow-lg hover:bg-[var(--hover)]",
     size: "p-2.5 sm:p-3",
     fixedTopRight: "fixed right-3 top-3 z-50 sm:right-4 sm:top-4",
+    fixedTopLeft: "fixed left-3 top-3 z-50 sm:left-4 sm:top-4",
   },
   linkButton:
     "flex items-center justify-center gap-2 rounded-xl bg-[var(--surface-deep)] px-4 py-3 font-bold text-[var(--ink)] transition-colors hover:bg-[var(--hover)]",
