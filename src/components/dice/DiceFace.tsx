@@ -52,6 +52,12 @@ export const DieFace: React.FC<DieProps> = ({
     <motion.div
       key={`die_${die.id}_${rollAnimationKey}`}
       onClick={onClick}
+      data-player={currentPlayer}
+      data-state={
+        isHeld ? "held" : isInvalidSelection ? "invalid"
+          : die.status === DieStatus.SELECTED ? "selected"
+            : isPlayer2Turn ? "opponent" : "active"
+      }
       initial={
         shouldAnimateRoll
           ? {
@@ -81,33 +87,21 @@ export const DieFace: React.FC<DieProps> = ({
               duration: 0,
             }
       }
-      className={`
-  relative h-14 w-14 rounded-xl cursor-pointer transition-all shadow-lg sm:h-16 sm:w-16
-  ${
-    isHeld
-      ? "bg-green-500"
-      : isInvalidSelection
-        ? "bg-yellow-400 outline-4 outline-offset-2 outline-amber-400"
-      : die.status === DieStatus.SELECTED
-        ? "bg-yellow-400"
-        : isPlayer2Turn
-          ? "bg-purple-400"
-          : "bg-white"
-  }
-`}
+      className="vd-die relative h-14 w-14 rounded-xl cursor-pointer transition-all shadow-lg sm:h-16 sm:w-16"
     >
       {pipPositions[die.value as keyof typeof pipPositions].map((position) => (
         <span
-          className={`absolute h-2.5 w-2.5 rounded-full sm:h-3 sm:w-3 ${
-            isHeld ? "bg-white" : "bg-zinc-950"
-          } ${pipClasses[position]}`}
+          className={`vd-pip absolute h-2.5 w-2.5 rounded-full sm:h-3 sm:w-3 ${pipClasses[position]}`}
           key={position}
         />
       ))}
+      {die.status === DieStatus.SELECTED && !isHeld && !isInvalidSelection && (
+        <span className="vd-selection-tick" aria-hidden="true">✓</span>
+      )}
       {isInvalidSelection && (
         <span
           aria-hidden="true"
-          className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border-2 border-zinc-950 bg-amber-400 text-sm font-black text-zinc-950 shadow-lg"
+          className="vd-invalid-badge absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border-2 text-sm font-black shadow-lg"
         >
           !
         </span>

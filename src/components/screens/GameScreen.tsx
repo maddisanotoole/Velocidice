@@ -87,6 +87,7 @@ export function GameScreen({
             disabled={gameView.actionButtonsDisabled}
             title={gameView.actionDisabledReason}
             color="blue"
+            themeRole="reroll_button"
           >
             Hold & Reroll
           </Button>

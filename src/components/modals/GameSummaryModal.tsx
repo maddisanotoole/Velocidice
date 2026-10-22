@@ -210,7 +210,7 @@ export function GameSummaryModal({
               <button
                 aria-label="Share summary"
                 className={cx(
-                  "flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors sm:h-11 sm:w-11",
+                  "flex h-10 w-10 items-center justify-center rounded-xl text-[var(--ink)] transition-colors sm:h-11 sm:w-11",
                   theme.iconButton.dark,
                 )}
                 onClick={shareSummaryTextResult}
@@ -226,7 +226,7 @@ export function GameSummaryModal({
               <button
                 aria-label="Download summary image"
                 className={cx(
-                  "flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors sm:h-11 sm:w-11",
+                  "flex h-10 w-10 items-center justify-center rounded-xl text-[var(--ink)] transition-colors sm:h-11 sm:w-11",
                   theme.iconButton.dark,
                 )}
                 onClick={downloadSummary}

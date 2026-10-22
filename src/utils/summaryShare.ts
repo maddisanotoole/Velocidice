@@ -87,26 +87,31 @@ async function createSummaryImage({
   canvas.height = height * scale;
   context.scale(scale, scale);
 
-  context.fillStyle = "#18181b";
+  const themeElement = document.querySelector(".vd-shell");
+  if (!themeElement) throw new Error("Could not read the game theme.");
+  const styles = getComputedStyle(themeElement);
+  const color = (name: string) => styles.getPropertyValue(name).trim();
+
+  context.fillStyle = color("--surface-deep");
   context.fillRect(0, 0, width, height);
 
-  context.fillStyle = "#27272a";
+  context.fillStyle = color("--surface");
   drawRoundRect(context, 32, 32, width - 64, height - 64, 24);
   context.fill();
 
-  context.fillStyle = "#a855f7";
+  context.fillStyle = color("--secondary");
   drawRoundRect(context, 56, 56, 64, 64, 14);
   context.fill();
 
-  context.fillStyle = "#ffffff";
+  context.fillStyle = color("--ink");
   context.font = "900 38px system-ui, -apple-system, Segoe UI, sans-serif";
   context.fillText("VelociDice", 136, 96);
 
-  context.fillStyle = "#ffffff";
+  context.fillStyle = color("--ink");
   context.font = "900 48px system-ui, -apple-system, Segoe UI, sans-serif";
   context.fillText(title, 56, 178);
 
-  context.fillStyle = "#a1a1aa";
+  context.fillStyle = color("--muted");
   context.font = "700 22px system-ui, -apple-system, Segoe UI, sans-serif";
   context.fillText(resultText, 56, 216);
 
@@ -116,29 +121,29 @@ async function createSummaryImage({
     const x = 56 + col * (tileWidth + gap);
     const y = tilesTop + row * (tileHeight + gap);
 
-    context.fillStyle = "#18181b";
+    context.fillStyle = color("--surface-deep");
     drawRoundRect(context, x, y, tileWidth, tileHeight, 14);
     context.fill();
 
-    context.strokeStyle = "#3f3f46";
+    context.strokeStyle = color("--line");
     context.lineWidth = 2;
     drawRoundRect(context, x, y, tileWidth, tileHeight, 14);
     context.stroke();
 
-    context.fillStyle = "#a1a1aa";
+    context.fillStyle = color("--muted");
     context.font = "800 18px system-ui, -apple-system, Segoe UI, sans-serif";
     context.fillText(label.toUpperCase(), x + 20, y + 38);
 
-    context.fillStyle = "#ffffff";
+    context.fillStyle = color("--ink");
     context.font = "900 34px system-ui, -apple-system, Segoe UI, sans-serif";
     context.fillText(String(value), x + 20, y + 82);
   });
 
-  context.fillStyle = "#a1a1aa";
+  context.fillStyle = color("--muted");
   context.font = "800 20px system-ui, -apple-system, Segoe UI, sans-serif";
   context.fillText("Play at", 56, footerTop);
 
-  context.fillStyle = "#ffffff";
+  context.fillStyle = color("--ink");
   context.font = "900 24px system-ui, -apple-system, Segoe UI, sans-serif";
   context.fillText(gameUrl, 56, footerTop + 32);
 

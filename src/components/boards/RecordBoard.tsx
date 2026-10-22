@@ -11,18 +11,18 @@ export function RecordBoard({ records }: RecordBoardProps) {
     <Board size={BoardSize.SMALL}>
       <Row>
         <span className="flex items-baseline gap-1 px-1">
-          <span className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+          <span className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
             Wins
           </span>
-          <span className="text-base font-black text-white">
+          <span className="text-base font-black text-[var(--ink)]">
             {records.vsComputer.wins}
           </span>
         </span>
         <span className="flex items-baseline gap-1 px-1">
-          <span className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+          <span className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
             Losses
           </span>
-          <span className="text-base font-black text-white">
+          <span className="text-base font-black text-[var(--ink)]">
             {records.vsComputer.losses}
           </span>
         </span>

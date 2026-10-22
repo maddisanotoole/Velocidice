@@ -19,7 +19,7 @@ export function SettingsButton({ onClick }: SettingsButtonProps) {
       title="Settings"
       type="button"
     >
-      <img alt="" className="h-5 w-5 sm:h-6 sm:w-6" src={settingsIcon} />
+      <img alt="" className="vd-settings-icon h-5 w-5 sm:h-6 sm:w-6" src={settingsIcon} />
     </button>
   );
 }

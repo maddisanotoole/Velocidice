@@ -13,7 +13,7 @@ const boardSizeClasses = {
 export function Board({ children, size = BoardSize.NORMAL }: BoardProps) {
   return (
     <div
-      className={`flex max-w-full flex-col bg-zinc-800 shadow-xl ${boardSizeClasses[size]}`}
+      className={`flex max-w-full flex-col bg-[var(--surface)] shadow-xl ${boardSizeClasses[size]}`}
     >
       {children}
     </div>

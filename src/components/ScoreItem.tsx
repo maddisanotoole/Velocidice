@@ -31,12 +31,12 @@ export function ScoreItem({
   return (
     <div
       className={`grid grid-rows-[1.25rem_auto_1.25rem] place-items-center rounded-lg px-2 py-1 transition-colors sm:px-3 sm:py-2 ${
-        active ? "bg-yellow-400" : ""
+        active ? "bg-[var(--highlight)]" : ""
       }`}
     >
       <span
         className={`flex min-h-5 items-center ${sizeClasses.label} uppercase tracking-wide ${
-          active ? "text-zinc-950" : "text-zinc-400"
+          active ? "text-[var(--highlight-ink)]" : "text-[var(--muted)]"
         }`}
       >
         {label}
@@ -44,7 +44,7 @@ export function ScoreItem({
 
       <span
         className={`${sizeClasses.value} font-black capitalize ${
-          active ? "text-zinc-950" : "text-white"
+          active ? "text-[var(--highlight-ink)]" : "text-[var(--ink)]"
         }`}
       >
         {value}
@@ -54,8 +54,8 @@ export function ScoreItem({
         className={`flex min-h-5 items-center text-sm font-black ${
           delta > 0
             ? active
-              ? "text-green-950"
-              : "text-green-400"
+              ? "text-[var(--highlight-ink)]"
+              : "text-[var(--points)]"
             : "text-transparent"
         }`}
       >

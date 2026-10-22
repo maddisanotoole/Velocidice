@@ -80,12 +80,12 @@ function MiniDie({ value }: { value: number }) {
   return (
     <span
       aria-label={`${value}`}
-      className="relative inline-block h-6 w-6 shrink-0 rounded-md bg-white shadow"
+      className="relative inline-block h-6 w-6 shrink-0 rounded-md bg-[var(--dice)] shadow"
     >
       {miniPipPositions[value as keyof typeof miniPipPositions].map(
         (position) => (
           <span
-            className={`absolute h-1 w-1 rounded-full bg-zinc-950 ${miniPipClasses[position]}`}
+            className={`absolute h-1 w-1 rounded-full bg-[var(--pip)] ${miniPipClasses[position]}`}
             key={position}
           />
         ),
@@ -180,7 +180,7 @@ export function RulesModal({ onClose }: RulesModalProps) {
               die does not score, you need to deselect it before holding or
               banking.
             </p>
-            <p className="mt-2 text-amber-300">
+            <p className="mt-2 text-[var(--warning)]">
               A selected die with a ! badge is selected, but is not adding
               points. Select another die to make it scoring, or unselect it.
             </p>
@@ -230,7 +230,7 @@ export function RulesModal({ onClose }: RulesModalProps) {
               className="grid gap-1 px-4 py-3 sm:grid-cols-[1fr_auto] sm:gap-4"
               key={label}
             >
-              <span className="flex flex-col gap-1 font-bold text-zinc-100 sm:flex-row sm:items-center sm:gap-3">
+              <span className="flex flex-col gap-1 font-bold text-[var(--ink)] sm:flex-row sm:items-center sm:gap-3">
                 <MiniDiceGroup values={dice} />
                 <span>{label}</span>
               </span>

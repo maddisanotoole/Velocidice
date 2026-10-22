@@ -26,27 +26,27 @@ export function MatchBoard({
   return (
     <Board size={BoardSize.SMALL}>
       <div className="flex items-baseline justify-center gap-3 sm:gap-4">
-        <span className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+        <span className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
           Match
         </span>
-        <span className="text-sm font-black text-white">
+        <span className="text-sm font-black text-[var(--ink)]">
           {matchLengthLabels[matchLength]}
         </span>
       </div>
       <div className="flex flex-wrap items-baseline justify-center gap-3 sm:gap-4">
         <span className="flex items-baseline gap-1 px-1">
-          <span className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+          <span className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
             {playerLabels.player}
           </span>
-          <span className="text-base font-black text-white">
+          <span className="text-base font-black text-[var(--ink)]">
             {matchScore.player}
           </span>
         </span>
         <span className="flex items-baseline gap-1 px-1">
-          <span className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+          <span className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
             {playerLabels.player2}
           </span>
-          <span className="text-base font-black text-white">
+          <span className="text-base font-black text-[var(--ink)]">
             {matchScore.player2}
           </span>
         </span>

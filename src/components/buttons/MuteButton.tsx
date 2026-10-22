@@ -22,7 +22,7 @@ export function MuteButton({ isMuted, onMuteChange }: MuteButtonProps) {
     >
       <img
         alt=""
-        className="h-5 w-5 sm:h-6 sm:w-6"
+        className="vd-icon-img h-5 w-5 sm:h-6 sm:w-6"
         src={isMuted ? soundOffIcon : soundOnIcon}
       />
     </button>
