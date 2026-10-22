@@ -29,7 +29,7 @@ export function TargetScoreSlider({
   return (
     <>
       <input
-        className="w-full accent-blue-500"
+        className="w-full accent-[var(--roll)]"
         list="target-score-options"
         max={TARGET_SCORE_OPTIONS[TARGET_SCORE_OPTIONS.length - 1]}
         min={TARGET_SCORE_OPTIONS[0]}
@@ -43,7 +43,7 @@ export function TargetScoreSlider({
           <option key={option} value={option} />
         ))}
       </datalist>
-      <div className="mt-2 flex justify-between text-xs font-bold text-zinc-400">
+      <div className="mt-2 flex justify-between text-xs font-bold text-[var(--muted)]">
         {TARGET_SCORE_OPTIONS.map((option) => (
           <span key={option}>{option}</span>
         ))}

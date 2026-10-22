@@ -45,6 +45,7 @@ export function useGameViewState(game: GameState) {
       game.matchWinner,
       game.gameMode,
       game.hasFarkled,
+      game.selectedDice.length > 0 && !game.selectedDiceAreValid,
     ),
     playerLabels,
     turnBannerClasses: getTurnBannerClasses(game.currentPlayer),

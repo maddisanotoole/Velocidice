@@ -10,6 +10,11 @@ import {
 } from "./viewState";
 
 describe("view state helpers", () => {
+  it("uses warning colours for invalid selections without overriding a Farkle or winner", () => {
+    expect(getFeedbackMessageVariant(null, null, "computer", false, true)).toBe("warning");
+    expect(getFeedbackMessageVariant(null, null, "computer", true, true)).toBe("danger");
+    expect(getFeedbackMessageVariant("player", null, "computer", false, true)).toBe("success");
+  });
   it("uses natural labels for computer mode", () => {
     const labels = getPlayerLabels("computer");
 

@@ -8,6 +8,9 @@ import { StartMenu } from "./components/screens/StartMenu";
 import { useGameState } from "./hooks/useGameState";
 import { useGameViewState } from "./hooks/useGameViewState";
 import { theme } from "./theme/classes";
+import { loadTheme, saveTheme, type ThemeId } from "./theme/preferences";
+import { ThemePicker } from "./components/modals/ThemePicker";
+import { getThemeStyle } from "./theme/styles";
 
 function isLocalDebugMode() {
   if (!import.meta.env.DEV || typeof window === "undefined") {
@@ -18,6 +21,13 @@ function isLocalDebugMode() {
 }
 
 function App() {
+  const [themeId, setThemeId] = useState(loadTheme);
+  const [themeSaveFailed, setThemeSaveFailed] = useState(false);
+  const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
+  function changeTheme(id: ThemeId) {
+    setThemeId(id);
+    setThemeSaveFailed(!saveTheme(id));
+  }
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
@@ -44,9 +54,10 @@ function App() {
   }
 
   return (
-    <div className={theme.app.shell}>
+    <div className={theme.app.shell} data-theme={themeId} style={getThemeStyle(themeId)}>
       {!game.hasStartedGame && (
         <StartMenu
+          onOpenTheme={() => setIsThemePickerOpen(true)}
           gameMode={game.gameMode}
           isMuted={game.isMuted}
           matchLength={game.matchLength}
@@ -61,8 +72,16 @@ function App() {
         />
       )}
       <SettingsButton onClick={openSettings} />
+      {isThemePickerOpen && <ThemePicker themeId={themeId} onApply={changeTheme} onClose={() => {
+        setIsThemePickerOpen(false);
+        requestAnimationFrame(() => document.getElementById("menu-theme-button")?.focus());
+      }} />}
+      {themeSaveFailed && !isSettingsOpen && <p role="status" className="fixed bottom-3 z-50 rounded-lg bg-[var(--surface)] p-3">Theme changed for this visit. Your browser could not save the preference.</p>}
       {isSettingsOpen && (
         <SettingsModal
+          themeId={themeId}
+          onThemeChange={changeTheme}
+          themeSaveFailed={themeSaveFailed}
           isLocalDebugMode={localDebugMode}
           isMuted={game.isMuted}
           isReturnToMenuHoldRequired={isReturnToMenuHoldRequired}

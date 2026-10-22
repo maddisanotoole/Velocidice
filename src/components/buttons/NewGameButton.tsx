@@ -12,7 +12,7 @@ export function NewGameButton({
   size = "normal",
 }: NewGameButtonProps) {
   return (
-    <Button onClick={onClick} color="green" size={size}>
+    <Button onClick={onClick} color="green" themeRole="start_button" size={size}>
       {label}
     </Button>
   );

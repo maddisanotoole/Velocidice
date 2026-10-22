@@ -9,6 +9,7 @@ import { cx, theme } from "../../theme/classes";
 import type { GameMode, MatchLength } from "../../types";
 
 type StartMenuProps = {
+  onOpenTheme: () => void;
   gameMode: GameMode;
   isMuted: boolean;
   matchLength: MatchLength;
@@ -23,6 +24,7 @@ type StartMenuProps = {
 };
 
 export function StartMenu({
+  onOpenTheme,
   gameMode,
   isMuted,
   matchLength,
@@ -119,12 +121,14 @@ export function StartMenu({
             <Button
               onClick={startGame}
               color="green"
+              themeRole="start_button"
               className="min-w-44 sm:min-w-56"
             >
               Start Game
             </Button>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-3 sm:mt-5 sm:gap-4">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:mt-5 sm:gap-4">
+            <button id="menu-theme-button" type="button" onClick={onOpenTheme} className={cx(theme.button.base, theme.button.size.normal, "bg-[var(--theme_button)] text-[var(--theme_button-ink)] theme-choice-focus")}>Theme</button>
             <RulesButton onClick={onOpenRules} />
             <Button onClick={onOpenStatistics} color="purple">
               Stats
@@ -132,8 +136,8 @@ export function StartMenu({
             <a
               aria-label="Open GitHub repository"
               className={cx(
-                "h-10 w-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
-                "flex items-center justify-center rounded-xl text-white transition-colors",
+                "h-10 w-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]",
+                "flex items-center justify-center rounded-xl text-[var(--ink)] transition-colors",
                 theme.iconButton.dark,
               )}
               href={GITHUB_REPOSITORY_URL}

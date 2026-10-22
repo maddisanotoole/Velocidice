@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { THEMES, type ThemeId } from "../../theme/preferences";
+import { ThemePicker } from "./ThemePicker";
 import { GITHUB_REPOSITORY_URL } from "../../appConstants";
 import Button from "../buttons/GameButton";
 import { DebugRollPanel } from "./DebugRollPanel";
@@ -7,6 +9,9 @@ import { MuteButton } from "../buttons/MuteButton";
 import { cx, theme } from "../../theme/classes";
 
 type SettingsModalProps = {
+  themeId: ThemeId;
+  onThemeChange: (id: ThemeId) => void;
+  themeSaveFailed: boolean;
   isLocalDebugMode: boolean;
   isMuted: boolean;
   isReturnToMenuHoldRequired: boolean;
@@ -18,6 +23,9 @@ type SettingsModalProps = {
 };
 
 export function SettingsModal({
+  themeId,
+  onThemeChange,
+  themeSaveFailed,
   isLocalDebugMode,
   isMuted,
   isReturnToMenuHoldRequired,
@@ -27,17 +35,27 @@ export function SettingsModal({
   onRollPresetTextChange,
   rollPresetText,
 }: SettingsModalProps) {
+  const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
+  const themeButton = useRef<HTMLButtonElement>(null);
+  function closeThemePicker() {
+    setIsThemePickerOpen(false);
+    requestAnimationFrame(() => themeButton.current?.focus());
+  }
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        onClose();
+        if (!isThemePickerOpen) onClose();
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, isThemePickerOpen]);
+
+  if (isThemePickerOpen) {
+    return <ThemePicker themeId={themeId} onApply={onThemeChange} onClose={closeThemePicker} />;
+  }
 
   return (
     <div className={theme.modal.centeredOverlay} onClick={onClose}>
@@ -46,6 +64,7 @@ export function SettingsModal({
         className={cx(theme.modal.panel, "max-w-md")}
         onClick={(event) => event.stopPropagation()}
         role="dialog"
+        aria-label="Settings"
       >
         <div className={theme.modal.header}>
           <div>
@@ -61,6 +80,16 @@ export function SettingsModal({
         </div>
 
         <div className="space-y-4 sm:space-y-6">
+          <button
+            ref={themeButton}
+            type="button"
+            className={cx(theme.panel.compact, "flex w-full items-center justify-between gap-3 text-left theme-choice-focus")}
+            onClick={() => setIsThemePickerOpen(true)}
+          >
+            <span><span className="block font-bold">Theme</span><span className={cx("block text-sm", theme.text.muted)}>{THEMES.find((item) => item.id === themeId)?.name}</span></span>
+            <span aria-hidden="true">→</span>
+          </button>
+          {themeSaveFailed && <p role="status">Theme changed for this visit. Your browser could not save the preference.</p>}
           <section
             className={cx(
               "flex items-center justify-between gap-3 sm:gap-4",

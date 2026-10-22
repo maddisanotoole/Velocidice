@@ -33,8 +33,8 @@ export function getTurnLabel(
 
 export function getTurnBannerClasses(currentPlayer: PlayerId): string {
   return currentPlayer === "player"
-    ? "border-blue-300 bg-blue-500 text-white"
-    : "border-purple-300 bg-purple-500 text-white";
+    ? "border-[var(--line)] bg-[var(--your_turn)] text-[var(--your_turn-ink)]"
+    : "border-[var(--line)] bg-[var(--opponent_turn)] text-[var(--opponent_turn-ink)]";
 }
 
 export function getWinnerMessage(
@@ -85,6 +85,7 @@ export function getFeedbackMessageVariant(
   matchWinner: PlayerId | null,
   gameMode: GameMode,
   hasFarkled: boolean,
+  hasInvalidSelection = false,
 ): FeedbackVariant {
   const resultWinner = matchWinner ?? winner;
 
@@ -94,7 +95,7 @@ export function getFeedbackMessageVariant(
       : "success";
   }
 
-  return hasFarkled ? "danger" : "default";
+  return hasFarkled ? "danger" : hasInvalidSelection ? "warning" : "default";
 }
 
 export function getActionDisabledReason({
