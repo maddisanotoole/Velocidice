@@ -1,6 +1,7 @@
 import Button from "../buttons/GameButton";
 import { DiceTray } from "../dice/DiceTray";
-import { FeedbackToast } from "../modals/FeedbackToast";
+import { DiceArea } from "../dice/DiceArea";
+import { TurnStatus } from "../TurnStatus";
 import { HoldToMenuButton } from "../buttons/HoldToMenuButton";
 import { MatchBoard } from "../boards/MatchBoard";
 import { NewGameButton } from "../buttons/NewGameButton";
@@ -68,18 +69,16 @@ export function GameScreen({
         >
           {gameView.turnLabel}
         </p>
-        <DiceTray
+        <DiceArea key={`${game.currentPlayer}_${game.rerollCount}`} hasFarkled={game.hasStartedGame && game.hasFarkled}>
+          <DiceTray
           currentPlayer={game.currentPlayer}
           dice={game.dice}
           invalidSelectedDieIds={game.invalidSelectedDieIds}
           isTurnChanging={game.isTurnChanging}
           onSelectDie={game.selectDie}
           rerollCount={game.hasStartedGame ? game.rerollCount : -1}
-        />
-        <FeedbackToast
-          message={gameView.feedbackMessage}
-          variant={gameView.feedbackMessageVariant}
-        />
+          />
+        </DiceArea>
         <div className="w-full pt-4 sm:pt-6" role="group" aria-label="Turn actions" aria-describedby="turn-action-guidance">
           <Row>
           <Button
@@ -100,14 +99,11 @@ export function GameScreen({
             {gameView.bankActionLabel}
           </Button>
           </Row>
-          <p
-            id="turn-action-guidance"
-            role="status"
-            aria-atomic="true"
-            className="mt-3 min-h-10 text-center text-sm text-[var(--ink)]"
-          >
-            {gameView.actionDisabledReason ?? "Bank to save your points, or reroll to risk them for more."}
-          </p>
+          <TurnStatus
+            message={game.hasFarkled ? undefined : gameView.feedbackMessage}
+            guidance={game.hasFarkled ? "The next turn starts automatically." : gameView.actionDisabledReason ?? "Bank to save your points, or reroll to risk them for more."}
+            variant={gameView.feedbackMessageVariant}
+          />
         </div>
       </section>
 

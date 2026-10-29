@@ -8,6 +8,7 @@ import { cx, theme } from "../../theme/classes";
 import type { GameMode, MatchLength } from "../../types";
 
 type StartMenuProps = {
+  themeSaveFailed: boolean;
   onOpenTheme: () => void;
   gameMode: GameMode;
   matchLength: MatchLength;
@@ -21,6 +22,7 @@ type StartMenuProps = {
 };
 
 export function StartMenu({
+  themeSaveFailed,
   onOpenTheme,
   gameMode,
   matchLength,
@@ -114,6 +116,7 @@ export function StartMenu({
           />
         </section>
         <div className={theme.menu.footer}>
+          {themeSaveFailed && <p role="status" className="mb-3 text-center text-sm">Theme changed for this visit. Your browser could not save the preference.</p>}
           <div className="flex justify-center">
             <Button
               onClick={startGame}

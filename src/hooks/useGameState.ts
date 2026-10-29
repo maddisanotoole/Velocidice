@@ -3,6 +3,7 @@ import {
   ACTION_MESSAGE_DELAY_MS,
   DEFAULT_MATCH_LENGTH,
   DEFAULT_TARGET_SCORE,
+  FARKLE_DISPLAY_DELAY_MS,
   SCORE_DELTA_DELAY_MS,
   TURN_SWITCH_DELAY_MS,
 } from "../appConstants";
@@ -464,7 +465,7 @@ export function useGameState() {
 
     logDebug("[Game Debug] Farkle auto-switch scheduled", {
       currentPlayer,
-      delayMs: TURN_SWITCH_DELAY_MS,
+      delayMs: FARKLE_DISPLAY_DELAY_MS,
     });
 
     playSound("farkle");
@@ -475,7 +476,7 @@ export function useGameState() {
       setTotalScoreDelta(0);
       setRoundScoreDelta(0);
       switchTurn();
-    }, TURN_SWITCH_DELAY_MS);
+    }, FARKLE_DISPLAY_DELAY_MS);
 
     return () => {
       logDebug("[Game Debug] Farkle auto-switch cleared", {
