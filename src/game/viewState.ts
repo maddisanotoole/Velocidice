@@ -8,6 +8,22 @@ import type {
 export const INVALID_SELECTION_MESSAGE =
   "Every selected die must contribute to the score.";
 
+export function getBankActionLabel({
+  roundScore, selectedScore, totalScore, targetScore, disabled,
+}: {
+  roundScore: number;
+  selectedScore: number;
+  totalScore: number;
+  targetScore: number;
+  disabled: boolean;
+}): string {
+  if (disabled) return "Bank & End Turn";
+  const amount = roundScore + selectedScore;
+  return totalScore + amount >= targetScore
+    ? `Bank ${amount.toLocaleString()} & Win`
+    : `Bank ${amount.toLocaleString()} points`;
+}
+
 export function getIsComputerControlledTurn(
   gameMode: GameMode,
   currentPlayer: PlayerId,
@@ -134,7 +150,7 @@ export function getActionDisabledReason({
   }
 
   if (hasFarkled) {
-    return "You farkled. End your turn.";
+    return "Farkle! No points banked. Changing turns automatically.";
   }
 
   if (selectedDiceCount === 0) {

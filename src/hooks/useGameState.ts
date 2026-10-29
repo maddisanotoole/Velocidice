@@ -3,7 +3,6 @@ import {
   ACTION_MESSAGE_DELAY_MS,
   DEFAULT_MATCH_LENGTH,
   DEFAULT_TARGET_SCORE,
-  INVALID_SELECTION_HELP_DELAY_MS,
   SCORE_DELTA_DELAY_MS,
   TURN_SWITCH_DELAY_MS,
 } from "../appConstants";
@@ -51,7 +50,6 @@ import {
 import { getNextPlayer, shouldAutoSwitchAfterFarkle } from "../game/turnFlow";
 import {
   getIsComputerControlledTurn,
-  INVALID_SELECTION_MESSAGE,
 } from "../game/viewState";
 import { useComputerTurn } from "./useComputerTurn";
 
@@ -90,7 +88,6 @@ function getWinningSound({
 export function useGameState() {
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
   const previousPlayerRef = useRef<PlayerId | null>(null);
-  const previousSelectedDiceKeyRef = useRef("");
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
   const [winner, setWinner] = useState<PlayerId | null>(null);
   const [matchWinner, setMatchWinner] = useState<PlayerId | null>(null);
@@ -124,9 +121,6 @@ export function useGameState() {
   const invalidSelectedDieIds = new Set(
     selectedScoreResult.nonScoringDice.map((die) => die.id),
   );
-  const selectedDiceKey = selectedDice
-    .map((die) => `${die.id}:${die.value}`)
-    .join("|");
   const hasFarkled = turn.status === "farkled";
   const requiredMatchWins = getRequiredMatchWins(matchLength);
   const isComputerControlledTurn = getIsComputerControlledTurn(
@@ -516,55 +510,12 @@ export function useGameState() {
   useEffect(() => {
     if (!actionMessage) return;
 
-    if (actionMessage === INVALID_SELECTION_MESSAGE) {
-      return;
-    }
-
     const timeout = setTimeout(() => {
       setActionMessage("");
     }, ACTION_MESSAGE_DELAY_MS);
 
     return () => clearTimeout(timeout);
   }, [actionMessage]);
-
-  useEffect(() => {
-    const previousSelectedDiceKey = previousSelectedDiceKeyRef.current;
-    previousSelectedDiceKeyRef.current = selectedDiceKey;
-
-    if (
-      previousSelectedDiceKey !== selectedDiceKey &&
-      actionMessage === INVALID_SELECTION_MESSAGE
-    ) {
-      setActionMessage("");
-    }
-  }, [actionMessage, selectedDiceKey]);
-
-  useEffect(() => {
-    if (
-      !hasStartedGame ||
-      winner ||
-      isTurnChanging ||
-      hasFarkled ||
-      isComputerControlledTurn ||
-      invalidSelectedDieIds.size === 0
-    ) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setActionMessage(INVALID_SELECTION_MESSAGE);
-    }, INVALID_SELECTION_HELP_DELAY_MS);
-
-    return () => clearTimeout(timeout);
-  }, [
-    hasFarkled,
-    hasStartedGame,
-    invalidSelectedDieIds.size,
-    isComputerControlledTurn,
-    isTurnChanging,
-    selectedDiceKey,
-    winner,
-  ]);
 
   useEffect(() => {
     if (roundScoreDelta === 0 && totalScoreDelta === 0) return;

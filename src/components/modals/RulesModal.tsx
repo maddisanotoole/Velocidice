@@ -205,8 +205,8 @@ export function RulesModal({ onClose }: RulesModalProps) {
             </h3>
             <p>
               A Farkle happens when the active dice have no possible scoring
-              dice. Your round score becomes 0, and the only available action is
-              to end the turn.
+              dice. Your round score becomes 0, and the game automatically
+              switches to the next player.
             </p>
           </section>
 
