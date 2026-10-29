@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest",
+    "check:vercel-function": "node scripts/check-vercel-function.mjs",
     "preview": "vite preview",
     "setup": "bash scripts/setup-hooks.sh"
   },

@@ -1,4 +1,4 @@
-import { isGameEvent, type GameEvent } from "../src/analytics/events";
+import { isGameEvent, type GameEvent } from "../src/analytics/events.js";
 
 type Settings = { enabled: boolean; origin: string | undefined; store: (event: GameEvent) => Promise<void> };
 

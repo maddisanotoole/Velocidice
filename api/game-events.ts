@@ -1,5 +1,5 @@
-import { createGameEventsHandler } from "../server/game-events-handler";
-import { storeGameEvent } from "../server/store-game-event";
+import { createGameEventsHandler } from "../server/game-events-handler.js";
+import { storeGameEvent } from "../server/store-game-event.js";
 
 export default {
   fetch(request: Request) {

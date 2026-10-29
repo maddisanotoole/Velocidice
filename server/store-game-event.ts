@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-import type { GameEvent } from "../src/analytics/events";
+import type { GameEvent } from "../src/analytics/events.js";
 
 export async function storeGameEvent(event: GameEvent) {
   const databaseUrl = process.env.DATABASE_URL;
