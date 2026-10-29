@@ -5,7 +5,6 @@ import {
   type PlayerScores,
 } from "../../types";
 import { Board } from "./Board";
-import { Row } from "../Row";
 import { ScoreItem } from "../ScoreItem";
 
 type PlayerBoardProps = {
@@ -22,25 +21,28 @@ export function PlayerBoard({
 }: PlayerBoardProps) {
   return (
     <Board size={BoardSize.SMALL}>
-      <Row>
+      <div className="grid grid-cols-3 gap-1 sm:gap-2">
         <ScoreItem
+          compact
           label="Target"
           value={targetScore}
           textSize={TextSize.SMALL}
         />
         <ScoreItem
+          compact
           label={playerLabels.player}
           value={playerScores.player}
           textSize={TextSize.SMALL}
           active={currentPlayer === "player"}
         />
         <ScoreItem
+          compact
           label={playerLabels.player2}
           value={playerScores.player2}
           textSize={TextSize.SMALL}
           active={currentPlayer === "player2"}
         />
-      </Row>
+      </div>
     </Board>
   );
 }

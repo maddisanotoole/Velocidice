@@ -46,15 +46,6 @@ button { touch-action: manipulation; }
 .theme-icon-button, .theme-option, .theme-picker-back { transition: filter 160ms ease, border-color 160ms ease; }
 .theme-option { color: var(--ink); }
 .theme-swatch { min-height: 72px; }
-.theme-live-preview { margin-bottom: 20px; padding: 20px 16px; border: 1px solid var(--disabled_text); border-radius: 14px; background: var(--table_surface); color: var(--menu_text); }
-.theme-preview-title { margin-bottom: 16px; text-align: center; font-weight: 800; }
-.theme-live-preview .theme-preview-dice { gap: 24px; }
-.theme-live-preview .theme-preview-die { width: 44px; height: 44px; padding: 7px; gap: 3px; }
-.theme-preview-labels { display: flex; justify-content: center; gap: 12px; margin-top: 10px; font-size: 11px; }
-.theme-preview-labels span { width: 56px; text-align: center; }
-.theme-preview-actions { display: flex; justify-content: center; gap: 10px; margin-top: 18px; }
-.theme-preview-actions span { border-radius: 8px; padding: 8px 16px; background: var(--reroll_button); color: var(--reroll_button-ink); font-size: 12px; font-weight: 800; }
-.theme-preview-actions span + span { background: var(--bank_button); color: var(--bank_button-ink); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
@@ -84,4 +75,21 @@ button { touch-action: manipulation; }
   .vd-dice-area[data-farkled] .vd-dice-area-tray { animation: none !important; opacity: .28; }
   .vd-dice-area[data-farkled] .vd-die { transform: none !important; }
   .vd-farkle-card { animation: vd-farkle-fade 180ms ease-out both !important; }
+}
+
+/* Keep navigation outside the scrollable centre of each screen. */
+.vd-menu-panel { padding-top: 52px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+.vd-menu-content { display: flex; flex: 1; min-height: 0; overflow-y: auto; padding: 4px; }
+.vd-menu-stack { width: 100%; margin-block: auto; flex-shrink: 0; padding-block: 16px; }
+.vd-menu-help { margin-top: 12px; }
+.vd-game-topbar { height: 48px; }
+.vd-game-middle { overscroll-behavior-y: contain; scrollbar-gutter: stable both-edges; }
+.vd-game-content { display: flex; flex-shrink: 0; flex-direction: column; align-items: center; width: 100%; margin-block: auto; gap: clamp(6px, calc((100dvh - 530px) / 16), 20px); padding-block: 4px; }
+.vd-game-actions { padding-top: clamp(0px, calc((100dvh - 620px) / 8), 16px); }
+.vd-turn-status { margin-top: 8px; min-height: 52px; padding-block: 8px; }
+.vd-game-footer { padding-top: 8px; padding-bottom: env(safe-area-inset-bottom); }
+/* Tighten decoration before asking short viewports to scroll. */
+@media (max-height: 740px) {
+  .vd-game-content .vd-dice-area { padding-block: 4px; }
+  .vd-game-content .vd-turn-status { min-height: 44px; padding-block: 6px; }
 }
