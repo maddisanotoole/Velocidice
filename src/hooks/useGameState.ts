@@ -53,6 +53,7 @@ import {
   getIsComputerControlledTurn,
 } from "../game/viewState";
 import { useComputerTurn } from "./useComputerTurn";
+import { createBrowserGameTracker } from "../analytics/client";
 
 const INITIAL_PLAYER_SCORES: PlayerScores = {
   player: 0,
@@ -87,6 +88,7 @@ function getWinningSound({
 }
 
 export function useGameState() {
+  const [analytics] = useState(createBrowserGameTracker);
   const [turn, setTurn] = useState<TurnState>(rollNewDice);
   const previousPlayerRef = useRef<PlayerId | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<PlayerId>("player");
@@ -159,6 +161,7 @@ export function useGameState() {
   }, [consumeDebugRollValues]);
 
   function setDebugRollsText(nextText: string) {
+    if (parseDebugRolls(nextText).length > 0) analytics.exclude();
     debugRollsRef.current = parseDebugRolls(nextText);
     setDebugRollPresetText(nextText);
   }
@@ -313,6 +316,8 @@ export function useGameState() {
     if (willWin) {
       const nextMatchScore = getNextMatchScore(matchScore, currentPlayer);
       const nextMatchWinner = getMatchWinner(nextMatchScore, matchLength);
+      analytics.turnEnded();
+      analytics.complete(currentPlayer, nextPlayerScore, nextMatchScore, nextMatchWinner);
       const winningSound = getWinningSound({
         isComputerControlledTurn,
         matchLength,
@@ -349,6 +354,7 @@ export function useGameState() {
       return;
     }
 
+    analytics.turnEnded();
     setIsTurnChanging(true);
   }
 
@@ -360,10 +366,12 @@ export function useGameState() {
           ? "Next Game"
           : "Game Reset";
 
-    if (!winner || matchWinner) {
+    const newMatch = !winner || Boolean(matchWinner);
+    if (newMatch) {
       resetMatchState();
     }
 
+    if (hasStartedGame) analytics.start({ mode: gameMode, targetScore, matchLength }, newMatch, debugRollsRef.current.length > 0);
     resetGameState(nextMessage);
     playSound("roll");
   }
@@ -374,6 +382,7 @@ export function useGameState() {
       targetScore,
     });
 
+    analytics.start({ mode: gameMode, targetScore, matchLength }, true, debugRollsRef.current.length > 0);
     primeSounds();
     resetMatchState();
     resetGameState("");
@@ -382,8 +391,10 @@ export function useGameState() {
   }
 
   function backToMenu() {
+    analytics.stop();
     setHasStartedGame(false);
-    resetGame("");
+    resetMatchState();
+    resetGameState("");
   }
 
   function handleMuteChange(nextIsMuted: boolean) {
@@ -475,6 +486,7 @@ export function useGameState() {
       });
       setTotalScoreDelta(0);
       setRoundScoreDelta(0);
+      analytics.turnEnded();
       switchTurn();
     }, FARKLE_DISPLAY_DELAY_MS);
 
@@ -493,6 +505,7 @@ export function useGameState() {
     switchTurn,
     turn,
     winner,
+    analytics,
   ]);
 
   useEffect(() => {

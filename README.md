@@ -60,6 +60,8 @@ npm run preview
 
 ## Roadmap
 
+Anonymous aggregate game collection setup is documented in [analytics.md](docs/analytics.md).
+
 Phase 4:
 
 - Sound effects (DONE)

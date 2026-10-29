@@ -24,7 +24,7 @@ export function StatisticsModal({ onClose, records }: StatisticsModalProps) {
   }, [onClose]);
 
   return (
-    <div className={theme.modal.overlay} onClick={onClose}>
+    <div className={theme.modal.centeredOverlay} onClick={onClose}>
       <section
         aria-modal="true"
         className={cx(theme.modal.panel, "max-w-md")}
@@ -35,7 +35,7 @@ export function StatisticsModal({ onClose, records }: StatisticsModalProps) {
           <div>
             <h2 className="text-2xl font-black sm:text-3xl">Statistics</h2>
             <p className={cx("mt-1 text-sm", theme.text.muted)}>
-              Vs computer records.
+              Vs computer records stored on this device.
             </p>
           </div>
           <Button onClick={onClose} color="red" size="small">
@@ -63,6 +63,7 @@ export function StatisticsModal({ onClose, records }: StatisticsModalProps) {
             value={stats.matchesWonByLength[10]}
           />
         </div>
+        {import.meta.env.GAME_ANALYTICS_ENABLED === true && <p className={cx("mt-4 text-xs", theme.text.muted)}>Anonymous game outcomes help us improve the game. No names or persistent player IDs are collected. Browser Do Not Track and Global Privacy Control preferences are respected.</p>}
       </section>
     </div>
   );
