@@ -1,4 +1,4 @@
-import { MATCH_LENGTH_OPTIONS, TARGET_SCORE_OPTIONS } from "../appConstants";
+import { MATCH_LENGTH_OPTIONS, TARGET_SCORE_OPTIONS } from "../appConstants.js";
 import type { GameMode, MatchLength, PlayerId } from "../types";
 
 export type GameEvent = {
