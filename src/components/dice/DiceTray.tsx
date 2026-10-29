@@ -8,6 +8,7 @@ type DiceTrayProps = {
   isTurnChanging: boolean;
   onSelectDie: (id: number) => void;
   rerollCount: number;
+  disabled?: boolean;
 };
 
 export function DiceTray({
@@ -17,6 +18,7 @@ export function DiceTray({
   isTurnChanging,
   onSelectDie,
   rerollCount,
+  disabled = false,
 }: DiceTrayProps) {
   return (
     <div className="grid grid-cols-3 gap-3 sm:flex sm:gap-4">
@@ -29,6 +31,7 @@ export function DiceTray({
           rollAnimationKey={`${currentPlayer}_${rerollCount}`}
           onClick={() => onSelectDie(die.id)}
           die={die}
+          disabled={disabled}
         />
       ))}
     </div>

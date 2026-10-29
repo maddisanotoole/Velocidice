@@ -8,6 +8,7 @@ import { cx, theme } from "../../theme/classes";
 import type { GameMode, MatchLength } from "../../types";
 
 type StartMenuProps = {
+  onOpenTutorial: () => void;
   onOpenTheme: () => void;
   gameMode: GameMode;
   matchLength: MatchLength;
@@ -21,6 +22,7 @@ type StartMenuProps = {
 };
 
 export function StartMenu({
+  onOpenTutorial,
   onOpenTheme,
   gameMode,
   matchLength,
@@ -114,6 +116,9 @@ export function StartMenu({
           />
         </section>
         <div className={theme.menu.footer}>
+          <div className="mb-4 text-center">
+            <button id="menu-tutorial-button" type="button" className="min-h-11 rounded-lg px-4 py-2 font-bold underline underline-offset-4" onClick={onOpenTutorial}>Learn to play</button>
+          </div>
           <div className="flex justify-center">
             <Button
               onClick={startGame}
