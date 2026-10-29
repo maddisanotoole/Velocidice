@@ -34,6 +34,7 @@ export function MatchLengthSlider({
           <button
             type="button"
             key={option}
+            aria-pressed={matchLength === option}
             onClick={() => changeMatchLength(option)}
             className={cx(
               theme.option.base,

@@ -63,6 +63,7 @@ export function StartMenu({
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
               type="button"
+              aria-pressed={gameMode === "computer"}
               onClick={() => changeGameMode("computer")}
               className={cx(
                 theme.option.base,
@@ -76,6 +77,7 @@ export function StartMenu({
             </button>
             <button
               type="button"
+              aria-pressed={gameMode === "local"}
               onClick={() => changeGameMode("local")}
               className={cx(
                 theme.option.base,

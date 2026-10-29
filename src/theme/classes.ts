@@ -27,7 +27,7 @@ export const theme = {
     base: "rounded-full transition-colors active:bg-[var(--disabled)]",
     dark: "bg-[var(--surface-deep)] hover:bg-[var(--hover)]",
     raised: "bg-[var(--surface)] text-[var(--ink)] shadow-lg hover:bg-[var(--hover)]",
-    size: "p-2.5 sm:p-3",
+    size: "min-h-11 min-w-11 p-2.5 sm:p-3",
     fixedTopRight: "fixed right-3 top-3 z-50 sm:right-4 sm:top-4",
     fixedTopLeft: "fixed left-3 top-3 z-50 sm:left-4 sm:top-4",
   },

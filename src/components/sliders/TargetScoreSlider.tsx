@@ -29,7 +29,9 @@ export function TargetScoreSlider({
   return (
     <>
       <input
-        className="w-full accent-[var(--roll)]"
+        aria-label="Target score"
+        aria-valuetext={`${targetScore.toLocaleString()} points`}
+        className="min-h-11 w-full accent-[var(--roll)]"
         list="target-score-options"
         max={TARGET_SCORE_OPTIONS[TARGET_SCORE_OPTIONS.length - 1]}
         min={TARGET_SCORE_OPTIONS[0]}

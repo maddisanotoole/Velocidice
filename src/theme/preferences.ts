@@ -10,14 +10,15 @@ export const THEMES = [
   { id: "halloween", name: "Halloween" },
 ] as const;
 
+export const DEFAULT_THEME: ThemeId = "midnight";
 export const THEME_STORAGE_KEY = "velocidice.theme";
 
 export function loadTheme(): ThemeId {
   try {
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-    return THEMES.find((theme) => theme.id === stored)?.id ?? "current";
+    return THEMES.find((theme) => theme.id === stored)?.id ?? DEFAULT_THEME;
   } catch {
-    return "current";
+    return DEFAULT_THEME;
   }
 }
 

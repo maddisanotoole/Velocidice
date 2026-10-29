@@ -39,3 +39,22 @@
 .theme-preview-die[data-preview-state="held"]{background:var(--held);color:var(--held-ink)}
 .theme-preview-die .pip-visible{background:currentColor}
 .vd-invalid-badge{background:var(--warning_message);color:var(--warning_message-ink);border-color:currentColor}
+
+/* Keep controls readable across the approved light and dark palettes. */
+.vd-icon-img, .vd-settings-icon { filter: var(--icon-filter); }
+button { touch-action: manipulation; }
+.theme-icon-button, .theme-option, .theme-picker-back { transition: filter 160ms ease, border-color 160ms ease; }
+.theme-option { color: var(--ink); }
+.theme-swatch { min-height: 72px; }
+.theme-live-preview { margin-bottom: 20px; padding: 20px 16px; border: 1px solid var(--disabled_text); border-radius: 14px; background: var(--table_surface); color: var(--menu_text); }
+.theme-preview-title { margin-bottom: 16px; text-align: center; font-weight: 800; }
+.theme-live-preview .theme-preview-dice { gap: 24px; }
+.theme-live-preview .theme-preview-die { width: 44px; height: 44px; padding: 7px; gap: 3px; }
+.theme-preview-labels { display: flex; justify-content: center; gap: 12px; margin-top: 10px; font-size: 11px; }
+.theme-preview-labels span { width: 56px; text-align: center; }
+.theme-preview-actions { display: flex; justify-content: center; gap: 10px; margin-top: 18px; }
+.theme-preview-actions span { border-radius: 8px; padding: 8px 16px; background: var(--reroll_button); color: var(--reroll_button-ink); font-size: 12px; font-weight: 800; }
+.theme-preview-actions span + span { background: var(--bank_button); color: var(--bank_button-ink); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
