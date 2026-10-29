@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { DEFAULT_THEME } from "./preferences";
 import { PALETTES, type ThemeId, type ThemeRole } from "./palettes";
 
 function luminance(hex: string): number {
@@ -28,8 +29,8 @@ const aliases: Record<string, ThemeRole> = {
 };
 
 export function getThemeStyle(id: ThemeId): CSSProperties {
-  const palette = PALETTES[id] ?? PALETTES.current;
-  const vars: Record<string, string> = { "--overlay": "#000b", "--icon-filter": "none" };
+  const palette = PALETTES[id] ?? PALETTES[DEFAULT_THEME];
+  const vars: Record<string, string> = { "--overlay": "#000b", "--icon-filter": readableInk(palette.menu_surface) == "#ffffff" ? "none" : "brightness(0)" };
   for (const [role, color] of Object.entries(palette)) {
     vars[`--${role}`] = color;
     vars[`--${role}-ink`] = readableInk(color);

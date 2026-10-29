@@ -13,11 +13,11 @@ function mockStorage(initial: Record<string, string> = {}) {
 }
 
 describe("theme preferences", () => {
-  it("defaults to Original Charcoal for new or invalid preferences", () => {
+  it("defaults to Midnight Blue for new or invalid preferences", () => {
     mockStorage();
-    expect(loadTheme()).toBe("current");
+    expect(loadTheme()).toBe("midnight");
     mockStorage({ [THEME_STORAGE_KEY]: "unknown-theme" });
-    expect(loadTheme()).toBe("current");
+    expect(loadTheme()).toBe("midnight");
   });
 
   it.each(THEMES)("restores $name after saving and starting a new session", ({ id }) => {
@@ -33,7 +33,7 @@ describe("theme preferences", () => {
 
   it("keeps the app usable when browser storage is unavailable", () => {
     vi.stubGlobal("window", { get localStorage() { throw new Error("Storage blocked"); } });
-    expect(loadTheme()).toBe("current");
+    expect(loadTheme()).toBe("midnight");
     expect(saveTheme("halloween")).toBe(false);
   });
 
@@ -43,7 +43,7 @@ describe("theme preferences", () => {
     ]);
     const records = '{"vsComputer":{"wins":42}}';
     const values = mockStorage({ [THEME_STORAGE_KEY]: "timber", "velocidice.records": records });
-    expect(loadTheme()).toBe("current");
+    expect(loadTheme()).toBe("midnight");
     expect(values.get("velocidice.records")).toBe(records);
   });
 });
