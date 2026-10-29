@@ -76,10 +76,8 @@ export function getWinnerMessage(
 
 export function getFeedbackMessage({
   actionMessage,
-  gameMode,
   hasFarkled,
   matchWinner,
-  playerLabels,
   winner,
 }: {
   actionMessage: string;
@@ -89,8 +87,9 @@ export function getFeedbackMessage({
   playerLabels: PlayerLabels;
   winner: PlayerId | null;
 }): string {
-  if (winner) {
-    return getWinnerMessage(winner, matchWinner, gameMode, playerLabels);
+  // The result board presents the outcome; do not duplicate it in a toast.
+  if (winner || matchWinner) {
+    return "";
   }
 
   return hasFarkled ? "Farkle!" : actionMessage;
