@@ -58,3 +58,30 @@ button { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Farkle feedback stays inside the dice area during its extended display delay. */
+.vd-dice-area { position: relative; isolation: isolate; padding: 12px; border-radius: 16px; }
+.vd-dice-area::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: #dc2626; opacity: 0; }
+.vd-farkle-announcement { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.vd-farkle-card { max-width: 100%; border: 1px solid #fca5a5; border-radius: 12px; background: #450a0af5; color: #fff; padding: 12px 16px; text-align: center; box-shadow: 0 6px 20px #0005; animation: vd-farkle-bounce 420ms 160ms both; }
+.vd-farkle-title { display: block; font-size: clamp(28px, 8vw, 40px); line-height: 1.1; font-weight: 900; letter-spacing: .04em; }
+.vd-farkle-description { display: block; margin-top: 6px; font-size: 12px; line-height: 1.4; }
+.vd-dice-area[data-farkled]::before { animation: vd-farkle-flash 650ms both; }
+.vd-dice-area[data-farkled] .vd-dice-area-tray { pointer-events: none; animation: vd-farkle-wobble 480ms both; }
+@keyframes vd-farkle-flash { 0% { opacity: 0; } 25% { opacity: .55; } 100% { opacity: .12; } }
+@keyframes vd-farkle-wobble {
+  0% { transform: translateX(0) rotate(0); opacity: 1; }
+  20% { transform: translateX(-5px) rotate(-2deg); }
+  40% { transform: translateX(5px) rotate(2deg); }
+  60% { transform: translateX(-3px) rotate(-1deg); }
+  80% { transform: translateX(2px) rotate(1deg); }
+  100% { transform: translateX(0) rotate(0); opacity: .28; }
+}
+@keyframes vd-farkle-bounce { 0% { opacity: 0; transform: scale(.82); } 65% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes vd-farkle-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .vd-dice-area[data-farkled]::before { animation: none !important; opacity: .12; }
+  .vd-dice-area[data-farkled] .vd-dice-area-tray { animation: none !important; opacity: .28; }
+  .vd-dice-area[data-farkled] .vd-die { transform: none !important; }
+  .vd-farkle-card { animation: vd-farkle-fade 180ms ease-out both !important; }
+}

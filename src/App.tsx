@@ -82,6 +82,7 @@ function App() {
           onStart={game.startGame}
           onTargetScoreChange={game.setTargetScore}
           targetScore={game.targetScore}
+          themeSaveFailed={themeSaveFailed}
         />
       )}
       <SettingsButton onClick={openSettings} />
@@ -90,7 +91,7 @@ function App() {
         setIsThemePickerOpen(false);
         requestAnimationFrame(() => document.getElementById("menu-theme-button")?.focus());
       }} />}
-      {themeSaveFailed && !isSettingsOpen && <p role="status" className="fixed bottom-3 z-50 rounded-lg bg-[var(--surface)] p-3">Theme changed for this visit. Your browser could not save the preference.</p>}
+      {themeSaveFailed && game.hasStartedGame && !isSettingsOpen && <p role="status" className="w-full max-w-lg rounded-lg bg-[var(--surface)] p-3 text-sm">Theme changed for this visit. Your browser could not save the preference.</p>}
       {isSettingsOpen && (
         <SettingsModal
           themeId={themeId}
