@@ -1,6 +1,7 @@
 import {
   getActionButtonsDisabled,
   getActionDisabledReason,
+  getBankActionLabel,
   getFeedbackMessage,
   getFeedbackMessageVariant,
   getPlayerLabels,
@@ -13,14 +14,22 @@ type GameState = ReturnType<typeof useGameState>;
 
 export function useGameViewState(game: GameState) {
   const playerLabels = getPlayerLabels(game.gameMode);
+  const actionButtonsDisabled = getActionButtonsDisabled({
+    hasFarkled: game.hasFarkled,
+    isComputerControlledTurn: game.isComputerControlledTurn,
+    isTurnChanging: game.isTurnChanging,
+    selectedDiceAreValid: game.selectedDiceAreValid,
+    winner: game.winner,
+  });
 
   return {
-    actionButtonsDisabled: getActionButtonsDisabled({
-      hasFarkled: game.hasFarkled,
-      isComputerControlledTurn: game.isComputerControlledTurn,
-      isTurnChanging: game.isTurnChanging,
-      selectedDiceAreValid: game.selectedDiceAreValid,
-      winner: game.winner,
+    actionButtonsDisabled,
+    bankActionLabel: getBankActionLabel({
+      roundScore: game.roundScore,
+      selectedScore: game.selectedScore,
+      totalScore: game.playerScore[game.currentPlayer],
+      targetScore: game.targetScore,
+      disabled: actionButtonsDisabled,
     }),
     actionDisabledReason: getActionDisabledReason({
       hasFarkled: game.hasFarkled,

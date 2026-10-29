@@ -80,7 +80,7 @@ export function GameScreen({
           message={gameView.feedbackMessage}
           variant={gameView.feedbackMessageVariant}
         />
-        <div className="pt-4 sm:pt-6">
+        <div className="w-full pt-4 sm:pt-6" role="group" aria-label="Turn actions" aria-describedby="turn-action-guidance">
           <Row>
           <Button
             onClick={game.holdDice}
@@ -97,9 +97,17 @@ export function GameScreen({
             title={gameView.actionDisabledReason}
             color="yellow"
           >
-            Bank & End Turn
+            {gameView.bankActionLabel}
           </Button>
           </Row>
+          <p
+            id="turn-action-guidance"
+            role="status"
+            aria-atomic="true"
+            className="mt-3 min-h-10 text-center text-sm text-[var(--ink)]"
+          >
+            {gameView.actionDisabledReason ?? "Bank to save your points, or reroll to risk them for more."}
+          </p>
         </div>
       </section>
 
