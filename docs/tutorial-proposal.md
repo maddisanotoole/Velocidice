@@ -1,6 +1,16 @@
 # Tutorial game proposal
 
-Research proposal; not yet implemented.
+Implemented as an optional Learn to play session from the start menu.
+The tutorial uses a pure reducer in `src/game/tutorial.ts` and its own screen in
+`src/components/screens/TutorialGame.tsx`. It has six instruction stages,
+explicit Continue buttons after banking and Farkle, Restart and Exit controls,
+and a Start a game action using the player's current setup.
+
+The scripted flow is covered by automated tests for scores, selection mistakes,
+fixed rolls, Farkle, restart, and absence of browser storage access. Dice now use
+native buttons for keyboard access and respect reduced-motion preferences.
+
+The original design notes follow.
 
 Offer an optional Learn to play action from the start menu. Use the real dice,
 score boards and action buttons, with a persistent instruction card, step count,
