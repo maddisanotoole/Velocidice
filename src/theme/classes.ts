@@ -5,7 +5,7 @@ export function cx(...classes: Array<string | false | null | undefined>) {
 export const theme = {
   app: {
     shell:
-      "vd-shell flex min-h-dvh flex-col items-center justify-start gap-3 bg-[var(--surface-deep)] px-3 py-3 text-[var(--ink)] sm:justify-center sm:gap-8 sm:px-4 sm:py-8",
+      "vd-shell flex h-dvh flex-col items-center gap-3 overflow-hidden bg-[var(--surface-deep)] px-3 py-3 text-[var(--ink)] sm:px-4 sm:py-4",
   },
   button: {
     base: "select-none rounded-xl font-bold transition-colors duration-200 [-webkit-touch-callout:none]",
@@ -44,10 +44,10 @@ export const theme = {
   },
   menu: {
     overlay:
-      "vd-menu fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[var(--surface-deep)] px-3 py-3 text-[var(--ink)] sm:items-center sm:px-4 sm:py-4",
+      "vd-menu fixed inset-0 z-50 flex justify-center overflow-hidden bg-[var(--surface-deep)] px-3 py-3 text-[var(--ink)] sm:px-4 sm:py-4",
     panel:
-      "flex min-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col overflow-y-auto rounded-xl bg-[var(--surface)] p-3 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:min-h-[42rem] sm:p-6",
-    footer: "mt-auto pt-5 sm:pt-6",
+      "vd-menu-panel flex h-full min-h-0 w-full max-w-md flex-col rounded-xl bg-[var(--surface)] p-3 shadow-2xl sm:p-6",
+    footer: "pt-5 sm:pt-6",
   },
   brand: {
     logoTile:

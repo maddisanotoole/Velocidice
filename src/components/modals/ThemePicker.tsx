@@ -43,18 +43,12 @@ export function ThemePicker({ themeId, onApply, onClose }: {
         <div><h2 id="theme-picker-title" className="text-2xl font-black">Choose your theme</h2><p className={cx("mt-1 text-sm", theme.text.muted)}>A new look for your dice and table.</p></div>
         <button type="button" className="theme-picker-back theme-choice-focus" onClick={onClose}>Back</button>
       </div>
-      <div className="theme-live-preview" data-theme={selected} style={getThemeStyle(selected)} aria-label="Theme preview">
-        <p className="theme-preview-title">{THEMES.find((item) => item.id === selected)?.name}</p>
-        <PreviewDice />
-        <div className="theme-preview-labels" aria-hidden="true"><span>Available</span><span>Selected</span><span>Held</span></div>
-        <div className="theme-preview-actions" aria-hidden="true"><span>Reroll</span><span>Bank points</span></div>
-      </div>
       <div className="theme-options" aria-label="Themes">
         {THEMES.map((item) => <button type="button" key={item.id} className="theme-option theme-choice-focus" aria-pressed={selected === item.id} onClick={() => setSelected(item.id)}>
           <span data-theme={item.id} style={getThemeStyle(item.id)} className="theme-swatch"><PreviewDice /></span>
           <span className="theme-option-caption">
             <span className="theme-option-name">{item.name}</span>
-            <span className="theme-option-state">{selected === item.id ? "✓ Selected" : "Preview"}</span>
+            <span className="theme-option-state">{selected === item.id ? "✓ Selected" : ""}</span>
           </span>
         </button>)}
       </div>

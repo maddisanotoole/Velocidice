@@ -19,7 +19,7 @@ export function TutorialGame({ onExit, onStartGame }: { onExit: () => void; onSt
   useEffect(() => { heading.current?.focus(); }, [state.step]);
 
   return (
-    <main className="flex w-full max-w-lg flex-col items-center gap-5 py-3 sm:py-6">
+    <main className="flex min-h-0 w-full max-w-lg flex-1 flex-col items-center gap-5 overflow-y-auto py-3 sm:py-6">
       <header className="flex w-full flex-wrap items-center justify-between gap-3">
         <span className="text-sm font-bold text-[var(--muted)]">Tutorial · Step {lesson.number} of 6</span>
         <div className="flex gap-2">

@@ -6,6 +6,7 @@ type ScoreItemProps = {
   delta?: number;
   textSize?: TextSizeType;
   active?: boolean;
+  compact?: boolean;
 };
 
 const textSizeClasses = {
@@ -25,12 +26,13 @@ export function ScoreItem({
   delta = 0,
   textSize = TextSize.NORMAL,
   active = false,
+  compact = false,
 }: ScoreItemProps) {
   const sizeClasses = textSizeClasses[textSize];
 
   return (
     <div
-      className={`grid grid-rows-[1.25rem_auto_1.25rem] place-items-center rounded-lg px-2 py-1 transition-colors sm:px-3 sm:py-2 ${
+      className={`grid ${compact ? "grid-rows-2 px-2 py-0.5" : "grid-rows-[1.25rem_auto_1.25rem] px-2 py-1 sm:px-3 sm:py-2"} place-items-center rounded-lg transition-colors ${
         active ? "bg-[var(--highlight)]" : ""
       }`}
     >
@@ -43,14 +45,14 @@ export function ScoreItem({
       </span>
 
       <span
-        className={`${sizeClasses.value} font-black capitalize ${
+        className={`${compact ? "text-base leading-tight" : sizeClasses.value} font-black capitalize ${
           active ? "text-[var(--highlight-ink)]" : "text-[var(--ink)]"
         }`}
       >
         {value}
       </span>
 
-      <span
+      {!compact && <span
         className={`flex min-h-5 items-center text-sm font-black ${
           delta > 0
             ? active
@@ -60,7 +62,7 @@ export function ScoreItem({
         }`}
       >
         +{delta}
-      </span>
+      </span>}
     </div>
   );
 }

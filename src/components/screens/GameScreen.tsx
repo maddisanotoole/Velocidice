@@ -38,10 +38,11 @@ export function GameScreen({
   onRulesClose,
 }: GameScreenProps) {
   return (
-    <main className="flex min-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col items-center sm:min-h-[calc(100dvh-4rem)] sm:max-w-lg">
-      <div className="h-12 w-full shrink-0 sm:h-14" />
+    <main className="vd-game-screen flex h-full min-h-0 w-full max-w-md flex-col items-center sm:max-w-lg">
+      <div className="vd-game-topbar w-full shrink-0" aria-hidden="true" />
 
-      <section className="flex w-full flex-1 flex-col items-center justify-center gap-3 sm:gap-5">
+      <section className="vd-game-middle flex min-h-0 w-full flex-1 overflow-y-auto">
+        <div className="vd-game-content">
         {game.matchLength > 1 && (
           <MatchBoard
             matchLength={game.matchLength}
@@ -79,7 +80,7 @@ export function GameScreen({
           rerollCount={game.hasStartedGame ? game.rerollCount : -1}
           />
         </DiceArea>
-        <div className="w-full pt-4 sm:pt-6" role="group" aria-label="Turn actions" aria-describedby="turn-action-guidance">
+        <div className="vd-game-actions w-full" role="group" aria-label="Turn actions" aria-describedby="turn-action-guidance">
           <Row>
           <Button
             onClick={game.holdDice}
@@ -105,9 +106,10 @@ export function GameScreen({
             variant={gameView.feedbackMessageVariant}
           />
         </div>
+        </div>
       </section>
 
-      <nav className="w-full shrink-0 pb-[env(safe-area-inset-bottom)] pt-3 sm:pt-5">
+      <nav className="vd-game-footer w-full shrink-0">
         <div className="flex items-center justify-between gap-3">
           <RulesButton onClick={onOpenRules} size="small" />
           <div className="flex flex-wrap justify-end gap-3 sm:gap-4">

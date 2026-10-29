@@ -1,8 +1,7 @@
+import { useRef, useState } from "react";
+import { GameConfigModal } from "../modals/GameConfigModal";
 import Button from "../buttons/GameButton";
 import { GITHUB_REPOSITORY_URL } from "../../appConstants";
-import { MatchLengthSlider } from "../sliders/MatchLengthSlider";
-import { RulesButton } from "../buttons/RulesButton";
-import { TargetScoreSlider } from "../sliders/TargetScoreSlider";
 import { playSound } from "../../game/sound";
 import { cx, theme } from "../../theme/classes";
 import type { GameMode, MatchLength } from "../../types";
@@ -36,12 +35,11 @@ export function StartMenu({
   onTargetScoreChange,
   targetScore,
 }: StartMenuProps) {
-  function changeGameMode(nextGameMode: GameMode) {
-    if (nextGameMode !== gameMode) {
-      playSound("select");
-    }
-
-    onGameModeChange(nextGameMode);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const configButton = useRef<HTMLButtonElement>(null);
+  function closeConfig() {
+    setIsConfigOpen(false);
+    requestAnimationFrame(() => configButton.current?.focus());
   }
 
   function startGame() {
@@ -52,6 +50,8 @@ export function StartMenu({
   return (
     <div className={theme.menu.overlay}>
       <section className={theme.menu.panel}>
+        <div className="vd-menu-content">
+          <div className="vd-menu-stack">
         <div className="text-center">
           <h1 className="text-3xl font-black uppercase tracking-wide sm:text-4xl">
             VelociDice
@@ -62,66 +62,8 @@ export function StartMenu({
             score.
           </p>
         </div>
-        <section className={theme.panel.section}>
-          <h2 className="font-bold">Game Mode</h2>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              aria-pressed={gameMode === "computer"}
-              onClick={() => changeGameMode("computer")}
-              className={cx(
-                theme.option.base,
-                "px-3 py-3 text-sm",
-                gameMode === "computer"
-                  ? theme.option.selected
-                  : theme.option.unselected,
-              )}
-            >
-              Computer
-            </button>
-            <button
-              type="button"
-              aria-pressed={gameMode === "local"}
-              onClick={() => changeGameMode("local")}
-              className={cx(
-                theme.option.base,
-                "px-3 py-3 text-sm",
-                gameMode === "local"
-                  ? theme.option.selected
-                  : theme.option.unselected,
-              )}
-            >
-              Local 2-Player
-            </button>
-          </div>
-        </section>
-        <MatchLengthSlider
-          matchLength={matchLength}
-          onMatchLengthChange={onMatchLengthChange}
-        />
-
-        <section className={theme.panel.section}>
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="font-bold">Target Score</h2>
-              <p className={cx("text-sm", theme.text.muted)}>
-                Choose the score needed to win.
-              </p>
-            </div>
-            <span className={cx("text-lg font-black", theme.text.heading)}>
-              {targetScore}
-            </span>
-          </div>
-          <TargetScoreSlider
-            onTargetScoreChange={onTargetScoreChange}
-            targetScore={targetScore}
-          />
-        </section>
         <div className={theme.menu.footer}>
           {themeSaveFailed && <p role="status" className="mb-3 text-center text-sm">Theme changed for this visit. Your browser could not save the preference.</p>}
-          <div className="mb-4 text-center">
-            <button id="menu-tutorial-button" type="button" className="min-h-11 rounded-lg px-4 py-2 font-bold underline underline-offset-4" onClick={onOpenTutorial}>Learn to play</button>
-          </div>
           <div className="flex justify-center">
             <Button
               onClick={startGame}
@@ -132,12 +74,25 @@ export function StartMenu({
               Start Game
             </Button>
           </div>
+          <div className="mt-4 text-center">
+            <p id="menu-config-summary" className={cx("text-sm", theme.text.muted)}>
+              {gameMode === "computer" ? "Vs computer" : "Local 2-player"} &middot; {targetScore.toLocaleString()} points &middot; {matchLength === 1 ? "Single game" : `Best of ${matchLength}`}
+            </p>
+            <button ref={configButton} type="button" aria-haspopup="dialog" aria-describedby="menu-config-summary" onClick={() => setIsConfigOpen(true)} className="min-h-11 rounded-lg px-4 py-2 font-bold underline underline-offset-4">Change game settings</button>
+          </div>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:mt-5 sm:gap-4">
             <button id="menu-theme-button" type="button" onClick={onOpenTheme} className={cx(theme.button.base, theme.button.size.normal, "bg-[var(--theme_button)] text-[var(--theme_button-ink)] theme-choice-focus")}>Theme</button>
-            <RulesButton onClick={onOpenRules} />
             <Button onClick={onOpenStatistics} color="purple">
               Stats
             </Button>
+          </div>
+
+        </div>
+          </div>
+        </div>
+          <nav aria-label="Game help" className="vd-menu-help flex shrink-0 flex-wrap items-center justify-center gap-3 border-t border-[var(--line)] pt-3">
+            <button type="button" className="min-h-11 rounded-lg px-4 py-2 font-bold underline underline-offset-4" onClick={onOpenRules}>Rules</button>
+            <button id="menu-tutorial-button" type="button" className="min-h-11 rounded-lg px-4 py-2 font-bold underline underline-offset-4" onClick={onOpenTutorial}>Learn to play</button>
             <a
               aria-label="Open GitHub repository"
               className={cx(
@@ -159,9 +114,9 @@ export function StartMenu({
                 <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.17c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
               </svg>
             </a>
-          </div>
-        </div>
+          </nav>
       </section>
+      {isConfigOpen && <GameConfigModal gameMode={gameMode} matchLength={matchLength} targetScore={targetScore} onGameModeChange={onGameModeChange} onMatchLengthChange={onMatchLengthChange} onTargetScoreChange={onTargetScoreChange} onClose={closeConfig} />}
     </div>
   );
 }
