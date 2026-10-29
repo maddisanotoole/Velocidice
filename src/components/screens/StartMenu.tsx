@@ -9,6 +9,7 @@ import type { GameMode, MatchLength } from "../../types";
 
 type StartMenuProps = {
   themeSaveFailed: boolean;
+  onOpenTutorial: () => void;
   onOpenTheme: () => void;
   gameMode: GameMode;
   matchLength: MatchLength;
@@ -23,6 +24,7 @@ type StartMenuProps = {
 
 export function StartMenu({
   themeSaveFailed,
+  onOpenTutorial,
   onOpenTheme,
   gameMode,
   matchLength,
@@ -117,6 +119,9 @@ export function StartMenu({
         </section>
         <div className={theme.menu.footer}>
           {themeSaveFailed && <p role="status" className="mb-3 text-center text-sm">Theme changed for this visit. Your browser could not save the preference.</p>}
+          <div className="mb-4 text-center">
+            <button id="menu-tutorial-button" type="button" className="min-h-11 rounded-lg px-4 py-2 font-bold underline underline-offset-4" onClick={onOpenTutorial}>Learn to play</button>
+          </div>
           <div className="flex justify-center">
             <Button
               onClick={startGame}

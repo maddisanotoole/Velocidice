@@ -12,6 +12,7 @@ import { theme } from "./theme/classes";
 import { loadTheme, saveTheme, type ThemeId } from "./theme/preferences";
 import { ThemePicker } from "./components/modals/ThemePicker";
 import { getThemeStyle } from "./theme/styles";
+import { TutorialGame } from "./components/screens/TutorialGame";
 
 function isLocalDebugMode() {
   if (!import.meta.env.DEV || typeof window === "undefined") {
@@ -22,6 +23,7 @@ function isLocalDebugMode() {
 }
 
 function App() {
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [themeId, setThemeId] = useState(loadTheme);
   const [themeSaveFailed, setThemeSaveFailed] = useState(false);
   const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
@@ -54,10 +56,22 @@ function App() {
     game.resetGame();
   }
 
+  if (isTutorialOpen) {
+    return (
+      <div className={theme.app.shell} data-theme={themeId} style={getThemeStyle(themeId)}>
+        <TutorialGame onExit={() => {
+          setIsTutorialOpen(false);
+          requestAnimationFrame(() => document.getElementById("menu-tutorial-button")?.focus());
+        }} onStartGame={() => { setIsTutorialOpen(false); game.startGame(); }} />
+      </div>
+    );
+  }
+
   return (
     <div className={theme.app.shell} data-theme={themeId} style={getThemeStyle(themeId)}>
       {!game.hasStartedGame && (
         <StartMenu
+          onOpenTutorial={() => setIsTutorialOpen(true)}
           onOpenTheme={() => setIsThemePickerOpen(true)}
           gameMode={game.gameMode}
           matchLength={game.matchLength}

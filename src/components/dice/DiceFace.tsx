@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { type Die, DieStatus, type PlayerId } from "../../types";
 
 interface DieProps {
@@ -8,6 +8,7 @@ interface DieProps {
   isBanked?: boolean;
   isInvalidSelection?: boolean;
   rollAnimationKey: string;
+  disabled?: boolean;
 }
 
 const pipPositions = {
@@ -43,13 +44,19 @@ export const DieFace: React.FC<DieProps> = ({
   isBanked = false,
   isInvalidSelection = false,
   rollAnimationKey,
+  disabled = false,
 }) => {
+  const reducedMotion = useReducedMotion();
   const isHeld = die.status === DieStatus.HELD || isBanked;
   const isPlayer2Turn = currentPlayer === "player2";
-  const shouldAnimateRoll = die.status === DieStatus.ACTIVE && !isBanked;
+  const shouldAnimateRoll = die.status === DieStatus.ACTIVE && !isBanked && !reducedMotion;
 
   return (
-    <motion.div
+    <motion.button
+      type="button"
+      disabled={disabled || isHeld}
+      aria-label={`Die ${die.id + 1}: ${die.value}${isHeld ? ", held" : isInvalidSelection ? ", does not score" : ""}`}
+      aria-pressed={die.status === DieStatus.SELECTED && !isHeld}
       key={`die_${die.id}_${rollAnimationKey}`}
       onClick={onClick}
       data-player={currentPlayer}
@@ -87,7 +94,7 @@ export const DieFace: React.FC<DieProps> = ({
               duration: 0,
             }
       }
-      className="vd-die relative h-14 w-14 rounded-xl cursor-pointer transition-all shadow-lg sm:h-16 sm:w-16"
+      className="vd-die relative h-14 w-14 rounded-xl cursor-pointer transition-all shadow-lg disabled:cursor-default sm:h-16 sm:w-16"
     >
       {pipPositions[die.value as keyof typeof pipPositions].map((position) => (
         <span
@@ -106,6 +113,6 @@ export const DieFace: React.FC<DieProps> = ({
           !
         </span>
       )}
-    </motion.div>
+    </motion.button>
   );
 };
