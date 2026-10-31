@@ -8,6 +8,16 @@ For scoring combinations and turn rules, see [RULES.md](src/docs/RULES.md).
 
 <img width="856" height="723" alt="image" src="https://github.com/user-attachments/assets/50adea71-e407-42cb-8202-e45cd1a29b62" />
 
+## Verified game flows
+
+Playwright captures from the local game show the computer banking a winning hand
+and a completed First to 6 match. See the [screenshot gallery](docs/screenshots/README.md)
+for the updated scoring guide and verification details.
+
+![Computer banks 4,000 points and wins against a 2,000-point target](docs/screenshots/computer-banks-winning-hand.png)
+
+![First to 6 match completes after six game wins](docs/screenshots/first-to-six-complete.png)
+
 ## Getting Started
 
 Install dependencies:
