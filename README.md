@@ -6,7 +6,7 @@ VelociDice is a browser-based Farkle-style dice game built with React, TypeScrip
 
 For scoring combinations and turn rules, see [RULES.md](src/docs/RULES.md).
 
-<img width="856" height="723" alt="image" src="https://github.com/user-attachments/assets/50adea71-e407-42cb-8202-e45cd1a29b62" />
+<img width="1440" height="1080" alt="02-scoring-dice-enable-actions" src="https://github.com/user-attachments/assets/04adc88a-e6d2-4f11-bf24-1fbaeebe0d3d" />
 
 ## Verified game flows
 
