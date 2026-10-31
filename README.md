@@ -42,6 +42,25 @@ npm run test -- --run
 npm run lint
 ```
 
+## Browser regression tests
+
+Install Playwright's Chromium browser once, then run the game-flow checks:
+
+```bash
+npx playwright install chromium
+npm run test:browser
+```
+
+The tests start their own development server on port 5175. They cover computer
+banking, hot dice, First to 6 matches and existing records, and the in-game rules.
+Screenshots and failure traces are written to the ignored `test-results` folder.
+To use installed Microsoft Edge on Windows instead of downloading Chromium:
+
+```powershell
+$env:PLAYWRIGHT_BROWSER_CHANNEL = "msedge"
+npm.cmd run test:browser
+```
+
 ## Build
 
 Create a production build:

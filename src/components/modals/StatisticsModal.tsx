@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { GameRecords } from "../../types";
 import Button from "../buttons/GameButton";
 import { cx, theme } from "../../theme/classes";
+import { MATCH_FORMAT_LABELS } from "../../game/match";
 
 type StatisticsModalProps = {
   onClose: () => void;
@@ -59,7 +60,7 @@ export function StatisticsModal({ onClose, records }: StatisticsModalProps) {
             value={stats.matchesWonByLength[3]}
           />
           <StatisticTile
-            label="Best of 10 Wins"
+            label={`${MATCH_FORMAT_LABELS[10]} Wins`}
             value={stats.matchesWonByLength[10]}
           />
         </div>

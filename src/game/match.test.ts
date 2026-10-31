@@ -22,6 +22,8 @@ describe("match helpers", () => {
   it("detects the match winner once they reach the required wins", () => {
     expect(getMatchWinner({ player: 2, player2: 1 }, 3)).toBe("player");
     expect(getMatchWinner({ player: 5, player2: 4 }, 10)).toBe(null);
+    expect(getMatchWinner({ player: 5, player2: 5 }, 10)).toBe(null);
+    expect(getMatchWinner({ player: 6, player2: 5 }, 10)).toBe("player");
     expect(getMatchWinner({ player: 5, player2: 6 }, 10)).toBe("player2");
   });
 });

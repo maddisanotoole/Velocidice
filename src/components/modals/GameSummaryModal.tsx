@@ -14,6 +14,7 @@ import downloadIcon from "../../assets/images/download.svg";
 import shareIcon from "../../assets/images/share.svg";
 import { cx, theme } from "../../theme/classes";
 import Button from "../buttons/GameButton";
+import { MATCH_FORMAT_LABELS as matchLengthLabels } from "../../game/match";
 
 type GameSummaryModalProps = {
   actionLabel: string;
@@ -26,12 +27,6 @@ type GameSummaryModalProps = {
   playerScore: PlayerScores;
   targetScore: number;
   winner: PlayerId;
-};
-
-const matchLengthLabels: Record<MatchLength, string> = {
-  1: "Single game",
-  3: "Best of 3",
-  10: "Best of 10",
 };
 
 const gameUrl = "https://velocidice.vercel.app/";

@@ -36,6 +36,7 @@ const scoringRules = [
   { label: "Single 1", dice: [1], value: "100 points" },
   { label: "Single 5", dice: [5], value: "50 points" },
   { label: "Three pairs", dice: [1, 1, 2, 2, 3, 3], value: "750 points" },
+  { label: "Two triplets", dice: [2, 2, 2, 3, 3, 3], value: "2,500 points" },
   { label: "Five-die straight", dice: [1, 2, 3, 4, 5], value: "1,000 points" },
   {
     label: "Six-die straight",
@@ -205,8 +206,9 @@ export function RulesModal({ onClose }: RulesModalProps) {
             </h3>
             <p>
               A Farkle happens when the active dice have no possible scoring
-              dice. Your round score becomes 0, and the game automatically
-              switches to the next player.
+              dice. Your unbanked points are lost, and the game automatically
+              switches to the next player after a short pause. Your banked total
+              stays safe.
             </p>
           </section>
 
@@ -215,8 +217,9 @@ export function RulesModal({ onClose }: RulesModalProps) {
               Hot Dice
             </h3>
             <p>
-              If all dice are held because they all scored, all six dice are
-              rolled again and your round score stays active.
+              If every remaining die scores, you can bank your points or choose
+              Hold &amp; Reroll to roll all six dice again. Your round score stays
+              active and at risk until you bank it.
             </p>
           </section>
         </div>

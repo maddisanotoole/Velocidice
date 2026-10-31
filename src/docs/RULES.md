@@ -6,13 +6,15 @@ VelociDice uses Farkle-style scoring. On your turn, select dice that contribute 
 
 Score points by selecting scoring dice and banking them before you Farkle. The first player to reach the target score wins.
 
+Choose a Single game, Best of 3 (first to two game wins), or First to 6 match. First to 6 continues until one player wins six games, so it can last eleven games.
+
 ## How A Turn Works
 
 1. Roll the dice.
 2. Select dice that score points.
 3. Choose one of two actions:
    - Hold and reroll to add the selected score to your round score and roll the remaining dice.
-   - Bank and end turn to add your round score to your total score.
+   - Bank and end turn to add your round score and selected score to your total score.
 4. If you roll and have no possible scoring dice, you Farkle.
 5. If you Farkle, your unbanked round score is lost and your turn ends.
 
@@ -27,7 +29,8 @@ Score points by selecting scoring dice and banking them before you Farkle. The f
 - Hold and Reroll: Adds the selected dice to your round score, then rolls the remaining active dice.
 - Bank and End Turn: Adds your round score and selected score to your total, then passes the turn.
 - Rules: Opens the scoring guide.
-- End Game / New Game: Resets the game.
+- Hold for Menu: Hold to return to the menu and discard the current game progress.
+- Next Game / New Game: Starts the next game in a match or a new match after completion.
 
 ## Selecting Dice
 
@@ -52,18 +55,18 @@ Example Farkle rolls:
 
 When you Farkle:
 
-- Your round score becomes 0.
+- Your unbanked points are lost.
 - Your banked total score does not change.
-- The only available action is to end the turn.
+- Turn actions are disabled during a short pause, then the game automatically switches to the next player.
 
 ## Hot Dice
 
-If all dice are held because they all scored, you get to roll all six dice again. Your round score stays active, so you can keep building points, but those points are still at risk until you bank them.
+If every remaining die scores, you can bank your points or choose Hold and Reroll to roll all six dice again. Your round score stays active, so you can keep building points, but those points are still at risk until you bank them.
 
 Example:
 
 1. You select 1, 2, 3, 4, 5, 6 for 1,500 points.
-2. All dice scored, so all six dice are rolled again.
+2. You choose Hold and Reroll, so all six dice are rolled again.
 3. Your round score remains 1,500.
 4. If the next roll Farkles, that 1,500 is lost.
 
@@ -84,7 +87,7 @@ Example:
 - Ending the turn banks the round score into the current player's total.
 - If a roll has no possible scoring dice, the player Farkles.
 - After a Farkle, all unbanked round points are lost.
-- After a Farkle, the only available action is to end the turn.
+- After a Farkle, turn actions are disabled and the game automatically switches to the next player after a short pause.
 - If all dice are held, all six dice are rerolled and the current round score is kept.
 - First player to the target score wins.
 
