@@ -5,6 +5,7 @@ import { GITHUB_REPOSITORY_URL } from "../../appConstants";
 import { playSound } from "../../game/sound";
 import { cx, theme } from "../../theme/classes";
 import type { GameMode, MatchLength } from "../../types";
+import { MATCH_FORMAT_LABELS } from "../../game/match";
 
 type StartMenuProps = {
   themeSaveFailed: boolean;
@@ -76,7 +77,7 @@ export function StartMenu({
           </div>
           <div className="mt-4 text-center">
             <p id="menu-config-summary" className={cx("text-sm", theme.text.muted)}>
-              {gameMode === "computer" ? "Vs computer" : "Local 2-player"} &middot; {targetScore.toLocaleString()} points &middot; {matchLength === 1 ? "Single game" : `Best of ${matchLength}`}
+              {gameMode === "computer" ? "Vs computer" : "Local 2-player"} &middot; {targetScore.toLocaleString()} points &middot; {MATCH_FORMAT_LABELS[matchLength]}
             </p>
             <button ref={configButton} type="button" aria-haspopup="dialog" aria-describedby="menu-config-summary" onClick={() => setIsConfigOpen(true)} className="min-h-11 rounded-lg px-4 py-2 font-bold underline underline-offset-4">Change game settings</button>
           </div>

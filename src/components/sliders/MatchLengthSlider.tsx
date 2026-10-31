@@ -2,16 +2,11 @@ import { MATCH_LENGTH_OPTIONS } from "../../appConstants";
 import { playSound } from "../../game/sound";
 import { cx, theme } from "../../theme/classes";
 import type { MatchLength } from "../../types";
+import { MATCH_FORMAT_LABELS } from "../../game/match";
 
 type MatchLengthSliderProps = {
   matchLength: MatchLength;
   onMatchLengthChange: (matchLength: MatchLength) => void;
-};
-
-const matchLengthLabels: Record<MatchLength, string> = {
-  1: "Single",
-  3: "Best of 3",
-  10: "Best of 10",
 };
 
 export function MatchLengthSlider({
@@ -44,7 +39,7 @@ export function MatchLengthSlider({
                 : theme.option.unselected,
             )}
           >
-            {matchLengthLabels[option]}
+            {MATCH_FORMAT_LABELS[option]}
           </button>
         ))}
       </div>

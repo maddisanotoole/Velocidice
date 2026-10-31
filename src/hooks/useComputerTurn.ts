@@ -133,6 +133,11 @@ export function useComputerTurn({
         ...bankDecision.details,
       });
 
+      if (bankableScore >= computerPointsToWin) {
+        bankOrSelectExtraDice(bankDecision.message, bankDecision.details);
+        return;
+      }
+
       if (remainingDice === 0) {
         logDebug("[Computer] Decision: hot dice, hold and reroll all dice");
         holdDice();

@@ -5,17 +5,12 @@ import {
   type PlayerScores,
 } from "../../types";
 import { Board } from "./Board";
+import { MATCH_FORMAT_LABELS } from "../../game/match";
 
 type MatchBoardProps = {
   matchLength: MatchLength;
   matchScore: PlayerScores;
   playerLabels: PlayerLabels;
-};
-
-const matchLengthLabels: Record<MatchLength, string> = {
-  1: "Single Game",
-  3: "Best of 3",
-  10: "Best of 10",
 };
 
 export function MatchBoard({
@@ -30,7 +25,7 @@ export function MatchBoard({
           Match
         </span>
         <span className="text-sm font-black text-[var(--ink)]">
-          {matchLengthLabels[matchLength]}
+          {MATCH_FORMAT_LABELS[matchLength]}
         </span>
       </div>
       <div className="flex flex-wrap items-baseline justify-center gap-3 sm:gap-4">
